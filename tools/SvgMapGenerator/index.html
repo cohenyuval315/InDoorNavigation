@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Downloadable SVG Map</title>
+  <style>
+    /* Add your custom styles here */
+    svg {
+      background-color: #f0f0f0;
+    }
+
+    polygon {
+      fill: #4caf50; /* Fill color */
+    }
+    #page_wrapper{
+      border: 1px solid lightgray;
+      display: flex;
+    }
+    #map_wrapper{
+      justify-self: center;
+      border: 1px solid black;
+      width: fit-content;
+    }
+    #map_config_wrapper{
+      display: flex;
+      flex:1;
+      padding: 10px;
+      max-width: 200px;
+      border: 1px solid lightblue;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the SVG Map Generator</h1>
+  <button id="downloadButton">Download SVG Map</button>
+  <br/>
+  <br/>
+
+
+  <br/>
+  <br/>
+  <div id="page_wrapper">
+    <div id="map_config_wrapper">
+      Config:
+      <div id="map_config"></div>
+    </div>
+    <div id="map_wrapper"></div>
+  </div>
+
+  <script src="./functions.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+services:
+  frontend:
+    container_name: front
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    
+    networks:
+      - front-net
+    volumes:
+      - ./frontend:./app/frontend
+
+
+  backend:
+    container_name: back
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      
+    networks:
+      - front-net
+      - back-net
+
+    volumes:
+      - ./frontend:./app/frontend
+
+  mongo:
+    image: mongo
+    networks:
+      - back-net
+
+
+
+networks:
+  front-net:
+    driver: bridge
+  back-net:
+    driver: bridge
+  
