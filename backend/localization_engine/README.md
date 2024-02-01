@@ -1,1 +1,0 @@
-pip install /path/to/wheelfile.whl
