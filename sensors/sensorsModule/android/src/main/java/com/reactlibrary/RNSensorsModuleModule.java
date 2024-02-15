@@ -19,4 +19,9 @@ public class RNSensorsModuleModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNSensorsModule";
   }
+
+  @ReactMethod
+  public String getSensorData() {
+      return "getSesnsorData";
+  }
 }

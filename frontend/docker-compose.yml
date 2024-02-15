@@ -1,0 +1,6 @@
+services:
+  frontend:
+    container_name: indoor-client
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
