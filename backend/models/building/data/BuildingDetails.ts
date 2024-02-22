@@ -14,16 +14,16 @@ const buildingDetailsSchema = new Schema({
     },    
     description:{
         type:String,
-        require:true
+        require:false
     }, 
     buildingType:{
         type:String,
         enum:Object.values(BuildingType),
-        require:true
+        require:false
     },
     address: {
         type:addressSchema,
-        require:true
+        require:false
     },
     owner:{
         type:String,
@@ -60,7 +60,7 @@ const buildingDetailsSchema = new Schema({
 
 
 }, { 
-    // _id:false,
+    _id:false,
     timestamps: true,
     autoCreate: false,
 });

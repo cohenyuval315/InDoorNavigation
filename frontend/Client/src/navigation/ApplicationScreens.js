@@ -3,12 +3,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MainScreen from '../screens/MainScreen';
 import GoogleMapsScreen from '../screens/GoogleMapsScreen';
 import DataCollectorScreen from '../screens/DataCollectorScreen';
+import BuildingsPickerScreen from '../screens/BuildingsPickerScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import GlobalMapScreen from '../screens/GoogleMapsScreen';
 
 export const ApplicationScreens = {
     BUILDING:{
         id:"BUILDING",
         options:{
-            title: 'build',
+            title: 'buildings',
             tabBarLabelStyle: { 
 
             },
@@ -17,12 +20,12 @@ export const ApplicationScreens = {
             return <Ionicons name={"star-outline"} size={size} color={color} />;
             }
         },
-        component:MainScreen
+        component:BuildingsPickerScreen
     },
-    GOOGLE_MAPS:{
-        id:"GOOGLE_MAPS",
+    settings:{
+        id:"Settings",
         options:{
-            title: 'map',
+            title: 'settings',
             tabBarLabelStyle: { 
 
             },
@@ -31,7 +34,7 @@ export const ApplicationScreens = {
             return <Ionicons name={"star-outline"} size={size} color={color} />;
             }
         },
-        component:GoogleMapsScreen
+        component:SettingsScreen
     },
     DataCollector:{
         id:"DataCollector",

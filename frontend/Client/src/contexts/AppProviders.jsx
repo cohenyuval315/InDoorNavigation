@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
-import {ThemeProvider} from "./ThemeProvider";
-
+import { AppDataProvider } from "./AppDataContext";
+import {ThemeProvider} from "./ThemeContext";
 
 const AppProviders = ({children}) => {
     return (
         <ThemeProvider>
-            {children}
+            <AppDataProvider>
+                {children}
+            </AppDataProvider>
         </ThemeProvider>
     )
 }

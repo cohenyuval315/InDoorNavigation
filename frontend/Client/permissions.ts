@@ -46,7 +46,7 @@ const requestAndroidPermissions = async () => {
           PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
           PermissionsAndroid.PERMISSIONS.BODY_SENSORS_BACKGROUND,
           PermissionsAndroid.PERMISSIONS.BODY_SENSORS,
-          PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES // Permission for Wi-Fi (if needed)
+          PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES,
       ]);
       for (const permission in granted) {
           if (granted[permission] !== PermissionsAndroid.RESULTS.GRANTED) {

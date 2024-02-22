@@ -6,7 +6,7 @@ import {ApplicationScreens} from './ApplicationScreens';
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
-import { useTheme } from '../contexts/ThemeProvider';
+import { useTheme } from '../contexts/ThemeContext';
 
 const screenOptions = {
   tabBarScrollEnabled: true, 

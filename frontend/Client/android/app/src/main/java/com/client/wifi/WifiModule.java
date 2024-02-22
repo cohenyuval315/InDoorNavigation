@@ -65,4 +65,26 @@ public class WifiModule extends ReactContextBaseJavaModule {
         // }
     }
 
+    // @ReactMethod
+    // public void loadWifiList(final Promise promise) {
+    //     try {
+    //         // wifi.onScanResultsAvailable()
+    //         final List<ScanResult> scanResults = wifi.getScanResults();
+    //         final WritableArray results = mapWifiScanResults(scanResults);
+    //         promise.resolve(results);
+    //     } catch (final Exception exception) {
+    //         promise.reject(exception.getMessage());
+    //     }
+    // }
+
+    // public lockWifi(){
+    //     this.wifi.acquire();
+    //     this.wifi.isHeld();
+    //     this.wifi.release();
+    //     // this.wifi.finalize();
+    // }
+
+
+
+
 }

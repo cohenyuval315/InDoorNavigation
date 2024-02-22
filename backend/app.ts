@@ -1,29 +1,40 @@
 
-import express from 'express';
+import express from "express";
+import cors from 'cors';
+import morgan from "morgan";
+
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from  'swagger-jsdoc';
-import userRouter from './routes/auth';
-import authRouter from './routes/user';
-import adminRouter from './routes/admin';
-import morgan from 'morgan';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import authRouter from './routes/auth-routes';
+import userRouter from './routes/user-routes';
+import adminRouter from './routes/admin-routes';
+// import morgan from 'morgan';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+// import fs from 'fs';
 import mongoose from 'mongoose';
-import { configDotenv } from 'dotenv';
+
 import http from 'http';
-import socketIo from 'socket.io';
+// import socketIo from 'socket.io';
 import {WebSocketServer} from 'ws';
-
-configDotenv({
-  path:'./.env',
-  encoding: 'utf-8', 
-  debug: true, 
-  override: false
-});
+import {errorHandler} from './middlewares/error-handler';
+import { ErrorHandlingMiddlewareFunction } from "mongoose";
+import bodyParser from "body-parser";
+// import { initAWSConfigurations } from "./config/aws-config";
+import { initConfig } from "./config/config";
 
 
-const app = express();
+
+
+initConfig();
+// initAWSConfigurations();
+
+export const app = express();
+
+app.use(bodyParser.json())
+app.use(morgan('dev'));
+
+app.use(cors()); 
 const server = http.createServer(app);
 // const io = socketIo(server);
 const wss = new WebSocketServer({
@@ -34,29 +45,33 @@ const wss = new WebSocketServer({
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 /**  Logs */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const logsDirectory = path.join(__dirname, 'logs');
-if (!fs.existsSync(logsDirectory)) {
-    fs.mkdirSync(logsDirectory);
-}
-const accessLogStream = fs.createWriteStream(path.join(logsDirectory, 'access.log'), { flags: 'a' });
-const lastRunLogStream = fs.createWriteStream(path.join(logsDirectory, 'last_run.log'), { flags: 'w' });
-app.use(morgan('combined', 
-  { 
-    stream: accessLogStream 
-  }
-));
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+// const logsDirectory = path.join(__dirname, 'logs');
+// if (!fs.existsSync(logsDirectory)) {
+//     fs.mkdirSync(logsDirectory);
+// }
+// const accessLogStream = fs.createWriteStream(path.join(logsDirectory, 'access.log'), { flags: 'a' });
+// const lastRunLogStream = fs.createWriteStream(path.join(logsDirectory, 'last_run.log'), { flags: 'w' });
+// app.use(morgan('combined', 
+//   { 
+//     stream: accessLogStream 
+//   }
+// ));
 
 
 /**  Mongo */
 
-mongoose.connect(process.env.MONGODB_URI);
-mongoose.connection.on('error', (err) => {
-  console.error(err);
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
-  process.exit();
-});
+if (process.env.MONGODB_URI){
+    mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connection.on('error', (err) => {
+      console.error(err);
+      console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
+      process.exit();
+    });   
+}else{
+    console.error("fail to connect mongo")
+}
 
 
 
@@ -69,7 +84,7 @@ const swaggerOptions = {
       description: 'Sample API with Swagger',
     },
   },
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.ts'],
   encoding: 'utf-8',
   failOnErrors: false,
   verbose: false,
@@ -87,10 +102,13 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
+app.get('/', (req, res) => {
+  res.send('Hello World from Express!');
+});
 
 app.use('/',userRouter);
-app.use('/auth/',authRouter);
-app.use('/admin/',adminRouter);
+app.use('/auth',authRouter);
+app.use('/admin',adminRouter);
 
 
 
@@ -104,8 +122,12 @@ wss.on('connection', (ws) => {
   ws.send('Hello from server!');
 });
 
+app.use(errorHandler)
 
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const appServer = server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
+
+export default appServer;
+

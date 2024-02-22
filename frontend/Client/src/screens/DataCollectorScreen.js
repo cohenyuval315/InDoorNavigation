@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 
-import { Text, TextInput, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import {NativeModules} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-const {SensorsModule} = NativeModules;
+const {WifiModule,AndroidSensorAccelerometer} = NativeModules;
+
 const CustomTextInput = ({initialValue,onChangeText}) => {
     const [value,setValue] = useState(initialValue ? initialValue : '');
     const handleTextOnChange = (value) => {
@@ -76,12 +77,13 @@ const TestComp = () => {
     const url = '';
     const wsurl = '';
     const as = async () => {
-        SensorsModule.test((val)=>{
-            console.log(val)
-        });
-        const sy = SensorsModule.testSync()
-        console.log(SensorsModule);
-        setMessage(sy);
+        // console.log(NativeModules)
+        // SensorsModule.test((val)=>{
+        //     console.log(val)
+        // });
+        // const sy = SensorsModule.testSync()
+        // console.log(SensorsModule);
+        // setMessage(sy);
     }
     useEffect(()=>{
         as();
@@ -121,6 +123,38 @@ const TestComp = () => {
     )
 }
 
+const WifiTest = () => {
+    const [wifiNetworks,setWifiNetworks] = useState();
+    const onWifiPress = async () => {
+        // console.log(AndroidSensorAccelerometer)
+        // console.log()
+        // console.log(NativeModules)
+        await load()
+        
+    }
+    
+    const load = async () => {
+        const data = WifiModule.loadWifiList();
+        const data2 = WifiModule.reScanAndLoadWifiList();
+        console.log(data)
+        console.log(data2)
+        
+    }
+    return (
+        <View>
+            <Text>
+                wifi:
+            </Text>
+            <TouchableOpacity onPress={onWifiPress}>
+                <Text>
+                    click me
+                </Text>
+            </TouchableOpacity>
+        </View>
+    )
+
+}
+
 /** admin only , create route and data */
 const DataCollectorScreen = () => {
     const [route,setRoute] = useState();
@@ -131,7 +165,79 @@ const DataCollectorScreen = () => {
                 yes
             </Text>
             <CustomTextInput />
+            <WifiTest/>
         </View>
     )
 }
+
+const RealDataCollector = () => {
+    return (
+        <View>
+            {/**
+             * Route / Location
+             * Route =>
+             * 
+             */}
+        </View>
+    )
+}
+
+
+const RouteDataCollector = () => {
+    return (
+        <View>
+            {/**
+             * Route
+             * Manual/Interval
+             * Inital x 
+             * Inital y
+             * end x
+             * end y
+             * 
+             * Inital Device Orientation
+             * User Heading
+             * User Movement Type
+             * Device Movement Type
+             * 
+             * Checkpoint
+             * Sensors Data
+             *  
+             * Manual:
+             * 
+             * Interval:
+             * Interval Position Increment x
+             * Interval Position Increment y
+             * TimeLength
+             *
+             * 
+             */}
+        </View>
+    )
+}
+
+
+
+const LocationDataCollector = () => {
+    return (
+        <View>
+            {/**
+             * Location
+             * Map X
+             * Map Y
+             * Map Floor
+             * GPS longitude
+             * GPS langitude
+             * Device Orientation
+             * User Heading
+             *
+             *
+             * Button Collect
+             * Data Log List
+             * Send all + Sensors Data
+             */}
+        </View>
+    )
+}
+
+
 export default DataCollectorScreen;

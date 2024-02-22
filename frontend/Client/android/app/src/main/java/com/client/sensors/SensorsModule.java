@@ -19,7 +19,6 @@ public class SensorsModule extends ReactContextBaseJavaModule {
     public SensorsModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        
     }
 
     @Override
@@ -35,6 +34,7 @@ public class SensorsModule extends ReactContextBaseJavaModule {
     public String testSync() {
         return "test_string_sync";
     }
+
 
 
     @ReactMethod

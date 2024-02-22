@@ -4,7 +4,7 @@ import { Schema, model } from 'mongoose';
 import userDestinationSchema  from './user/UserDestination';
 import userSettingSchema from './user/UserSetting';
 
-const userSchema = new Schema({
+const userDataSchema = new Schema({
   email: { type: String, unique: true },
   password: String,
   passwordResetToken: String,
@@ -26,7 +26,7 @@ const userSchema = new Schema({
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', async function save(next) {
+userDataSchema.pre('save', async function save(next) {
   const user = this;
   if (!user.isModified('password')) { return next(); }
 
@@ -44,7 +44,7 @@ userSchema.pre('save', async function save(next) {
 /**
  * Helper method for validating user's password.
  */
-userSchema.methods.comparePassword = async function comparePassword(candidatePassword:string, cb:any) {
+userDataSchema.methods.comparePassword = async function comparePassword(candidatePassword:string, cb:any) {
   try {
     cb(null, await verify(candidatePassword, this.password));
   } catch (err:any) {
@@ -55,7 +55,7 @@ userSchema.methods.comparePassword = async function comparePassword(candidatePas
 /**
  * Helper method for getting user's gravatar.
  */
-userSchema.methods.gravatar = function gravatar(size:number) {
+userDataSchema.methods.gravatar = function gravatar(size:number) {
   if (!size) {
     size = 200;
   }
@@ -66,5 +66,5 @@ userSchema.methods.gravatar = function gravatar(size:number) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
-const User = model('User', userSchema);
-export default User;
+const UserData = model('User', userDataSchema);
+export default UserData;

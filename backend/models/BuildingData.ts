@@ -4,7 +4,7 @@ import buildingDetailsSchema from './building/data/BuildingDetails';
 import entranceSchema from './building/data/Entrance';
 import { BuildingStatus } from '../constants/constants';
 
-const buildingDataSchema = new Schema({
+const buildingDataSchema = new Schema({    
     status: {
         type: String, 
         enum: Object.values(BuildingStatus),
@@ -24,10 +24,6 @@ const buildingDataSchema = new Schema({
             },
             message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
         }    
-    },
-    doorGeoCoordinate:{
-        type: geoCoordinateSchema,
-        require:true
     },
     entrances:{
         type:[entranceSchema],

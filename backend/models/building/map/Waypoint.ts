@@ -8,10 +8,7 @@ const waypointSchema = new Schema({
     type:String,
     require:true
    },
-   weight:{
-    type:Number,
-    require:true,
-   },
+
    pathType:{
     type:String,
     enum:Object.values(WaypointPathType),
