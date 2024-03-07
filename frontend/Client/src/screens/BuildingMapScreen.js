@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import { useEffect, useState,useRef } from "react";
 import client from "../services/api-client";
 import { View,ScrollView, Text } from "react-native";

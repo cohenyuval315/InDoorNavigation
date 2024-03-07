@@ -64,9 +64,25 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 if (process.env.MONGODB_URI){
     mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connection.on('connected', () => {
+      console.log('MongoDB connected successfully');
+    });  
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+    });      
+    process.on('SIGINT',async () => {
+      try {
+        await mongoose.connection.close();
+        console.log('MongoDB connection closed due to application termination');
+        process.exit(0);
+    } catch (error) {
+        console.error('Error closing MongoDB connection:', error);
+        process.exit(1); 
+    }
+    });    
     mongoose.connection.on('error', (err) => {
       console.error(err);
-      console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
+      console.log('%s MongoDB connection error. Please make sure MongoDB is running.', err);
       process.exit();
     });   
 }else{

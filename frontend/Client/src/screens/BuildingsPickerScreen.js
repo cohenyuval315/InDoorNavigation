@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import { FlatList, Text, View } from "react-native"
 import { useAppData } from "../contexts/AppDataContext"
 import BuildingCard from "../components/building/BuildingCard";

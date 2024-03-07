@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { AppDataProvider } from "./AppDataContext";
 import {ThemeProvider} from "./ThemeContext";
 

@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 const afekaBuildingData = {
     id:'324324324343',

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Linking,Platform } from "react-native";
 
 export const openMap = async (address, city, zipCode) => {

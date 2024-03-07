@@ -30,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new SensorsModule());
           packages.add(new SensorsPackage());
           packages.add(new WifiPackage());
+          packages.add(new SamsungHealthPackage(BuildConfig.APPLICATION_ID));
           return packages;
         }
 

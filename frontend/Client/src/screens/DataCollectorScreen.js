@@ -1,6 +1,4 @@
-/* eslint-disable prettier/prettier */
-
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import {NativeModules} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
@@ -89,7 +87,7 @@ const TestComp = () => {
         as();
     },[])
     
-    const [message,setMessage] = useState('s');
+    const [message,setMessage] = useState('');
     const [messages,setMessages] = useState([]);
     return (
         <View>
@@ -123,6 +121,43 @@ const TestComp = () => {
     )
 }
 
+
+const SensorsTest = () => {
+    
+    const [data,setData] = useState([]);
+    useEffect(() => {
+        
+    },[])
+
+    const onPress = () => {
+        console.log(AndroidSensorAccelerometer)
+        AndroidSensorAccelerometer.addListener((event)=>{
+            setData(event);
+        })
+
+    }
+
+    return (
+        <View>
+            <Text>
+            sensors:
+            </Text>
+            <TouchableOpacity onPress={onPress} style={{
+                backgroundColor:'red',
+                padding:10,
+            }}>
+                <Text>
+                    click me
+                </Text>
+            </TouchableOpacity>
+            <Text>
+                {JSON.stringify(data, null, 2)}
+            </Text>
+
+        </View>
+    )
+}   
+
 const WifiTest = () => {
     const [wifiNetworks,setWifiNetworks] = useState();
     const onWifiPress = async () => {
@@ -134,22 +169,32 @@ const WifiTest = () => {
     }
     
     const load = async () => {
-        const data = WifiModule.loadWifiList();
-        const data2 = WifiModule.reScanAndLoadWifiList();
-        console.log(data)
-        console.log(data2)
+        const data = await WifiModule.loadWifiList();
+        const data2 = await WifiModule.reScanAndLoadWifiList();
+        setWifiNetworks(data)
+        //console.log(data2)
         
     }
     return (
-        <View>
+        <View style={{
+            marginTop:100
+        }}>
             <Text>
                 wifi:
             </Text>
-            <TouchableOpacity onPress={onWifiPress}>
+            <TouchableOpacity onPress={onWifiPress} style={{
+                backgroundColor:'blue',
+                padding:10,
+            }}>
                 <Text>
                     click me
                 </Text>
             </TouchableOpacity>
+            <ScrollView>
+                <Text>
+                    {JSON.stringify(wifiNetworks, null, 2)}
+                </Text>
+            </ScrollView>
         </View>
     )
 
@@ -159,13 +204,15 @@ const WifiTest = () => {
 const DataCollectorScreen = () => {
     const [route,setRoute] = useState();
     return (
-        <View>
+        <View style={{
+            flex:1,
+        }}>
+       
             <TestComp/>
-            <Text>
-                yes
-            </Text>
             <CustomTextInput />
+            <SensorsTest/>
             <WifiTest/>
+            
         </View>
     )
 }

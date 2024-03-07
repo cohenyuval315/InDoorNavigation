@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 class ApiClient{
     constructor(){
         this.host = '10.0.0.9'
@@ -7,7 +6,7 @@ class ApiClient{
     }
     
     async getBuildings(){
-        console.log('request buildings data');
+        console.debug('request buildings data');
         const path = '/buildings';
         const response = await fetch(this.base_url + path,{
             method:'GET',

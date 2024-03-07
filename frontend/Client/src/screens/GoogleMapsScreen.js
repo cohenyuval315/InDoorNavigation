@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Text, View,Linking,Platform, TouchableOpacity } from "react-native";
 import { WebView } from 'react-native-webview';
 

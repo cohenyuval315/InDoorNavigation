@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React,{useContext, useEffect, useState} from "react";
 import client from "../services/api-client";
 
@@ -63,9 +62,11 @@ export const AppDataProvider = ({ children }) => {
 
     useEffect(()=>{
         client.getBuildings().then((buildings)=>{
+            console.log(buildings)
+
             setBuildings(buildings);
         })
-        setBuildings([afekaBuildingData]);
+        //setBuildings([afekaBuildingData]);
     },[])
     return (
       <AppDataContext.Provider

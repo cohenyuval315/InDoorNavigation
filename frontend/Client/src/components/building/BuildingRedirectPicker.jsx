@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View,Platform,StyleSheet } from "react-native"
 import { isMapServiceAvailable, openMap } from "../../services/map";
