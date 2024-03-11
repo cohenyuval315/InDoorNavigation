@@ -12,6 +12,7 @@ import java.util.List;
 import com.client.sensors.SensorsPackage;
 import com.client.wifi.WifiPackage;
 // import com.client.SensorsModule;
+import com.client.samsunghealth.SamsungHealthPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
