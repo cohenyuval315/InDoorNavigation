@@ -1,7 +1,7 @@
 import { FlatList, Text, View } from "react-native"
 import { useAppData } from "../contexts/AppDataContext"
 import BuildingCard from "../components/building/BuildingCard";
-import { hideGlobalModal, showGlobalModal } from "../layouts/globalmodal/GlobalModal";
+import { hideGlobalModal, showGlobalModal } from "../layouts/global-modal/GlobalModal";
 import { generateUUID } from "../../utils";
 import BuildingRedirectPicker from "../components/building/BuildingRedirectPicker";
 import { openMap } from "../services/map";

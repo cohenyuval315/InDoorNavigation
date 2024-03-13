@@ -111,6 +111,18 @@ public class ConnectionListener implements
 
         if (error.hasResolution()) {
           switch(error.getErrorCode()) {
+            case HealthConnectionErrorResult.CONNECTION_FAILURE:
+                message = "connection failure";
+                break;    
+            case HealthConnectionErrorResult.PLATFORM_SIGNATURE_FAILURE:
+                message = "signiture failure";
+                break;   
+            case HealthConnectionErrorResult.TIMEOUT:
+                message = "timeout";
+                break;                                                 
+            case HealthConnectionErrorResult.OLD_VERSION_SDK:
+                message = "SDK outdated";
+                break;            
             case HealthConnectionErrorResult.PLATFORM_NOT_INSTALLED:
                 message = "Please install Samsung Health";
                 break;
@@ -123,6 +135,12 @@ public class ConnectionListener implements
             case HealthConnectionErrorResult.USER_AGREEMENT_NEEDED:
                 message = "Please agree with Samsung Health policy";
                 break;
+            case HealthConnectionErrorResult.UNKNOWN:
+                message = "Unknown Error";
+                break;     
+            case HealthConnectionErrorResult.USER_PASSWORD_NEEDED:
+                message = "User Password Needed";
+                break;                              
             default:
                 message = "Please make Samsung Health available";
                 break;

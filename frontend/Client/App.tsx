@@ -13,7 +13,7 @@ import React from 'react';
 
 import AppProviders from './src/contexts/AppProviders';
 import { AppContainer } from './src/navigation/AppContainer';
-import GlobalModal from './src/layouts/globalmodal/GlobalModal';
+import GlobalModal from './src/layouts/global-modal/GlobalModal';
 
 
 function App(): JSX.Element {

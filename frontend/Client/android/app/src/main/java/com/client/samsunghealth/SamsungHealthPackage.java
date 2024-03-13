@@ -16,7 +16,7 @@ import java.util.List;
 import com.client.samsunghealth.SamsungHealthModule;
 
 /**
- * Created by firodj on 5/2/17.
+ 
  */
 
 public class SamsungHealthPackage implements ReactPackage {

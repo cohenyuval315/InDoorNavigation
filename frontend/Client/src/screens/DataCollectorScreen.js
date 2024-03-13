@@ -2,7 +2,7 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-nativ
 import { useEffect, useState } from "react";
 import {NativeModules} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-const {WifiModule,AndroidSensorAccelerometer} = NativeModules;
+const {WifiModule,AndroidSensorAccelerometer,RNSamsungHealth} = NativeModules;
 
 const CustomTextInput = ({initialValue,onChangeText}) => {
     const [value,setValue] = useState(initialValue ? initialValue : '');
@@ -158,6 +158,71 @@ const SensorsTest = () => {
     )
 }   
 
+const SamsungHealthTest = () => {
+    const [data,setData] = useState();
+
+    const load = async () => {
+        try{
+            // const auth = await RNSamsungHealth.authorize();
+            console.log(RNSamsungHealth)
+            console.log(Object.keys(RNSamsungHealth))
+            const cons = RNSamsungHealth.getConstants()
+            console.log(cons)
+            RNSamsungHealth.connect(
+                [RNSamsungHealth.STEP_COUNT],
+            (err)=>{
+                console.log("error:")
+                console.log(err);
+            },
+            (success) => {
+                console.log("success:")
+                console.log(success);
+            })
+
+            RNSamsungHealth.readStepCount(
+                Date.now(),
+                Date.now(),
+            (err)=>{
+                console.log("error:")
+                console.log(err);
+            },
+            (success) => {
+                console.log("success:")
+                console.log(success);
+            })
+        }catch(error){
+            console.log(error);
+        }
+
+        // setData(data)
+        //console.log(data2)
+        
+    }
+    return (
+        <View style={{
+            marginTop:100
+        }}>
+            <Text>
+                samsungHealth:
+            </Text>
+            <TouchableOpacity onPress={load} style={{
+                backgroundColor:'lightgreen',
+                padding:10,
+            }}>
+                <Text>
+                    click me
+                </Text>
+            </TouchableOpacity>
+            <ScrollView>
+                <Text>
+                    {JSON.stringify(data, null, 2)}
+                </Text>
+            </ScrollView>
+        </View>
+    )
+
+}
+
 const WifiTest = () => {
     const [wifiNetworks,setWifiNetworks] = useState();
     const onWifiPress = async () => {
@@ -212,6 +277,7 @@ const DataCollectorScreen = () => {
             <CustomTextInput />
             <SensorsTest/>
             <WifiTest/>
+            <SamsungHealthTest/>
             
         </View>
     )
