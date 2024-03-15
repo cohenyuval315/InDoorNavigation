@@ -5,6 +5,10 @@ class ApiClient{
         this.base_url = `http://${this.host}:${this.port}`
     }
     
+    async _request(){
+
+    }
+
     async getBuildings(){
         console.debug('request buildings data');
         const path = '/buildings';
@@ -34,6 +38,24 @@ class ApiClient{
             return results;
         }
     }
+
+    async getSystemConfigurations(data){
+        const path = "/system";
+        const response = await fetch(this.base_url + path,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body:{
+                data:data
+            }
+        });
+        if(response.ok){
+            const results = await response.json();
+            return results;
+        }
+    }
+    
 }
 const client = new ApiClient();
-export default client
+export default client;

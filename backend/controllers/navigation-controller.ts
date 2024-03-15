@@ -39,6 +39,8 @@ export const getUserLocation  = async (req:Request,res:Response,next:NextFunctio
   
 }
 
+
+
   // if (!validator.isString(name) || validator.isEmpty(name)) {
   //   return res.status(400).json({ error: 'Name must be a non-empty string' });
   // }

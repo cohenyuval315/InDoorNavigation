@@ -77,3 +77,5 @@ export const deleteAllBuildingsMapsData = async () => {
     const response = await BuildingMapData.deleteMany();
     return response.deletedCount;
 }
+
+

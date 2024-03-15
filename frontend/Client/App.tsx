@@ -14,7 +14,8 @@ import React from 'react';
 import AppProviders from './src/contexts/AppProviders';
 import { AppContainer } from './src/navigation/AppContainer';
 import GlobalModal from './src/layouts/global-modal/GlobalModal';
-
+import { Provider } from 'react-redux';
+import store from './src/app/store';
 
 function App(): JSX.Element {
   // const isDarkMode = useColorScheme() === 'dark';
@@ -23,11 +24,16 @@ function App(): JSX.Element {
   //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   // };
 
+  
   return (
+    
     <AppProviders>
-      <AppContainer />
-      <GlobalModal /> 
+      <Provider store={store}>
+        <AppContainer />
+        <GlobalModal /> 
+      </Provider>
     </AppProviders>
+    
   );
 }
 
