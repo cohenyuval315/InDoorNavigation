@@ -1,6 +1,6 @@
-import { createAsyncThunk } from "@reduxjs/toolkit"
-import client from './../../services/api-client';
-import Status from './../status';
+import { createAsyncThunk,createSlice } from "@reduxjs/toolkit"
+import client from '../../services/api-client';
+import Status from '../status';
 
 const getUserData = createAsyncThunk(
   'user/data',

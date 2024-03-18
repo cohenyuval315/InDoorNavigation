@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View,Platform,StyleSheet } from "react-native"
-import { isMapServiceAvailable, openMap } from "../../services/map";
+import { isMapServiceAvailable, openMap } from "../../services/map-service-provider";
 import Geolocation from '@react-native-community/geolocation';
 
 const recheckTimeLength = 30;

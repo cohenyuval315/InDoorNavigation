@@ -62,6 +62,10 @@
       </activity>
       <meta-data
           android:name="com.samsung.android.health.permission.read"
-          android:value="com.samsung.health.weight;com.samsung.health.step_count;com.samsung.shealth.step_daily_trend;com.samsung.health.height;com.samsung.health.blood_pressure;com.samsung.health.heart_rate;com.samsung.health.sleep;com.samsung.health.body_temperature;" />      
+          android:value="com.samsung.health.weight;com.samsung.health.step_count;com.samsung.shealth.step_daily_trend;com.samsung.health.height;com.samsung.health.blood_pressure;com.samsung.health.heart_rate;com.samsung.health.sleep;com.samsung.health.body_temperature;" 
+          />      
+      <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="Your Google maps API Key Here"/>          
     </application>
 </manifest>

@@ -1,59 +1,77 @@
-/* eslint-disable prettier/prettier */
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-// import {
-//   StyleSheet,
-// } from 'react-native';
-
-import AppProviders from './src/contexts/AppProviders';
-import { AppContainer } from './src/navigation/AppContainer';
-import GlobalModal from './src/layouts/global-modal/GlobalModal';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import store from './src/app/store';
+import RootStackScreen from './src/screens/RootStackScreen';
+import { requestPermissions } from './permissions';
+
+import RNExitApp from 'react-native-exit-app';
+import { requestContractStatus,acceptContract } from './contract';
+import ContractComponent from './src/components/contract/ContractComponent';
+import { BottomSheetProvider } from '@gorhom/bottom-sheet/lib/typescript/contexts';
 
 function App(): JSX.Element {
-  // const isDarkMode = useColorScheme() === 'dark';
+  const [loadingPermissions, setLoadingPermissions] = useState(true);
+  const [loadingContract, setLoadingContract] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [hasAcceptedContract, setHasAcceptedContract] = useState(false);
 
-  // const backgroundStyle = {
-  //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  // };
+  useEffect(() => {
 
+    const checkPermissionStatus = async () => {
+      setLoadingPermissions(true);
+      try {
+        const permissionStatus = await requestPermissions(); // Your custom function
+        setHasPermission(permissionStatus);
+        if (!permissionStatus){
+          RNExitApp.exitApp();
+        }
+      } catch (error) {
+        console.error('Error checking permission status:', error);
+      }finally{
+        setLoadingPermissions(false);
+      }
+      
+    };
+
+    checkPermissionStatus();
+  }, []);
   
+  useEffect(() => {
+    const checkContractStatus = async () => {
+      setLoadingContract(true);
+      try {
+        const contractStatus = await requestContractStatus();
+        setHasAcceptedContract(contractStatus === 'true'); // Convert stored value to boolean
+      } catch (error) {
+        console.error('Error checking Contract status:', error);
+      } finally {
+        setLoadingContract(false);
+      }
+      
+    };
+
+    checkContractStatus();
+  }, []);
+
+  if(loadingContract || loadingPermissions){
+    return <></>;
+  }
+
+  if (!hasAcceptedContract) {
+    return <ContractComponent 
+      onAccept={async ()=>{
+        await acceptContract();
+      }} 
+      onDeny={()=>{
+        RNExitApp.exitApp();
+      }}
+      />;
+  }
+
   return (
-    
-    <AppProviders>
-      <Provider store={store}>
-        <AppContainer />
-        <GlobalModal /> 
-      </Provider>
-    </AppProviders>
-    
+    <Provider store={store}>
+        <RootStackScreen />
+    </Provider>
   );
 }
-
-// const styles = StyleSheet.create({
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-// });
-
 export default App;

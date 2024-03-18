@@ -1,2 +1,2 @@
-import BuildingMapScreen from "./BuildingMapScreen";
+import BuildingMapScreen from "./BuildingMapScreen2";
 export default BuildingMapScreen;

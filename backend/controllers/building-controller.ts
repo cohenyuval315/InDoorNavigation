@@ -17,18 +17,47 @@ const afekaBuildingData = {
         address:'Mivtsa Kadesh St 38',
         city:'Tel Aviv-Yafo',
         zipCode:6998812,
-        openingHours:`
-            Sunday	    9 am - 9 pm
-            Monday	    9 am - 9 pm
-            Tuesday	    9 am - 9 pm
-            Wednesday	9 am - 9 pm
-            Thursday	9 am - 9 pm
-            Friday	    9 am - 1 pm
-            Saturday	Closed
-        `,
+        openingHours:{
+            "Sunday": { open: 9, close: 21 },
+            "Monday": { open: 9, close: 21 },
+            "Tuesday": { open: 9, close: 21 },
+            "Wednesday": { open: 9, close: 21 },
+            "Thursday": { open: 9, close: 21 },
+            "Friday": { open: 9, close: 13 },
+            "Saturday": { open: null, close: null } // Closed all day
+        },
+        // `
+        //     Sunday	    9 am - 9 pm
+        //     Monday	    9 am - 9 pm
+        //     Tuesday	    9 am - 9 pm
+        //     Wednesday	9 am - 9 pm
+        //     Thursday	9 am - 9 pm
+        //     Friday	    9 am - 1 pm
+        //     Saturday	Closed
+        // `,
+        
         websiteLink:`https://www.afeka.ac.il/`,
         phonenumbers:`03-768-8600`,
-        buildingOpeningDate: new Date('1996-01-01')
+        buildingOpeningDate: new Date('1996-01-01'),
+        accessibility:{
+            elevator:true,
+            parking:true,
+            wheelchairAccessibleParking:true,
+            wheelchairAccessibleToilet:true,
+            wheelchairAccessibleEntrance:true
+        },
+        activities:{
+            toilets:true,
+            freeWifi:true,
+            restaurants:false,
+            delis:true,
+            convenienceStores:false,
+            smokingArea:true
+        }
+    },
+    globalCoordinates:{
+        latitude:32.113912134046394,
+        longitude:34.81804756153953
     },
     geoArea:[
         {

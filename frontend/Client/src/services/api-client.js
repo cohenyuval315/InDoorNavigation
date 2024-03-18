@@ -21,7 +21,7 @@ class ApiClient{
         });
         if(response.ok){
             const results = await response.json();
-            return results.data;
+            return results;
         }
     }
     async getBuildingMap(buildingId){

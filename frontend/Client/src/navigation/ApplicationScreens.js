@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MainScreen from '../screens/MainScreen';
-import GoogleMapsScreen from '../screens/GoogleMapsScreen';
+import GoogleMapsScreen from '../screens/global-map-screen/GlobalMapScreen';
 import DataCollectorScreen from '../screens/DataCollectorScreen';
 import BuildingsPickerScreen from '../screens/BuildingsPickerScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import GlobalMapScreen from '../screens/GoogleMapsScreen';
+import SettingsScreen from '../screens/settings/SettingsScreen';
+import GlobalMapScreen from '../screens/global-map-screen/GlobalMapScreen';
 
 export const ApplicationScreens = {
     BUILDING:{
