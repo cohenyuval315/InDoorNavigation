@@ -1,0 +1,35 @@
+/* Coolors Exported Palette - https://coolors.co/080819-ee6055-ee4266-a7a7b7-dfdfe1 */
+
+- Tailwind
+
+{ 'rich_black': { DEFAULT: '#080819', 100: '#010105', 200: '#030309', 300: '#04040e', 400: '#060613', 500: '#080819', 600: '#1e1e60', 700: '#3535a9', 800: '#6d6dd1', 900: '#b6b6e8' }, 'bittersweet': { DEFAULT: '#ee6055', 100: '#3a0906', 200: '#75130c', 300: '#af1c11', 400: '#e82719', 500: '#ee6055', 600: '#f17e76', 700: '#f59e98', 800: '#f8beba', 900: '#fcdfdd' }, 'red_(crayola)': { DEFAULT: '#ee4266', 100: '#380510', 200: '#700a20', 300: '#a81031', 400: '#e01541', 500: '#ee4266', 600: '#f16a87', 700: '#f58fa5', 800: '#f8b4c3', 900: '#fcdae1' }, 'cool_gray': { DEFAULT: '#a7a7b7', 100: '#202027', 200: '#3f3f4d', 300: '#5f5f74', 400: '#818198', 500: '#a7a7b7', 600: '#b9b9c6', 700: '#cbcbd4', 800: '#dcdce3', 900: '#eeeef1' }, 'platinum': { DEFAULT: '#dfdfe1', 100: '#2c2c2e', 200: '#57575c', 300: '#83838a', 400: '#b1b1b6', 500: '#dfdfe1', 600: '#e6e6e7', 700: '#ececed', 800: '#f2f2f3', 900: '#f9f9f9' } }
+
+- CSV
+
+080819,ee6055,ee4266,a7a7b7,dfdfe1
+
+- With #
+
+#080819, #ee6055, #ee4266, #a7a7b7, #dfdfe1
+
+- Array
+
+["080819","ee6055","ee4266","a7a7b7","dfdfe1"]
+
+- Object
+
+{"Rich black":"080819","Bittersweet":"ee6055","Red (Crayola)":"ee4266","Cool gray":"a7a7b7","Platinum":"dfdfe1"}
+
+- Extended Array
+
+[{"name":"Rich black","hex":"080819","rgb":[8,8,25],"cmyk":[68,68,0,90],"hsb":[240,68,10],"hsl":[240,52,6],"lab":[3,3,-9]},{"name":"Bittersweet","hex":"ee6055","rgb":[238,96,85],"cmyk":[0,60,64,7],"hsb":[4,64,93],"hsl":[4,82,63],"lab":[59,54,35]},{"name":"Red (Crayola)","hex":"ee4266","rgb":[238,66,102],"cmyk":[0,72,57,7],"hsb":[347,72,93],"hsl":[347,83,60],"lab":[55,67,19]},{"name":"Cool gray","hex":"a7a7b7","rgb":[167,167,183],"cmyk":[9,9,0,28],"hsb":[240,9,72],"hsl":[240,10,69],"lab":[69,3,-8]},{"name":"Platinum","hex":"dfdfe1","rgb":[223,223,225],"cmyk":[1,1,0,12],"hsb":[240,1,88],"hsl":[240,3,88],"lab":[89,0,-1]}]
+
+- XML
+
+<palette>
+  <color name="Rich black" hex="080819" r="8" g="8" b="25" />
+  <color name="Bittersweet" hex="ee6055" r="238" g="96" b="85" />
+  <color name="Red (Crayola)" hex="ee4266" r="238" g="66" b="102" />
+  <color name="Cool gray" hex="a7a7b7" r="167" g="167" b="183" />
+  <color name="Platinum" hex="dfdfe1" r="223" g="223" b="225" />
+</palette>

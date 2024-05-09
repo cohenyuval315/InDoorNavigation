@@ -1,18 +1,21 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import client from '../../services/api-client';
+import client from '../../services/server/api-client';
 import Status from '../status';
+import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
+import { getIsraelPointByGlobalCoordinates } from "../../static-maps/israel";
+import { prepareBuildingsData } from "../../utils/building-data";
 
 
 export const fetchBuildings = createAsyncThunk(
-  'map/fetchBuildings', 
+  'buildings/fetchBuildings', 
   async (state, thunkAPI) => {
     const response = await client.getBuildings();
-    console.log(response.data)
     return response.data
     
   },
 )
+
 
 const buildingsAdapter = createEntityAdapter({
   selectId: building => building.id, // Assuming each building has an 'id' property
@@ -35,12 +38,14 @@ const buildingsSlice = createSlice({
           state.error = null;
         })
         .addCase(fetchBuildings.fulfilled, (state, action) => {
-          buildingsAdapter.setAll(state,action.payload);
+          // buildingsAdapter.setAll(state,action.payload); make it one item 
+          state.entities = prepareBuildingsData(action.payload)
           state.status = Status.SUCCEEDED;
         })
         .addCase(fetchBuildings.rejected, (state, action) => {
           state.status = Status.FAILED;
           state.error = action.payload.error;
+          state.entities = null;
         })       
     }
 
@@ -48,7 +53,6 @@ const buildingsSlice = createSlice({
 
 
   export const selectBuilding = state => state.buildings;
-
   export const selectBuildingsStatus = state => state.buildings.status;
   export const selectBuildingsError = state => state.buildings.error;
   
@@ -57,7 +61,6 @@ const buildingsSlice = createSlice({
 
   // export const selectAllBuildings = buildingsAdapter.getSelectors((state) => state.buildings);
   export const selectAllBuildings = state => state.buildings.entities;
-
   // export const selectBuildingById = (state, buildingId) =>
   // buildingsAdapter.getSelectors().selectById(state.buildings, buildingId);
 

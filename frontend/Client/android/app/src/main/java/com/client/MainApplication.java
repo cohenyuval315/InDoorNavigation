@@ -11,8 +11,9 @@ import com.facebook.soloader.SoLoader;
 import java.util.List;
 import com.client.sensors.SensorsPackage;
 import com.client.wifi.WifiPackage;
-// import com.client.SensorsModule;
+import com.client.navigation.NavigationPackage;
 import com.client.samsunghealth.SamsungHealthPackage;
+import com.client.sensors.RNSensorsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -29,8 +30,10 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new SensorsModule());
+          packages.add(new RNSensorsPackage());
           packages.add(new SensorsPackage());
           packages.add(new WifiPackage());
+          packages.add(new NavigationPackage());
           packages.add(new SamsungHealthPackage(BuildConfig.APPLICATION_ID));
           return packages;
         }

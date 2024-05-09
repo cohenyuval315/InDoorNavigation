@@ -1,5 +1,5 @@
 import { createAsyncThunk,createSlice } from "@reduxjs/toolkit"
-import client from './../../services/api-client';
+import client from '../../services/server/api-client';
 import Status from './../status';
 import { useSelector } from "react-redux";
 
@@ -109,6 +109,9 @@ const userOrientationSlice = createSlice({
     reducer:{
       addSensorData(state,action){
         state.sensorsData
+      },
+      setInitialPosition(state,action){
+        state.userState.position = action.payload;
       }
     },
     extraReducers: (builder) => {
@@ -143,8 +146,8 @@ const userOrientationSlice = createSlice({
         })          
     }
   })
-
-
-
+export const selectPositionStatus = state => state.userOrientation;
+export const selectPosition  = state => state.userOrientation;
+export const { setInitialPosition } = userOrientationSlice.actions;
 
 export default userOrientationSlice.reducer;

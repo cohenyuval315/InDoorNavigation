@@ -658,6 +658,9 @@ export default class ImageViewer extends React.Component<ImageZoomProps, ImageZo
         {
           translateY: this.animatedPositionY,
         },
+        { 
+          rotate: this.props.rotation ? this.props.rotation.interpolate({ inputRange: [0, 360], outputRange: ['0deg', '360deg'] }) : "0rad"
+        },
       ],
     };
 

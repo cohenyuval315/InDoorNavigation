@@ -1,0 +1,35 @@
+/* Coolors Exported Palette - https://coolors.co/080819-0b0b3a-313178-a7a7b7-dfdfe1 */
+
+- Tailwind
+
+{ 'rich_black': { DEFAULT: '#080819', 100: '#010105', 200: '#030309', 300: '#04040e', 400: '#060613', 500: '#080819', 600: '#1e1e60', 700: '#3535a9', 800: '#6d6dd1', 900: '#b6b6e8' }, 'penn_blue': { DEFAULT: '#0b0b3a', 100: '#02020c', 200: '#050518', 300: '#070724', 400: '#090930', 500: '#0b0b3a', 600: '#191986', 700: '#2727cf', 800: '#6c6ce3', 900: '#b5b5f1' }, 'delft_blue': { DEFAULT: '#313178', 100: '#0a0a18', 200: '#141430', 300: '#1d1d48', 400: '#272760', 500: '#313178', 600: '#4545a8', 700: '#6d6dc4', 800: '#9e9ed7', 900: '#ceceeb' }, 'cool_gray': { DEFAULT: '#a7a7b7', 100: '#202027', 200: '#3f3f4d', 300: '#5f5f74', 400: '#818198', 500: '#a7a7b7', 600: '#b9b9c6', 700: '#cbcbd4', 800: '#dcdce3', 900: '#eeeef1' }, 'platinum': { DEFAULT: '#dfdfe1', 100: '#2c2c2e', 200: '#57575c', 300: '#83838a', 400: '#b1b1b6', 500: '#dfdfe1', 600: '#e6e6e7', 700: '#ececed', 800: '#f2f2f3', 900: '#f9f9f9' } }
+
+- CSV
+
+080819,0b0b3a,313178,a7a7b7,dfdfe1
+
+- With #
+
+#080819, #0b0b3a, #313178, #a7a7b7, #dfdfe1
+
+- Array
+
+["080819","0b0b3a","313178","a7a7b7","dfdfe1"]
+
+- Object
+
+{"Rich black":"080819","Penn Blue":"0b0b3a","Delft Blue":"313178","Cool gray":"a7a7b7","Platinum":"dfdfe1"}
+
+- Extended Array
+
+[{"name":"Rich black","hex":"080819","rgb":[8,8,25],"cmyk":[68,68,0,90],"hsb":[240,68,10],"hsl":[240,52,6],"lab":[3,3,-9]},{"name":"Penn Blue","hex":"0b0b3a","rgb":[11,11,58],"cmyk":[81,81,0,77],"hsb":[240,81,23],"hsl":[240,68,14],"lab":[6,17,-30]},{"name":"Delft Blue","hex":"313178","rgb":[49,49,120],"cmyk":[59,59,0,53],"hsb":[240,59,47],"hsl":[240,42,33],"lab":[24,22,-41]},{"name":"Cool gray","hex":"a7a7b7","rgb":[167,167,183],"cmyk":[9,9,0,28],"hsb":[240,9,72],"hsl":[240,10,69],"lab":[69,3,-8]},{"name":"Platinum","hex":"dfdfe1","rgb":[223,223,225],"cmyk":[1,1,0,12],"hsb":[240,1,88],"hsl":[240,3,88],"lab":[89,0,-1]}]
+
+- XML
+
+<palette>
+  <color name="Rich black" hex="080819" r="8" g="8" b="25" />
+  <color name="Penn Blue" hex="0b0b3a" r="11" g="11" b="58" />
+  <color name="Delft Blue" hex="313178" r="49" g="49" b="120" />
+  <color name="Cool gray" hex="a7a7b7" r="167" g="167" b="183" />
+  <color name="Platinum" hex="dfdfe1" r="223" g="223" b="225" />
+</palette>

@@ -103,3 +103,23 @@ export enum MovementType{
     SPRINT = "sprint",
     FREE = "free",
 }
+
+export enum DeviceOrientationType{
+    FACE_UP = "Face Up",
+    FACE_UP_TILTED_TOWARDS = "Face Up Tilted Towards Viewer",
+    FACE_UP_TILTED_TOWARDS_TILTED_RIGHT = "Face Up Tilted Towards Viewer Tilted Right",
+    FACE_UP_TILTED_TOWARDS_TILTED_LEFT = "Face Up Tilted Towards Viewer Tilted Left",
+    FACE_UP_TILTED_AWAY = "Face Up Tilted Away from Viewer",
+    FACE_UP_TILTED_AWAY_TILTED_RIGHT = "Face Up Tilted Away from Viewer Tilted Right",
+    FACE_UP_TILTED_AWAY_TILTED_LEFT = "Face Up Tilted Away from Viewer Tilted Left",
+    FACE_LEFT = "Face Left",
+    FACE_LEFT_TILTED_UP = "Face Left Tilted Up",
+    FACE_LEFT_TILTED_DOWN = "Face Left Tilted Down",
+    FACE_RIGHT = "Face Right",
+    FACE_RIGHT_TILTED_UP = "Face Right Tilted Up",
+    FACE_RIGHT_TILTED_DOWN = "Face Right Tilted Down",
+    FACE_DOWN = "Face Down",
+    FACE_DOWN_TILTED_LEFT = "Face Down Tilted Left",
+    FACE_DOWN_TILTED_RIGHT = "Face Down Tilted Right"  
+}
+
