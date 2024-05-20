@@ -9,26 +9,36 @@ const BuildingPOIPoint = ({POI,rotationRef,onPOIPress}) => {
     const centerY = POI.center.y;
     const iconPositionX = centerX - iconSize / 2; 
     const iconPositionY = centerY - iconSize / 2;   
+    let rotationValue = 0;
 
-    const [animatedRotation] = useState(new Animated.Value(rotationRef.current._value));
+    if (rotationRef && rotationRef.current){
+        rotationValue = rotationRef.current._value
+    }
+    
+    const [animatedRotation] = useState(new Animated.Value(rotationValue));
 
     useEffect(() => {
-    const subscription = rotationRef.current.addListener((value) => {
-        Animated.timing(animatedRotation, {
-        toValue: -value.value,
-        duration: 100, // Adjust duration as needed
-        easing: Easing.linear,
-        useNativeDriver: true,
-        }).start();
-        
-    });
-    return () => rotationRef.current.removeListener(subscription);
+        if (rotationRef && rotationRef.current){
+            const subscription = rotationRef.current.addListener((value) => {
+                Animated.timing(animatedRotation, {
+                toValue: -value.value,
+                duration: 100, // Adjust duration as needed
+                easing: Easing.linear,
+                useNativeDriver: true,
+                }).start();
+                
+            });
+            return () => rotationRef.current.removeListener(subscription);
+        }
+
     }, [rotationRef]); 
 
     const rotate = animatedRotation.interpolate({
         inputRange: [0, 360],
         outputRange: ['0deg', '360deg'],
-    });      
+    });    
+    
+    
     return (
         <Animated.View style={{
             position:"absolute",

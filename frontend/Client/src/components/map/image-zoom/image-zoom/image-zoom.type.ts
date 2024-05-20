@@ -26,8 +26,11 @@ export class ImageZoomProps {
   /**
    * 操作区域宽度
    */
+  
   public cropWidth: number = 100;
-  public rotation: number = 0;
+  public rotation?: number = 0;
+  public wrapperStyles?: object = {};
+  public imageStyles?: object = {}
 
   /**
    * 操作区域高度

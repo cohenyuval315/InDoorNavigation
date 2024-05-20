@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { CardinalDirection, Direction } from "../../../constants/constants";
-import { Animated } from "react-native";
+import { Animated, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BuildingDropDown from "../components/building-dropdown";
 import UnsureSwitch from "../components/unsure-switch";
 import TestSwitch from "../components/test-switch";
 import AdminBuildingMap from "../components/building-map/AdminBuildingMap";
 import { generateUUID } from "../../../utils/uuid";
+import RouteOverlay from "./components/route-overlay";
+import RouteBuilder from "./components/route-builder";
+import PositionOverlay from "../components/position-overlay";
+import ActiveRouteOverlay from "./components/active-route-overlay";
 
 const directionAngles = {
     [Direction.DOWN]: 180,
@@ -36,7 +40,7 @@ const DataRouteCollectionScreen = () => {
     const [isTest,setIsTest] = useState(false);
     const [isUnsure,setIsUnsure] = useState(false);
 
-    const [floorsOpacities,setFloorOpacities] = useState([0,1])
+    const [floorsOpacities,setFloorOpacities] = useState([1,1])
 
     /** TIMER */
     const [timeLength, setTimeLength] = useState(3);
@@ -61,7 +65,7 @@ const DataRouteCollectionScreen = () => {
     
 
 
-    const [route,setRoute] = useState();
+    const [route,setRoute] = useState([]);
     const [pathType,setPathType] = useState();
     
     const [isManual,setIsManual] = useState();
@@ -171,22 +175,81 @@ const DataRouteCollectionScreen = () => {
     }
     const routeOverlay = useMemo(() => {
         return (
-            <PathOverlay /> 
+            <RouteOverlay points={[]} /> 
         )
     }, []);   
+    const onRouteChange = (value) => {
+        setRoute(value)
+    }
+    const onStartPress = () => {
+        if (route.length <= 1) {
+            return;
+        }
+    
+
+    }
+
+    const userPosition = () => {
+        return (
+            <>
+            </>
+        )
+    }
+    
+    const activeRoute = useMemo(() => {
+        return (
+            <ActiveRouteOverlay 
+                route={route}
+            />
+        )
+    },[route])
 
     return (
         <View style={{
             flex:1,
 
         }}>
-            <ScrollView>
+            <ScrollView style={{
+                width:"100%",
+                height:"100%"
+            }}>
                 <BuildingDropDown val={buildingID} onChange={handleBuildingChange} />
                 <TestSwitch value={isTest} onChange={onIsTestChange}/>
                 <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
+                <RouteBuilder route={route} onChange={onRouteChange} />
+
+
                 <AdminBuildingMap floorsOpacities={floorsOpacities}>
-                    {routeOverlay}
+                    {userPosition}
+                    {activeRoute}
                 </AdminBuildingMap>
+                <TouchableOpacity style={{
+                    padding:20,
+                    backgroundColor:"lightblue"
+                }}>
+                    <Text style={{
+                        color:"black",
+                        textAlign:'center'
+                    }}>
+                        Start
+                    </Text>
+                </TouchableOpacity>
+                <View style={{
+                    padding:10,
+                }}>
+                    <TouchableOpacity style={{
+                        padding:20,
+                        backgroundColor:"lightblue"
+                    }}>
+                        <Text style={{
+                            color:"black",
+                            textAlign:'center'
+                        }}>
+                            record checkpoint
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                
             </ScrollView>
         </View>
     )

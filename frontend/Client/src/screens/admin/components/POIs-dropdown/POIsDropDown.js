@@ -8,7 +8,7 @@ const POIsDropDown = ({val,onChange}) => {
     const [open,setOpen] = useState(false);
     const POIsItems = POIs.map((item) => {
         return {
-            label:item.details.title,
+            label:`${item.details.title} (floor ${item.floor})`,
             value:item.id
         }
     })
@@ -19,6 +19,7 @@ const POIsDropDown = ({val,onChange}) => {
     const [value,setValue] = useState(val);
 
     const handleSetValue = (value) => {
+        console.log(value)
         onChange(value);
         setValue(value)
     }

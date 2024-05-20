@@ -18,6 +18,7 @@ const useGPS = (windowSize=-1,
     const [isListening,setIsListening] = useState(false);
     const [isWorking,setIsWorking] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [loadingLocationServicesStatu,setLoadingLocationServicesStatus] = useState(true)
 
     const dataRef = useRef([]);
     const lastPositionRef = useRef(null);

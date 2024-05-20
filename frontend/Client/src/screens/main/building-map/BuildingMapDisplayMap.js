@@ -3,15 +3,16 @@ import BuildingMapButtonsOverlay from "./components/buttons-overlay/BuildingMapB
 import BuildingMapWidgetsOverlay from "./components/widgets-overlay/BuildingMapWidgetsOverlay";
 import { useEffect, useRef, useState } from "react";
 import BuildingMap from "../components/BuildingMap";
-import { selectNumberOfFloors } from "../../../app/map/map-slice";
+import { selectMinFloor, selectNumberOfFloors } from "../../../app/map/map-slice";
 import { selectActivePOI } from "../../../app/active/active-slice";
 import { useSelector } from "react-redux";
 import BuildingMapUserPositionOverlay from "./components/user-position-overlay/BuildingMapUserPositionOverlay";
+import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../utils/scaling";
 
 const BuildingMapDisplayMap = () => {
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const initialOpacitiesValues = Array.from({ length: numberOfFloors }, (_, index) => index === 0 ? new Animated.Value(1) : new Animated.Value(0))
-
+    const minFloor = useSelector(selectMinFloor);
     const containerRef = useRef(null);
     const rotationRef = useRef(new Animated.Value(0)); 
     const opacitiesRef = useRef(initialOpacitiesValues);

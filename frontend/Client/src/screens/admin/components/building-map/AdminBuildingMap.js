@@ -11,8 +11,9 @@ import BuildingMapFloorPOIsOverlay from "../../../main/building-map/components/P
 const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
     const maps = useSelector(selectMap);
     const minFloor = useSelector(selectMinFloor);
+    const numOfFloors = useSelector(selectNumberOfFloors);
     const containerRef = useRef(null);
-    const initialOpacitiesValues = Array.from({ length: floorsOpacities }, (opacity, index) => new Animated.Value(opacity));
+    const initialOpacitiesValues = floorsOpacities.map((opacity, index) => new Animated.Value(opacity));
     const opacitiesRef = useRef(initialOpacitiesValues);
   
 
@@ -32,7 +33,8 @@ const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
         setOpacities(floorsOpacities)
     },[floorsOpacities])
 
-    console.log('full render')
+    console.log('full render',opacitiesRef.current)
+    console.log('full render',floorsOpacities)
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
@@ -47,26 +49,33 @@ const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
             enableCenterFocus
             {...imageProps}                  
         >
-            {Array.from({ length: floorsOpacities }, (_, index) => (
-                <Animated.View 
-                    key={`map_svg_${index}`} 
-                    style={[{ 
-                        opacity: opacitiesRef.current[index],
-                        zIndex: Math.round(opacitiesRef.current[index]._value) + 1,
-                    },styles.floorMapContainer]} 
-                    >
-                        <BuildingMapSVG
-                            data={maps[index]}
-                            width={WINDOW_WIDTH}
-                            height={WINDOW_HEIGHT}
-                        />
-                        <BuildingMapFloorPOIsOverlay 
-                            floorIndex={maps[index].floor}
-                            onPOIPress={() => {}}
-                        />
-                </Animated.View>
-            ))}    
-            {children}
+            <View style={{
+                position:"relative"
+            }}>
+                {Array.from({ length: numOfFloors }, (_, index) => (
+                    <Animated.View 
+                        key={`map_svg_${index}`} 
+                        style={[{ 
+                            opacity: opacitiesRef.current[index],
+                            zIndex: Math.round(opacitiesRef.current[index]._value) + 1,
+                        },styles.floorMapContainer]} 
+                        >
+                            <BuildingMapSVG
+                                data={maps[index]}
+                                width={WINDOW_WIDTH}
+                                height={WINDOW_HEIGHT}
+                            />
+                            <BuildingMapFloorPOIsOverlay 
+                                floorIndex={maps[index].floor}
+                                rotationRef={null}
+                                onPOIPress={() => {}}
+                            />
+                    </Animated.View>
+                ))}  
+                {children}
+            </View>
+  
+            
         </ImageZoom>                        
     )
 }

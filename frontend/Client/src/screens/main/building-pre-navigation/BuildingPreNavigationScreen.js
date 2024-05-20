@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Animated, Modal, StyleSheet, Text, View } from "react-native";
+import { Animated, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import { selectActivePath } from "../../../app/active/active-slice";
 import { selectNumberOfFloors } from "../../../app/map/map-slice";
@@ -163,13 +163,49 @@ const BuildingPreNavigationScreen = (props) => {
         props.navigation.navigate('error-message',{error:data.error})
         return;
         
+        
     }
 
+    const onContinuePress = () => {
+        props.navigation.navigate('building-navigation')
+    }
+
+    const onCancelPress = () => {
+        props.navigation.goBack();
+    }
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
-                hello
-            </Text>
+            <View style={{
+                backgroundColor:'lightgray',
+                flexDirection:'row',
+            }}>
+                <TouchableOpacity style={{
+                    flex:1,
+                    flexDirection:'row',
+                    justifyContent:'center',
+                    borderColor:'black',
+                    borderWidth:1,
+                    padding:20,
+                    backgroundColor:'pink'
+                }}>
+                    <Text style={styles.text}>
+                        Path1:
+                    </Text>  
+                </TouchableOpacity>
+                <TouchableOpacity style={{
+                    flex:1,
+                    flexDirection:'row',
+                    justifyContent:'center',
+                    borderColor:'black',
+                    borderWidth:1,
+                    padding:20,                    
+                }}>
+                    <Text style={styles.text}>
+                        Path2:
+                    </Text>  
+                </TouchableOpacity>
+              
+            </View>
             <BuildingMap
                 centerOn={centerOn}
                 containerRef={containerRef}
@@ -179,10 +215,91 @@ const BuildingPreNavigationScreen = (props) => {
             >
                 <PathesRoutes/>
             </BuildingMap>
-            <View>
-                <Text style={styles.text}>
-                    he
-                </Text>
+            <View style={{
+                backgroundColor:"lightblue"
+            }}>
+                <View style={{
+                    flexDirection:'row',
+                    justifyContent:'space-between',
+                    padding:10,
+                }}>
+                    <View style={{
+                        flex:1,
+                        flexDirection:'row',
+                        justifyContent:'center',
+                    }}>
+                        <Text style={{
+                            fontSize:16,
+                            color:'black',
+                            fontWeight:'bold',
+                        }}>
+                            Time Length: 
+                        </Text>
+                        <Text style={{
+                            fontSize:16,
+                            color:'black',
+                            fontWeight:'bold',
+                        }}>
+                            30min
+                        </Text>
+                    </View>
+                    <View style={{
+                        flex:1,
+                        flexDirection:'row',
+                        justifyContent:'center',
+                    }}>
+                        <Text style={{
+                            fontSize:16,
+                            color:'black',
+                            fontWeight:'bold',
+                        }}>
+                            Distance:
+                        </Text>     
+                        <Text style={{
+                            fontSize:16,
+                            color:'black',
+                            fontWeight:'bold',
+                        }}>
+                            100m
+                        </Text>                                   
+                    </View>
+
+                </View>
+
+                <View style={{
+                    flexDirection:'row',
+                    justifyContent:"center"
+                }}>
+                    <TouchableOpacity style={{
+                        padding:10,
+                        paddingHorizontal:20,
+                        backgroundColor:"lightgray",
+                        borderRadius:30,
+                        margin:20,
+                    }} onPress={onCancelPress}>
+                        <Text style={{
+                            color:"black",
+                            textAlign:'center'
+                        }}>
+                            cancel
+                        </Text>
+                    </TouchableOpacity>                     
+                    <TouchableOpacity onPress={onContinuePress} style={{
+                        padding:10,
+                        paddingHorizontal:20,
+                        backgroundColor:"lightgreen",
+                        borderRadius:30,
+                        margin:20,
+                    }}>
+                        <Text style={{
+                            color:"black",
+                            textAlign:'center'
+                        }}>
+                            Continue
+                        </Text>
+                    </TouchableOpacity>
+  
+                </View>            
             </View>
         </View>
     )

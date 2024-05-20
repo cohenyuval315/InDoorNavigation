@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Animated, LayoutChangeEvent, PanResponder, StyleSheet, View } from 'react-native';
+import { Animated, LayoutChangeEvent, PanResponder, StyleSheet, Text, View } from 'react-native';
 import styles from './image-zoom.style';
 import { ICenterOn, ImageZoomProps, ImageZoomState } from './image-zoom.type';
 
@@ -647,7 +647,9 @@ export default class ImageViewer extends React.Component<ImageZoomProps, ImageZo
   }
 
   public render(): React.ReactNode {
+    
     const animateConf = {
+      ...this.props.wrapperStyles,
       transform: [
         {
           scale: this.animatedScale,
@@ -672,7 +674,7 @@ export default class ImageViewer extends React.Component<ImageZoomProps, ImageZo
       parentStyles.height = this.props.cropHeight
     }
     const imageStyles:any = {
-      // flex:1,
+      ...this.props.imageStyles
     }
     if (this.props.imageHeight !== null){
       imageStyles.height = this.props.imageHeight
@@ -689,13 +691,16 @@ export default class ImageViewer extends React.Component<ImageZoomProps, ImageZo
         }}
         {...this.imagePanResponder.panHandlers}
       >
-        <Animated.View style={animateConf} renderToHardwareTextureAndroid={this.props.useHardwareTextureAndroid}>
+        <Animated.View 
+            style={animateConf} 
+            renderToHardwareTextureAndroid={this.props.useHardwareTextureAndroid}>
           <View
             onLayout={this.handleLayout.bind(this)}
             style={imageStyles}
           >
-            {this.props.children}
+            {this.props.children}        
           </View>
+
         </Animated.View>
       </View>
     );
