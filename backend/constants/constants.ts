@@ -27,7 +27,10 @@ export enum BuildingType {
 export enum WaypointPathType{
     ENTRANCE = "entrance",
     INTERSECT = "intersect",
-    CORNER = "corner"
+    CORNER = "corner",
+    EDGE_ALIGN_CORNER = "edge_align_corner",
+    EDGE_ALIGN_INTERSECT = "edge_align_intersect",
+    ONE_WAY = "one_way"
 }
 export enum SegmentPathType{ 
     TRAIL = "trail",
@@ -47,7 +50,9 @@ export enum WaypointFacilityType{
     EMERGENCY_EXIT = "emergency_exit",
     FIRST_AID_ROOM = "first_aid_room",
     POI = "poi",
+    RAMP = "ramp",
     NONE = "none",
+    DOOR = "door"
 }
 
 export enum POIType{
@@ -56,6 +61,21 @@ export enum POIType{
     PATIENT_ROOM = "patient_room",
     DOCTOR_ROOM = "doctor_room",
     YARD = "yard",
+    BATHROOM = "bathroom",
+    LAB = "lab",
+    ROOM = "ROOM",
+    ELEVATOR = "elevator",
+    STAIRS = "stairs",
+    ESCALATORS = "escalators",
+    ROOM_ENTRANCE = "room_entrance",
+    BUILDING_ENTRANCE = "building_entrance",
+    EXIT = "exit",
+    EMERGENCY_EXIT = "emergency_exit",    
+    INFORMATION_DESK = "information_desk",
+    UNKNOWN = "unknown",
+    VENDING_MACHINE = "vending_machine",
+    SMOKING_AREA = "smoking_area",
+    CAFETERIA ="cafeteria",
 }
 
 export enum AccessibilityType{

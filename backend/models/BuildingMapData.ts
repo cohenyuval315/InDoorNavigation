@@ -6,10 +6,12 @@ const buildingMapDataSchema = new Schema({
         type: Schema.Types.ObjectId, 
         require:true
     },
+
     mapImageStorageKey:{
         type: String, 
         require:true
     },
+    
     POIs:{
         type: [POISchema], 
         require:true,

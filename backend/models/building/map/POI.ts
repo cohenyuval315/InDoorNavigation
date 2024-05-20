@@ -28,7 +28,7 @@ const POISchema = new Schema({
         default:false,
         require:false
     },
-    POIDetails:{
+    details:{
         type:POIDetailsSchema,
         require:true
     }

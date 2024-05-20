@@ -119,6 +119,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.get('/', (req, res) => {
+  // res.sendStatus(200)
   res.send('Hello World from Express!');
 });
 
