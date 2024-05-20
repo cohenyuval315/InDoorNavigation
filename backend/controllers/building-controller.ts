@@ -105,7 +105,7 @@ const afekaBuildingCardinalDirections = {
 const nodes =[ 
     {
         id:"node_main_entrance",
-        title:"",
+        title:"node_main_entrance",
         pathType:WaypointPathType.INTERSECT,
         facilityType:WaypointFacilityType.BUILDING_ENTRANCE,
         POIId:null,
@@ -1153,8 +1153,8 @@ const nodes =[
             Direction.LEFT,
         ],
         mapCoordinates:{
-            x:372,
-            y:604,
+            x:366,
+            y:570,
             floor:0
         }
     },  
@@ -1352,6 +1352,915 @@ const nodes =[
             floor:-0.5
         }
     }, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+        id:"node_infront_stairs_right_room",
+        title:"node_infront_stairs_right_room",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:1018,
+            y:257,
+            floor:-1
+        }
+    }, 
+
+
+    {
+        id:"node_infront_stairs_right_room",
+        title:"node_infront_stairs_right_room",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:1018,
+            y:257,
+            floor:-1
+        }
+    }, 
+
+    {
+        id:"node_stairs_right_floor_-1",
+        title:"node_stairs_right_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.STAIRS,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:991,
+            y:334,
+            floor:-1
+        }
+    }, 
+
+
+
+    {
+        id:"node_outside_stairs_right_floor_-1",
+        title:"node_outside_stairs_right_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.STAIRS,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.RIGHT,
+            Direction.UP_RIGHT,
+            Direction.DOWN_RIGHT,
+            Direction.DOWN_LEFT,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:249,
+            floor:-1
+        }
+    }, 
+
+
+    {
+        
+        id:"node_edge_align_outside_innovation_and_entrepreneurship_center",
+        title:"node_edge_align_outside_innovation_and_entrepreneurship_center",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.UP_LEFT,
+            Direction.UP_RIGHT,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:755,
+            floor:-1
+        }
+    }, 
+
+
+    
+
+    {
+        
+        id:"node_innovation_and_entrepreneurship_center",
+        title:"node_innovation_and_entrepreneurship_center",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:777,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_edge_align_yard_intersect_center",
+        title:"node_edge_align_yard_intersect_center",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.RIGHT,
+            Direction.UP_RIGHT,
+            Direction.LEFT,
+            Direction.UP_LEFT
+        ],
+        mapCoordinates:{
+            x:460,
+            y:777,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_yard_smoking_area",
+        title:"node_yard_smoking_area",
+        pathType:WaypointPathType.INTERSECT,
+        facilityType:WaypointFacilityType.POI,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.UP_RIGHT,
+            Direction.UP_LEFT,
+
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN_RIGHT,
+            Direction.DOWN_LEFT,
+
+        ],
+        mapCoordinates:{
+            x:460,
+            y:944,
+            floor:-1
+        }
+    }, 
+    {
+        
+        id:"node_edge_align_bottom_corner",
+        title:"node_edge_align_bottom_corner",
+        pathType:WaypointPathType.INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.UP_RIGHT,
+            Direction.UP_LEFT,
+
+            Direction.LEFT,
+            Direction.RIGHT,
+
+        ],
+        mapCoordinates:{
+            x:460,
+            y:1146,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_bottom_left",
+        title:"node_bottom_left",
+        pathType:WaypointPathType.CORNER,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:30,
+            y:1146,
+            floor:-1
+        }
+    }, 
+
+
+    {
+        
+        id:"node_bottom_left_start_path",
+        title:"node_bottom_left_start_path",
+        pathType:WaypointPathType.INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.RIGHT,
+
+        ],
+        mapCoordinates:{
+            x:30,
+            y:519,
+            floor:-1
+        }
+    },
+
+    
+
+
+    {
+        
+        id:"node_edge_align_stairs_left_yard_intersect",
+        title:"node_edge_align_stairs_left_yard_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.UP_LEFT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:237,
+            y:519,
+            floor:-1
+        }
+    },
+
+    {
+        
+        id:"node_elevator_floor_-1",
+        title:"node_elevator_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.ELEVATOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:366,
+            y:570,
+            floor:-1
+        }
+    },
+
+    {
+        
+        id:"node_elevator_floor_0",
+        title:"node_elevator_floor_0",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.ELEVATOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:366,
+            y:570,
+            floor:0
+        }
+    },
+
+
+    {
+        
+        id:"node_lab_entrance_yard_lab_right",
+        title:"node_lab_entrance_yard_lab_right",
+        pathType:WaypointPathType.ENTRANCE,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:354,
+            y:637,
+            floor:-1
+        }
+    },
+
+    
+    
+
+    {
+        
+        id:"node_elevator_entrance_floor_-1",
+        title:"node_elevator_entrance_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.ELEVATOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:353,
+            y:571,
+            floor:-1
+        }
+    },
+    {
+        
+        id:"node_entrance_lab_floor_-1",
+        title:"node_entrance_lab_floor_-1",
+        pathType:WaypointPathType.ENTRANCE,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:237,
+            y:558,
+            floor:-1
+        }
+    },
+
+    {
+        
+        id:"node_edge_align_lab_stairs_elevator_intersect",
+        title:"node_edge_align_lab_stairs_elevator_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:237,
+            y:574,
+            floor:-1
+        }
+    },
+
+
+    {
+        
+        id:"node_edge_align_lab_stairs_floor_-1",
+        title:"node_edge_align_lab_stairs_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:211,
+            y:574,
+            floor:-1
+        }
+    },
+
+    
+
+
+
+    {
+        
+        id:"node_stairs_left_floor_-1",
+        title:"node_stairs_left_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.STAIRS,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:129,
+            y:480,
+            floor:-1
+        }
+    },
+    {
+        
+        id:"node_edge_align_stairs_left_yard_intersect",
+        title:"node_edge_align_stairs_left_yard_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.RIGHT,
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:129,
+            y:519,
+            floor:-1
+        }
+    },
+    
+
+
+
+
+
+
+    {
+        
+        id:"node_cafeteria_entrance",
+        title:"node_cafeteria_entrance",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.RIGHT,
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:352,
+            y:725,
+            floor:-1
+        }
+    }, 
+
+    
+    
+    {
+        
+        id:"node_yard_main_entrance",
+        title:"node_yard_main_entrance",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.RIGHT,
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:622,
+            y:481,
+            floor:-1
+        }
+    }, 
+
+
+    {
+        
+        id:"node_node_align_yard_main_entrance_outside_intersect",
+        title:"node_node_align_yard_main_entrance_outside_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:622,
+            y:519,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_node_align_yard_entrance_stairs_right_intersect",
+        title:"node_node_align_yard_entrance_stairs_right_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+            Direction.UP_RIGHT,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:519,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_align_room_outside_stairs_right_intersect",
+        title:"node_align_room_outside_stairs_right_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.RIGHT,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+        ],
+        mapCoordinates:{
+            x:1018,
+            y:297,
+            floor:-1
+        }
+    }, 
+    {
+        
+        id:"node_align_stairs_left_stairs_right_intersect",
+        title:"node_align_stairs_left_stairs_right_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+            Direction.UP_RIGHT,
+            Direction.UP_LEFT,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:297,
+            floor:-1
+        }
+    }, 
+
+
+    {
+        
+        id:"node_align_stairs_left_stairs_right_intersect",
+        title:"node_align_stairs_left_stairs_right_intersect",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.LEFT,
+            Direction.RIGHT,
+            Direction.DOWN,
+            Direction.DOWN_LEFT,
+            Direction.DOWN_RIGHT,
+            Direction.UP_RIGHT,
+            Direction.UP_LEFT,
+        ],
+        mapCoordinates:{
+            x:1098,
+            y:297,
+            floor:-1
+        }
+    }, 
+    {
+        
+        id:"node_entrance_left_floor_-1",
+        title:"node_entrance_left_floor_-1",
+        pathType:WaypointPathType.ENTRANCE,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:168,
+            y:281,
+            floor:-1
+        }
+    }, 
+
+    {
+        
+        id:"node_edge_align_entrance_left_floor_-1",
+        title:"node_edge_align_entrance_left_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.RIGHT,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:30,
+            y:281,
+            floor:-1
+        }
+    }, 
+    
+
+
+    /**INSIDE */
+
+
+    {
+        
+        id:"node_edge_align_entrance_left_hall_room_112_floor_-1",
+        title:"node_edge_align_entrance_left_hall_room_112_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.RIGHT,
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:210,
+            y:291,
+            floor:-1
+        }
+    },
+
+
+    {
+        
+        id:"node_room_112_floor_-1",
+        title:"node_room_112_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:210,
+            y:291,
+            floor:-1
+        }
+    },
+    
+
+    {
+        
+        id:"node_edge_align_entrance_left_hall_help_floor_-1",
+        title:"node_edge_align_entrance_left_hall_help_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:231,
+            y:281,
+            floor:-1
+        }
+    },
+    {
+        
+        id:"node_help_room_floor_-1",
+        title:"node_help_room_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.DOWN,
+            Direction.UP,
+        ],
+        mapCoordinates:{
+            x:231,
+            y:281,
+            floor:-1
+        }
+    },
+
+    {
+        
+        id:"node_edge_align_entrance_left_hall_tech_help_floor_-1",
+        title:"node_edge_align_entrance_left_hall_tech_help_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:327,
+            y:281,
+            floor:-1
+        }
+    },
+    
+    {
+        
+        id:"node_tech_help_floor_-1",
+        title:"node_tech_help_floor_-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:327,
+            y:338,
+            floor:-1
+        }
+    },
+    
+
+    {
+        
+        id:"node_edge_align_lab_entrance_first_floor_-1",
+        title:"node_edge_align_lab_entrance_first_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:413,
+            y:271,
+            floor:-1
+        }
+    },
+    
+
+    {
+        
+        id:"node_edge_align_lab_entrance_second_floor_-1",
+        title:"node_edge_align_lab_entrance_second_floor_-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+            Direction.LEFT,
+            Direction.RIGHT,
+        ],
+        mapCoordinates:{
+            x:434,
+            y:271,
+            floor:-1
+        }
+    },
+    {
+        
+        id:"node_edge_align_labs_intersect_floor-1",
+        title:"node_edge_align_labs_intersect_floor-1",
+        pathType:WaypointPathType.EDGE_ALIGN_INTERSECT,
+        facilityType:WaypointFacilityType.NONE,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP_RIGHT,
+            Direction.UP_LEFT,
+            Direction.LEFT,
+        ],
+        mapCoordinates:{
+            x:422,
+            y:281,
+            floor:-1
+        }
+    },
+
+
+
+    {
+        
+        id:"node_room_under_stairs_floor-1",
+        title:"node_room_under_stairs_floor-1",
+        pathType:WaypointPathType.ONE_WAY,
+        facilityType:WaypointFacilityType.DOOR,
+        POIId:null,
+        isAvailable:true,
+        availableHeadings:[
+            Direction.UP,
+            Direction.DOWN,
+        ],
+        mapCoordinates:{
+            x:428,
+            y:304,
+            floor:-1
+        }
+    },
+
+
+
+    
+
+
+    
+    
+
+    
+
+
+    
+
+
+    
+
+    
+  
+
+
+
+
+    
+    
+    
+    
 
 
 
