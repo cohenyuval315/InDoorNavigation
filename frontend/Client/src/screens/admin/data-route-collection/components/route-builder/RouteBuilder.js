@@ -3,22 +3,52 @@ import { StyleSheet, Text, TouchableOpacity, View,Modal, FlatList, ScrollView } 
 import POIsDropDown from "../../../components/POIs-dropdown"
 import { useSelector } from "react-redux"
 import { selectMapPOIs } from "../../../../../app/map/map-slice"
+import { selectEdges, selectNodes } from "../../../../../app/admin/admin-slice"
+import NodesDropdown from "../../../components/nodes-dropdown"
+import EdgesDropdown from "../../../components/edges-dropdown"
 
 const RouteBuilderModal = ({visible,route,onChange,onClose}) => {
-    const POIs = useSelector(selectMapPOIs);
-    const [POI,setPOI] = useState(null);
-    const onPOIChange = (value) => {
-        setPOI(value)
+    const nodes = useSelector(selectNodes);
+    const edges = useSelector(selectEdges);
+    const [node,setNode] = useState(null);
+    const onNodeChange = (value) => {
+        setNode(value)
     }
+    
     const onReset = () => {
         onChange([])
     }
-    const onAdd = () => {
-        if(POI){
-            const POIItem = POIs.filter((p) => p.id === POI)[0];
-            onChange([...route,POIItem])
+
+    const onNodeAdd = () => {
+        if (node) {
+          const nodeItem = nodes.find((p) => p.id === node);
+          const isNodeInRoute = route.some((p) => p.id === node);
+
+            if (isNodeInRoute) {
+                console.log('Node is already in the route.');
+                return;
+            }
+          if (route.length > 0) {
+            const lastNode = route[route.length - 1].id;
+            const hasEdge = edges.some(
+              (edge) =>
+                (edge.nodeA === lastNode && edge.nodeB === node) ||
+                (edge.nodeA === node && edge.nodeB === lastNode)
+            );
+    
+            if (hasEdge) {
+              onChange([...route, nodeItem]);
+            } else {
+              // Optionally, notify the user that the node cannot be added
+              console.log('No edge exists between the selected nodes.');
+            }
+          } else {
+            // If the route is empty, add the first node
+            onChange([...route, nodeItem]);
+          }
         }
-    }
+      };
+
     return (
         <Modal
             visible={visible}
@@ -28,9 +58,9 @@ const RouteBuilderModal = ({visible,route,onChange,onClose}) => {
                 flex:1,
                 backgroundColor:"white"
             }}>
-                <POIsDropDown
-                    onChange={onPOIChange}
-                    val={POI}
+                <NodesDropdown
+                    onChange={onNodeChange}
+                    val={node}
                 />
                 <View style={{
                     flex:1,
@@ -44,7 +74,7 @@ const RouteBuilderModal = ({visible,route,onChange,onClose}) => {
                                     <Text style={{
                                         color:"black"
                                     }}>
-                                        {item.details.title}
+                                        {item.title}
                                     </Text>
                                 </View>
                             )
@@ -56,7 +86,7 @@ const RouteBuilderModal = ({visible,route,onChange,onClose}) => {
                     <TouchableOpacity style={{
                         backgroundColor:"lightgreen",
                         padding:20,
-                    }} onPress={onAdd}>
+                    }} onPress={onNodeAdd}>
                         <Text style={{
                             color:"black",
                             textAlign:"center",
@@ -102,7 +132,6 @@ const RouteBuilder = ({route,onChange}) => {
     }
     return (
         <View style={{
-            flex:1,
             flexDirection:"row"
         }}>
             <TouchableOpacity onPress={onPress} style={{
@@ -138,9 +167,10 @@ const RouteBuilder = ({route,onChange}) => {
                         </Text>
                     )}
                     {route.map((item,index) => {
-                        const mapAreaString = item.mapArea.map(({ floor, x, y }) => {
-                            return `(${x.toFixed(0)},${y.toFixed(0)})`;
-                        }).join(', ');
+                        console.log(item)
+                        const { floor, x, y } = item.mapCoordinates;
+                        const mapAreaString = `(${x.toFixed(0)},${y.toFixed(0)})`;
+
                         return (
                             <View key={`item_${item.id.toString()}_${index}`} style={{
                                 flexDirection:"row",
@@ -178,7 +208,7 @@ const RouteBuilder = ({route,onChange}) => {
                                         <Text style={{
                                             color:"black"
                                         }}>
-                                        ({item.details.title},{item.floor},({mapAreaString}))
+                                        ({item.title},{item.mapCoordinates.floor},({mapAreaString}))
 
                                             {route.length - 1 > index && (
                                                 <Text style={{

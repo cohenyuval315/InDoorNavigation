@@ -7,22 +7,30 @@ import { SvgXml } from "react-native-svg";
 
 const BuildingMapSVG = memo(({
     data,
-    width,
-    height
+    styles = {},
 }) => {
     const mapSvgData = data.file;
     const mapFloor = data.floor;
     const mapHeight = data.height;
     const mapWidth = data.width;
-    console.log(`rerender ${mapFloor}`);
+    console.log(`rrerender ${mapFloor}`);
+    const viewBox =`0 0 ${mapWidth} ${mapHeight}`
     return (
         <View style={{ 
                 position: 'absolute',
+                ...styles
             }}>
             <SvgXml 
                 xml={mapSvgData} 
-                width={width} 
-                height={height} 
+                // width={width} 
+                // height={height} 
+                viewBox={viewBox}
+                // width?: NumberProp;
+                // height?: NumberProp;
+                // viewBox?: string;
+                // preserveAspectRatio?: string;
+                // color?: ColorValue;
+                // title?: string;
             />
         </View>
     )

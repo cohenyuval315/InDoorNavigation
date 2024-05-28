@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CardinalDirection, Direction } from "../../../constants/constants";
-import { Animated, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Button, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BuildingDropDown from "../components/building-dropdown";
 import UnsureSwitch from "../components/unsure-switch";
 import TestSwitch from "../components/test-switch";
@@ -10,6 +10,10 @@ import RouteOverlay from "./components/route-overlay";
 import RouteBuilder from "./components/route-builder";
 import PositionOverlay from "../components/position-overlay";
 import ActiveRouteOverlay from "./components/active-route-overlay";
+import { selectMapsDims } from "../../../app/map/map-slice";
+import { useSelector } from "react-redux";
+import RouteTimer from "./components/route-timer";
+import { TextInput } from "react-native-gesture-handler";
 
 const directionAngles = {
     [Direction.DOWN]: 180,
@@ -35,6 +39,10 @@ const buildingCardinalDirections = {
     [Direction.DOWN_RIGHT]:CardinalDirection.NORTH_WEST,
 }
 
+const UserPosition = () => {
+
+}
+
 
 const DataRouteCollectionScreen = () => {
     const [isTest,setIsTest] = useState(false);
@@ -43,7 +51,7 @@ const DataRouteCollectionScreen = () => {
     const [floorsOpacities,setFloorOpacities] = useState([1,1])
 
     /** TIMER */
-    const [timeLength, setTimeLength] = useState(3);
+    const [timeLength, setTimeLength] = useState(30);
     const [time, setTime] = useState(timeLength);
     const [isTimeActive, setIsTimeActive] = useState(false);
 
@@ -96,6 +104,7 @@ const DataRouteCollectionScreen = () => {
     const [routeData,setRouteData] = useState();
 
     const [data,setData] = useState()
+    const [currentFloorIndex ,setCurrentFloorIndex] = useState(0);
     
     const [devicesDetails] = useState({
         device:{
@@ -157,11 +166,6 @@ const DataRouteCollectionScreen = () => {
             initialDirection:initialDirection,
             initialCardinalDirection:buildingCardinalDirections[initialDirection],
             totalTime:totalTime,
-            
-
-
-            
-
         }
         return r;
     }
@@ -173,11 +177,7 @@ const DataRouteCollectionScreen = () => {
     const addToRoute = () => {
 
     }
-    const routeOverlay = useMemo(() => {
-        return (
-            <RouteOverlay points={[]} /> 
-        )
-    }, []);   
+
     const onRouteChange = (value) => {
         setRoute(value)
     }
@@ -185,48 +185,80 @@ const DataRouteCollectionScreen = () => {
         if (route.length <= 1) {
             return;
         }
-    
-
     }
 
-    const userPosition = () => {
-        return (
-            <>
-            </>
-        )
-    }
-    
+
     const activeRoute = useMemo(() => {
         return (
             <ActiveRouteOverlay 
+
                 route={route}
+                floorIndex={currentFloorIndex}
             />
         )
     },[route])
+    
+    const onTestPress = () => {
+        console.log("test")
+        setCurrentFloorIndex(0)
+    }
 
+
+      const [timerDuration, setTimerDuration] = useState(null);
+      const [currentTimer, setCurrentTimer] = useState(null);
+      const checkpointsRef = useRef([])
+      const timeRef = useRef(0);
+      const handleStart = () => {
+        checkpointsRef.current = [];
+        setTimerDuration(timeLength); // Set the timer duration to 60 seconds
+        setCurrentTimer(timeLength);
+      };
+
+      const handleOnTick = (t) => {
+        timeRef.current = t;
+      }
+      
+    
+      const handleRecord = () => {
+        checkpointsRef.current.push(timeRef.current)
+      };
+    
+      const handleTimeEnd = () => {
+        setCurrentTimer(null);
+        setTimerDuration(null);
+        console.log(checkpointsRef.current)
+      };
     return (
         <View style={{
             flex:1,
 
         }}>
-            <ScrollView style={{
+            <View style={{
                 width:"100%",
                 height:"100%"
-            }}>
+            }} nestedScrollEnabled>
+                <Button  title="test_button" onPress={onTestPress}/>
                 <BuildingDropDown val={buildingID} onChange={handleBuildingChange} />
                 <TestSwitch value={isTest} onChange={onIsTestChange}/>
                 <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
                 <RouteBuilder route={route} onChange={onRouteChange} />
-
-
-                <AdminBuildingMap floorsOpacities={floorsOpacities}>
-                    {userPosition}
+                <TextInput style={{
+                    backgroundColor:"black"
+                }}  keyboardType="numeric" value={`${timeLength}`} onChangeText={(val) => {
+                    setTimeLength(val)
+                }}/>
+                <RouteTimer onTick={handleOnTick} duration={timerDuration} onStart={() => setCurrentTimer(timerDuration)} onTimeEnd={handleTimeEnd} />
+                <AdminBuildingMap 
+                    currentFloorIndex={currentFloorIndex} 
+                    floorsOpacities={floorsOpacities}>
+                    
+                   
                     {activeRoute}
                 </AdminBuildingMap>
                 <TouchableOpacity style={{
                     padding:20,
                     backgroundColor:"lightblue"
-                }}>
+                }}  onPress={handleStart}>
                     <Text style={{
                         color:"black",
                         textAlign:'center'
@@ -237,7 +269,7 @@ const DataRouteCollectionScreen = () => {
                 <View style={{
                     padding:10,
                 }}>
-                    <TouchableOpacity style={{
+                    <TouchableOpacity onPress={handleRecord} style={{
                         padding:20,
                         backgroundColor:"lightblue"
                     }}>
@@ -250,7 +282,7 @@ const DataRouteCollectionScreen = () => {
                     </TouchableOpacity>
                 </View>
                 
-            </ScrollView>
+            </View>
         </View>
     )
 }

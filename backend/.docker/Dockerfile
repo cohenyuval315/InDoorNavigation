@@ -1,19 +1,33 @@
-FROM node:20.11.1-alpine as base
+# Stage 1: Build Stage
+FROM node:20.9.0-alpine AS build
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
+# Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
-RUN yarn install
 
-
-# Build dist
-RUN yarn build
-
-
+# Install all dependencies
 RUN npm install
 
+# Copy all project files to the container
 COPY . .
 
+# Build the project
+RUN npm run build
+
+# Stage 2: Development Stage
+FROM node:20.9.0-alpine AS dev
+
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=build /app .
+
+# Install development dependencies
+RUN npm install
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Command to run the app with nodemon for hot-reloading
+CMD ["npm", "run", "dev"]

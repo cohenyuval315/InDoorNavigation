@@ -58,14 +58,21 @@ const PositionSelection = ({initialX,initialXBy,initialYBy,initialY,onChangeX,on
         return val.toFixed(2);
     }
     const onIncrementXByChange = (value) => {
+        if (value == "" || isNaN(value)){   
+            return 
+        }
         setIncrementXBy(`${parseFloat(value).toFixed(0)}`);
     }
 
     const onIncrementYByChange = (value) => {
+        if (value == "" || isNaN(value)){   
+            return 
+        }        
         setIncrementYBy(`${parseFloat(value).toFixed(0)}`);
     }
 
     const incrementX = () => {
+        
         setX(prev => `${normalizeX(parseInt(prev) + parseInt(incrementXBy))}`);
     }
     const decrementX = () => {

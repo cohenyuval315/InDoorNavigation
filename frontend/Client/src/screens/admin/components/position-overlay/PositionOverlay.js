@@ -8,6 +8,9 @@ import { useSelector } from 'react-redux';
 import { calculateBottomLeftOffset } from '../../../../utils/map-data';
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from '../../../../utils/scaling';
 const PositionOverlay = ({floor,x,y,rotationRef,size}) => {  
+    if (!x || !y) {
+        return null;
+    }
     const maps = useSelector(selectMap)
     const mapWidth = maps[floor].width;
     const mapHeight = maps[floor].height;

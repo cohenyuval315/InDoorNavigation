@@ -11,27 +11,54 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../utils/scaling";
 
 const BuildingMapDisplayMap = () => {
     const numberOfFloors = useSelector(selectNumberOfFloors);
-    const initialOpacitiesValues = Array.from({ length: numberOfFloors }, (_, index) => index === 0 ? new Animated.Value(1) : new Animated.Value(0))
     const minFloor = useSelector(selectMinFloor);
+    const initialOpacitiesValues = Array.from({ length: numberOfFloors }, (_, index) => index + minFloor == 0 ? new Animated.Value(1) : new Animated.Value(0))
+    
     const containerRef = useRef(null);
     const rotationRef = useRef(new Animated.Value(0)); 
     const opacitiesRef = useRef(initialOpacitiesValues);
-
+    const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
     const selectedActivePOI = useSelector(selectActivePOI);
 
     const [centerOn,setCenterOn] = useState(null);
     const test = () => {
-        console.log("test")
+        console.log("toogle")
+        setCurrentFloorIndex(prevIndex => (prevIndex === 0 ? 1 : 0));
+
     }
+    useEffect(() => {
+        toggleTest()
+    },[currentFloorIndex])
+
+    const toggleTest = () => {
+        const newOpacities = opacitiesRef.current.map((_, index) =>
+          currentFloorIndex === index ? 1 : 0
+        );
+    
+        opacitiesRef.current.forEach((opacityRef, index) => {
+          Animated.timing(opacityRef, {
+            toValue: newOpacities[index],
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log("Animation completed for floor", index);
+          });
+        });
+      };
+
 
     useEffect(() => {
         if(selectedActivePOI === null){
             containerRef.current.reset();
+        }else{
+
         }
 
     },[selectedActivePOI])
 
-    const onPanMove = () => {
+
+    const onPanMove = (data) => {
+        // console.log(data)
         setCenterOn(null);
     }
 
@@ -68,6 +95,7 @@ const BuildingMapDisplayMap = () => {
                 centerOn={centerOn}
                 containerRef={containerRef}
                 opacitiesRef={opacitiesRef}
+                currentFloorIndex={currentFloorIndex}
                 rotationRef={rotationRef}
                 onPanMove={onPanMove}
                 rotateChildren={true}

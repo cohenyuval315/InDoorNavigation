@@ -270,14 +270,15 @@ const DataPointCollectionScreen = () => {
         }).start();
     }, [mapDirection]);
 
-    const userSize = 10;
+    
 
     const userPosition = useMemo(() => {
+        const userSize = currentDims.height / 33;
         return (
             <PositionOverlay size={userSize} floor={floorIndex} x={x} y={y} rotationRef={rotationRef}/> 
         )
 
-    }, [userSize,floor,x,y,rotationRef.current]);   
+    }, [floor,x,y,rotationRef.current]);   
 
     const pointsOverlay = useMemo(() => {
         const savedPs = savedPoints.filter((p) => p.floor === floor);

@@ -6,7 +6,7 @@ import { selectMapPOIs } from "../../../../app/map/map-slice";
 const POIsDropDown = ({val,onChange}) => {
     const POIs = useSelector(selectMapPOIs);
     const [open,setOpen] = useState(false);
-    const POIsItems = POIs.map((item) => {
+    const POIsItems = POIs.map((item,index) => {
         return {
             label:`${item.details.title} (floor ${item.floor})`,
             value:item.id

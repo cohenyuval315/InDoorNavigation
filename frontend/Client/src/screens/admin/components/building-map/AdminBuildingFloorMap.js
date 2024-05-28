@@ -5,6 +5,10 @@ import { Animated, Button, StyleSheet, Text, TouchableOpacity, View } from "reac
 import ImageZoom from "../../../../components/map/image-zoom";
 import BuildingMapSVG from "../../../main/building-map/components/building-map/BuildingMapSVG";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../../utils/scaling";
+import BuildingMapGraphDataOverlay from "../../../main/components/building-map-graph";
+import BuildingMapFloorPOIsAreaOverlay from "../../../main/building-map/components/POIs-overlay/BuildingMapFloorPOIsAreaOverlay";
+import BuildingMapFloorPOIsOverlay from "../../../main/building-map/components/POIs-overlay/BuildingMapFloorPOIsOverlay";
+import { selectGraphMaps } from "../../../../app/admin/admin-slice";
 
 const AdminBuildingFloorMap = ({floorIndex,imageProps={},children}) => {
     const maps = useSelector(selectMap);
@@ -13,11 +17,14 @@ const AdminBuildingFloorMap = ({floorIndex,imageProps={},children}) => {
     const map = useMemo(() => {
         console.log('rerender map floor');
         return (
-            <BuildingMapSVG
-                data={maps[floorIndex]}
-                    width={WINDOW_WIDTH}
-                    height={WINDOW_HEIGHT}
-            /> 
+            <>
+                <BuildingMapSVG
+                    data={maps[floorIndex]}
+                /> 
+                <BuildingMapFloorPOIsAreaOverlay floorIndex={floorIndex} />
+                <BuildingMapGraphDataOverlay floorIndex={floorIndex} />
+            </>
+
         )
 
     }, [floorIndex]);    
@@ -27,19 +34,26 @@ const AdminBuildingFloorMap = ({floorIndex,imageProps={},children}) => {
             width:WINDOW_WIDTH,
             zIndex:0,
             transform: [{ translateY: -WINDOW_HEIGHT / 120 }]
+            
         }}>
             <ImageZoom style={styles.container}
                 ref={containerRef}
-                cropWidth={WINDOW_WIDTH}
-                cropHeight={WINDOW_HEIGHT}
-                imageWidth={WINDOW_WIDTH}
-                imageHeight={WINDOW_HEIGHT}
-                minScale={1}
+                cropWidth={WINDOW_WIDTH * 0.5}
+                cropHeight={WINDOW_HEIGHT * 0.5}
+                imageWidth={maps[0].width}
+                
+                imageHeight={maps[0].height}
+                wrapperStyles={{
+                    
+                }}
+                minScale={0.3}
+                centerOn={null}
                 useHardwareTextureAndroid
                 useNativeDriver
                 panToMove
-                enableCenterFocus
-                {...imageProps}                  
+                enableCenterFocus={false}
+                {...imageProps}   
+                
             >
                 {map}
                 {children}

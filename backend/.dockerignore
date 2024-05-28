@@ -1,2 +1,10 @@
-node_modules/
-dist/
+node_modules
+dist
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.vscode
+*.log
+.env
+    

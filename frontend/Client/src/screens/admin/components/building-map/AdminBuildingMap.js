@@ -7,8 +7,10 @@ import ImageZoom from "../../../../components/map/image-zoom";
 import BuildingMapSVG from "../../../main/building-map/components/building-map/BuildingMapSVG";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../../utils/scaling";
 import BuildingMapFloorPOIsOverlay from "../../../main/building-map/components/POIs-overlay/BuildingMapFloorPOIsOverlay";
+import BuildingMapGraphDataOverlay from "../../../main/components/building-map-graph";
+import BuildingMapFloorPOIsAreaOverlay from "../../../main/building-map/components/POIs-overlay/BuildingMapFloorPOIsAreaOverlay";
 
-const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
+const AdminBuildingMap = ({floorsOpacities,currentFloorIndex,imageProps={},children}) => {
     const maps = useSelector(selectMap);
     const minFloor = useSelector(selectMinFloor);
     const numOfFloors = useSelector(selectNumberOfFloors);
@@ -38,16 +40,21 @@ const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
-            cropWidth={WINDOW_WIDTH}
-            cropHeight={WINDOW_HEIGHT}
-            imageWidth={WINDOW_WIDTH}
-            imageHeight={WINDOW_HEIGHT}
-            minScale={1}
+            cropWidth={WINDOW_WIDTH * 0.5}
+            cropHeight={WINDOW_HEIGHT * 0.5}
+            imageWidth={maps[0].width}
+            
+            imageHeight={maps[0].height}
+            wrapperStyles={{
+                
+            }}
+            minScale={0.3}
+            centerOn={null}
             useHardwareTextureAndroid
             useNativeDriver
             panToMove
-            enableCenterFocus
-            {...imageProps}                  
+            enableCenterFocus={false}
+            {...imageProps}                   
         >
             <View style={{
                 position:"relative"
@@ -57,19 +64,23 @@ const AdminBuildingMap = ({floorsOpacities,imageProps={},children}) => {
                         key={`map_svg_${index}`} 
                         style={[{ 
                             opacity: opacitiesRef.current[index],
-                            zIndex: Math.round(opacitiesRef.current[index]._value) + 1,
+                            zIndex: currentFloorIndex === index ? 1 : 0,
+                            display:currentFloorIndex === index ? "flex" : "none",
                         },styles.floorMapContainer]} 
                         >
                             <BuildingMapSVG
                                 data={maps[index]}
-                                width={WINDOW_WIDTH}
-                                height={WINDOW_HEIGHT}
                             />
                             <BuildingMapFloorPOIsOverlay 
                                 floorIndex={maps[index].floor}
                                 rotationRef={null}
                                 onPOIPress={() => {}}
                             />
+                                <BuildingMapFloorPOIsAreaOverlay floor={maps[index].floor} />
+
+                                {/* TEMPORARY TODO */}
+                                    <BuildingMapGraphDataOverlay floor={maps[index].floor} />
+                                {/* TEMPORARY */}                            
                     </Animated.View>
                 ))}  
                 {children}

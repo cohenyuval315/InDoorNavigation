@@ -8,8 +8,10 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../utils/scaling";
 import BuildingMapSVG from "../building-map/components/building-map/BuildingMapSVG";
 import { RotatingLayout } from "../../../layouts/map-layout";
 import BuildingMapFloorPOIsOverlay from "../building-map/components/POIs-overlay/BuildingMapFloorPOIsOverlay";
+import BuildingMapGraphDataOverlay from "./building-map-graph";
+import BuildingMapFloorPOIsAreaOverlay from "../building-map/components/POIs-overlay/BuildingMapFloorPOIsAreaOverlay";
 
-const BuildingMap = ({centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children}) => {
+const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children}) => {
     const maps = useSelector(selectMap);
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
@@ -20,13 +22,14 @@ const BuildingMap = ({centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,o
     // const [centerOn,setCenterOn] = useState(null); // does not rerender
     // const initialOpacitiesValues = Array.from({ length: numberOfFloors }, (_, index) => index === 0 ? new Animated.Value(1) : new Animated.Value(0))
     // const opacitiesRef = useRef(initialOpacitiesValues);
-
+    console.log("OPS",opacitiesRef.current,"floor",currentFloorIndex)
     function test() {
         console.log("clicked")
         testRef()
         _randomOpacitiesTest()
 
     }
+
     function randomCenterOn () {
         // setCenterOn({
         //     x: Math.abs(100) / 2,
@@ -83,71 +86,68 @@ const BuildingMap = ({centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,o
             scale: 2,
             duration: 300,
         })
-        // containerRef.current.reset();
-        // containerRef.current.resetScale();
-        //resetScale
-        //centerOn
-
     }
-
-    // const onPOIPress = (POI) => {
-    //     // console.log(POI.center,WINDOW_WIDTH)
-    //     containerRef.current.centerOn({
-    //         x: WINDOW_WIDTH /2 - POI.center.x,
-    //         y: (WINDOW_HEIGHT * 3 / 5  - POI.center.y) * -1,
-    //         scale: 2,
-    //         duration: 300,
-    //     })
-    //     const newOpacities = opacitiesRef.current.map((_,index) => POI.floor === minFloor + index ? 1 : 0);
-    //     opacitiesRef.current.forEach((opacityRef, index) => {
-    //         Animated.timing(opacityRef, {
-    //             toValue: newOpacities[index],
-    //             duration: 500,
-    //             useNativeDriver: true
-    //         }).start(() => {
-    //             console.log("Animation completed for floor", minFloor + index);
-    //         });
-    //     });
-    //     console.log(opacitiesRef.current)        
-    // }
+    // console.log(maps[1].floor)
+    // console.log(Object.keys(maps[0].file))
 
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
-            cropWidth={WINDOW_WIDTH}
-            cropHeight={WINDOW_HEIGHT}
-            imageWidth={WINDOW_WIDTH}
-            imageHeight={WINDOW_HEIGHT}
+            cropWidth={WINDOW_WIDTH * 0.5}
+            cropHeight={WINDOW_HEIGHT * 0.5}
+            imageWidth={maps[0].width}
+            
+            imageHeight={maps[0].height}
+            wrapperStyles={{
+                
+            }}
+            minScale={0.3}
             centerOn={centerOn}
-            minScale={1}
             useHardwareTextureAndroid
             useNativeDriver
             panToMove
-            enableCenterFocus
+            enableCenterFocus={false}
             onMove={onPanMove} 
             {...imageProps}                  
-        >
+        >   
             <RotatingLayout rotationRef={rotationRef}>
-                {Array.from({ length: numberOfFloors }, (_, index) => (
-                    <Animated.View 
-                        key={`map_svg_${index}`} 
-                        style={[{ 
-                            opacity: opacitiesRef.current[index],
-                            zIndex: Math.round(opacitiesRef.current[index]._value) + 1,
-                        },styles.floorMapContainer]} 
-                        >
-                            <BuildingMapSVG
-                                data={maps[index]}
-                                width={WINDOW_WIDTH}
-                                height={WINDOW_HEIGHT}
-                            />
-                            <BuildingMapFloorPOIsOverlay 
-                                floorIndex={maps[index].floor}
-                                rotationRef={rotationRef}
-                                onPOIPress={onPOIPress}
-                            />
-                    </Animated.View>
-                ))}    
+                {Array.from({ length: numberOfFloors }, (_, index) => {
+                    console.log("ref:",opacitiesRef.current[index],"index:",Math.round(opacitiesRef.current[index]._value) + 1)
+                    const style = {
+
+                    }
+                    if (opacitiesRef.current[index] == 0){
+                        style['height'] = 0;
+                        console.log("reached")
+                    }
+                    return (
+                        <Animated.View 
+                            key={`map_svg_${index}`} 
+                            style={[{
+                                opacity: opacitiesRef.current[index],
+                                zIndex: currentFloorIndex === index ? 1 : 0,
+                                display:currentFloorIndex === index ? "flex" : "none",
+                            },styles.floorMapContainer]} 
+                            >
+                                <BuildingMapSVG
+                                    data={maps[index]}
+      
+                                />
+                                <BuildingMapFloorPOIsOverlay 
+                                    floorIndex={maps[index].floor}
+                                    rotationRef={rotationRef}
+                                    onPOIPress={onPOIPress}
+                                />
+                                <BuildingMapFloorPOIsAreaOverlay floor={maps[index].floor} />
+
+                                {/* TEMPORARY TODO */}
+                                    <BuildingMapGraphDataOverlay floor={maps[index].floor} />
+                                {/* TEMPORARY */}
+                        </Animated.View>
+                    )
+                }
+
+                )}    
                 {rotateChildren && children && (
                     <>
                     {children}
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
         zIndex:0,
     },
     floorMapContainer:{
+        position:"absolute",
         height:"100%",
         width:"100%",
     }

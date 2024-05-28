@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import client from '../../services/server/api-client';
 import Status from '../status';
 import { normalizePOIsPoints } from "../../utils/map-data";
+import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
 
 
 export const fetchBuildingByMapId = createAsyncThunk(
@@ -18,8 +19,9 @@ const mapInitialState = {
   data:null,
   error:null,
   status:Status.IDLE,
-  maps:[],
+  maps:null,
   POIs:null,
+  POIsMaps:null,
   dims:null
 }
 
@@ -39,7 +41,7 @@ const mapSlice = createSlice({
           let buildingMapData = action.payload.data;
           const floorsFiles = action.payload.floorsFiles.sort((a, b) => a.floor - b.floor);
           floorsFiles.forEach((mapFile,index) => {
-            const normalPOIs = normalizePOIsPoints(buildingMapData.POIs, mapFile.width,mapFile.height,mapFile.floor)
+            const normalPOIs = normalizePOIsPoints(buildingMapData.POIs, mapFile.width,mapFile.height,mapFile.floor,WINDOW_HEIGHT,WINDOW_WIDTH)
             buildingMapData = {
               ...buildingMapData,
               POIs: normalPOIs
@@ -48,6 +50,7 @@ const mapSlice = createSlice({
           state.data = buildingMapData;
           state.maps = floorsFiles;    
           state.POIs =  buildingMapData.POIs 
+          state.POIsMaps = buildingMapData.POIsMaps.sort((a,b) => a.floor - b.floor);
           state.dims = floorsFiles.map((f) => {
             return {
               width: f.width,
@@ -60,10 +63,12 @@ const mapSlice = createSlice({
         })
         .addCase(fetchBuildingByMapId.rejected, (state, action) => {
           state.data = null;
-          state.maps = []
+          state.maps = null
+          state.POIsMaps = null;
           state.status = Status.FAILED;
           state.error = action.payload.error;
-        })       
+        })   
+                       
     }
 
   })
@@ -78,6 +83,7 @@ const mapSlice = createSlice({
   export const selectMapStatus = state => state.map.status;
   export const selectMapError = state => state.map.error;
   export const selectMapsDims = state => state.map.dims;
+  export const selectPOIsMaps = state => state.map.POIsMaps;
   // export const selectPOIById = POIId => state => state.map.POIs.find(POI => POI.id === POIId);
   export const {} = mapSlice.actions;
   export default mapSlice.reducer;

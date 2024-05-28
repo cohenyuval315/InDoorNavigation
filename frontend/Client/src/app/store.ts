@@ -3,6 +3,7 @@ import mapReducer from './map/map-slice';
 import userOrientationReducer from './user/user-orientation-slice';
 import buildingsReducer from './building/buildings-slice';
 import ActiveReducer from './active/active-slice';
+import AdminReducer from './admin/admin-slice';
 import { combineReducers } from 'redux'
 import logger from './logger';
 
@@ -10,7 +11,8 @@ const rootReducer = combineReducers({
     map:mapReducer,
     orientation:userOrientationReducer,
     buildings:buildingsReducer,
-    active:ActiveReducer
+    active:ActiveReducer,
+    admin:AdminReducer
 })
 
 const store = configureStore({

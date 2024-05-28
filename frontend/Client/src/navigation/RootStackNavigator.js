@@ -54,6 +54,7 @@ const Stack = createStackNavigator();
 import { Button, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBuildingByMapId, selectMapStatus } from '../app/map/map-slice';
+import { fetchBuildingGraphById,selectGraphStatus } from '../app/admin/admin-slice';
 import { useTheme } from '../contexts/ThemeContext';
 import BuildingMapPathBuilder from '../screens/main/building-map/components/path-builder/BuildingMapPathBuilder';
 import Status from '../app/status';
@@ -64,16 +65,17 @@ const TestScreen = (props) => {
   const buildingId = "324324324343";
   React.useEffect(()=>{
     dispatch(fetchBuildingByMapId(buildingId));
+    dispatch(fetchBuildingGraphById(buildingId));
   },[])
 
-  const status = useSelector(selectMapStatus)
-
+  const mapStatus = useSelector(selectMapStatus)
+  const graphStatus = useSelector(selectGraphStatus);
   React.useEffect(() => {
-    if(status === Status.SUCCEEDED){
+    if(mapStatus === Status.SUCCEEDED && graphStatus == Status.SUCCEEDED){
       setLoading(false)
     }
 
-  },[dispatch,status])
+  },[dispatch,mapStatus,graphStatus])
   
   const onPress = () => {
     // props.navigation.navigate("data-points-collection")

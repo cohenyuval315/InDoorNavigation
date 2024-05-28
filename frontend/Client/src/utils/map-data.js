@@ -53,17 +53,18 @@ const getIconName = (icon) => {
     }
 }
 
-export function normalizePOIsPoints(POIs,mapWidth,mapHeight,floor){
-    const {offsetX , offsetY} = calculateBottomLeftOffset(mapWidth,mapHeight,WINDOW_WIDTH,WINDOW_HEIGHT);
-    const {displayedMapHeight, displayedMapWidth} = calculateDisplayDimensions(mapWidth,mapHeight,WINDOW_WIDTH,WINDOW_HEIGHT);
-    
+export function normalizePOIsPoints(POIs,mapWidth,mapHeight,floor,windowWidth,windowHeight){
+    const {offsetX , offsetY} = calculateBottomLeftOffset(mapWidth,mapHeight,windowWidth,windowHeight);
+    const {displayedMapHeight, displayedMapWidth} = calculateDisplayDimensions(mapWidth,mapHeight,windowWidth,windowHeight);
+    let _offsetX = 0 //offsetX
+    let _offsetY = offsetY
     const normalize =  POIs.map((POI) => {
         return {
             ...POI,
             mapArea:POI.mapArea.map((point)=>{
                 if (point.floor == floor){
-                    const normalizedX = (point.x / mapWidth) * displayedMapWidth + offsetX;
-                    const normalizedY = (point.y / mapHeight) * displayedMapHeight + offsetY;
+                    const normalizedX = (point.x / mapWidth) * displayedMapWidth + _offsetX;
+                    const normalizedY = (point.y / mapHeight) * displayedMapHeight + _offsetY;
                     const normalPoint =  { 
                         ...point,
                         x: normalizedX, 

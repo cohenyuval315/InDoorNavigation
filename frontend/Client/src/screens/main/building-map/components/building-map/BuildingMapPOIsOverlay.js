@@ -9,7 +9,7 @@ const BuildingMapPOIsOverlay = ({
     onPOIPress,
     rotationRef
 }) => {
-    console.log('hy')
+    console.log('hyg')
     return (
         <MapOverlay>
             {POIs.map((POI,index) => {

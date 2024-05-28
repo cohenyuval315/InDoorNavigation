@@ -111,10 +111,6 @@
     "tests"
   ],
   "include": [
-    "models",
-    "controllers",
-    "routes",
-    "app.ts",
-    "config"
+    "src/**/*.ts"
   ]
 }

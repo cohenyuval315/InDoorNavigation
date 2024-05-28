@@ -40,6 +40,21 @@ class ApiClient{
         }
     }
 
+    async getBuildingGraphMap(buildingId){
+        console.log('request buildings GRAPH rmap data');
+        const path = `/admin/buildings/${buildingId}/graph`;
+        const response = await fetch(this.base_url + path,{
+            method:'GET',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+        });
+        if(response.ok){
+            const results = await response.json();
+            return results;
+        }
+    }
+
     async getSystemConfigurations(data){
         const path = "/system";
         const response = await fetch(this.base_url + path,{

@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 import BuildingMapPOI from "./BuildingMapPOI";
 import { useDispatch, useSelector } from "react-redux";
 import { selectMapPOIs } from "../../../../../app/map/map-slice";
@@ -16,10 +16,24 @@ const BuildingMapFloorPOIsOverlay = ({floorIndex,rotationRef,onPOIPress}) => {
         }
         dispatch(setActivePOI(POI))
     }   
-
+    // console.log("number pois: ",floorPOIs.length)
     return (
         <MapOverlay>
-            {floorPOIs.map((POI,index) => {
+            <FlatList
+                data={floorPOIs}
+                renderItem={({item}) => {
+                    return (
+                        <BuildingMapPOI 
+                            POI={item}
+                            onPOIPress={()=>handleOnPOIPress(item)}
+                            rotationRef={rotationRef}
+                            isSelected={selectedPOI && selectedPOI.id === item.id}
+                    />     
+                    )
+                }}
+                keyExtractor={(item,index) => `POI_${item.id}_${index}`}
+            />
+            {/* {floorPOIs.map((POI,index) => {
                 return (
                         <BuildingMapPOI 
                             key={`POI_${POI.id}_${index}`} 
@@ -29,7 +43,7 @@ const BuildingMapFloorPOIsOverlay = ({floorIndex,rotationRef,onPOIPress}) => {
                             isSelected={selectedPOI && selectedPOI.id === POI.id}
                         />                        
                 )
-            })}
+            })} */}
         </MapOverlay>
     )
 }
