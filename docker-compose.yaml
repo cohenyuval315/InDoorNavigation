@@ -1,31 +1,31 @@
 services:
-  backend:
-    container_name: indoor-backend
-    build:
-      context: ./backend
-      dockerfile: ./.docker/Dockerfile
+  # backend:
+  #   container_name: indoor-backend
+  #   build:
+  #     context: ./backend
+  #     dockerfile: ./.docker/Dockerfile
       
 
+  # #   environment:
+  # #     - MONGODB_URI=mongodb://mongo:27017/test
+  # #     - MONGODB_URI=mongodb://root:test@mongo:27017/
+  # #     - LOCALSTACK_URL=http://localstack:4566     
+  # #     - NODE_ENV=development
+  # #   ports:
+  # #     - "3000:3000"
   #   environment:
-  #     - MONGODB_URI=mongodb://mongo:27017/test
-  #     - MONGODB_URI=mongodb://root:test@mongo:27017/
-  #     - LOCALSTACK_URL=http://localstack:4566     
-  #     - NODE_ENV=development
-  #   ports:
-  #     - "3000:3000"
-    environment:
-      NODE_ENV: production
+  #     NODE_ENV: production
 
-    depends_on:
-      - mongo
-      - localstack
+  #   depends_on:
+  #     - mongo
+  #     - localstack
       
-    volumes:
-      - ./backend/dist:/app/dist
-      - ./backend/node_modules:/app/node_modules
-      - ./backend/.env:/app/.env
+  #   volumes:
+  #     - ./backend/dist:/app/dist
+  #     - ./backend/node_modules:/app/node_modules
+  #     - ./backend/.env:/app/.env
 
-    command: ["npm", "run", "dev"]
+  #   command: ["npm", "run", "dev"]
 
   mongo:
     container_name: indoor-mongo

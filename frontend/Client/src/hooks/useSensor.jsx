@@ -70,8 +70,9 @@ const useSensor = (sensor,interval = 1,windowSize=-1,onLoadCallback=null,onEvent
     
     const loadIsSensorAvailable = async () => {
         setSensorLoading(true);
-        const isAvail = await isSensorAvailable(sensor);
+        // const isAvail = await isSensorAvailable(sensor);
         const information = await getSensorInformation(sensor);
+        const isAvail =  information['isAvailable']
         console.log("INFO:",information);
         setIsAvailableSensor(isAvail)
         setSensorLoading(false);

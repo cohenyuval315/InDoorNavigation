@@ -111,7 +111,7 @@ const getShapeType = (coordinates) => {
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Svg,Path, Polygon } from "react-native-svg";
-import BuildingPOIPoint from "./BuildingPOIPoint";
+import BuildingPOIPoint from "./BuildingPOIIcon";
 import BuildingPOIPath from "./BuildingPOIPath";
 import BuildingPOIPolygon from "./BuildingPOIPolygon";
 

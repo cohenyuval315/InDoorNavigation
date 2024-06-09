@@ -1,20 +1,55 @@
-import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import client from '../../services/server/api-client';
 import Status from '../status';
-import { normalizePOIsPoints } from "../../utils/map-data";
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
-
-
 
 export const fetchBuildingGraphById = createAsyncThunk(
   'admin/fetchBuildingGraphById', 
-  async (buildingId) => {
+  async (buildingId,_) => {
     const response = await client.getBuildingGraphMap(buildingId)
     return response
   },
 )
+export const fetchAllProcessingRoutes = createAsyncThunk(
+  'admin/fetchAllProcessingRoutes', 
+  async (buildingId,_) => {
+    const response = await client.getAllBuildingProcessingRoutes(buildingId)
+    return response
+  },
+)
 
+export const fetchProcessingMap = createAsyncThunk(
+  'admin/fetchProcessingMap', 
+  async (args,_) => {
+    const {buildingId,version} = args;
+    const response = await client.getBuildingProcessingMap(buildingId,version)
+    return response
+  },
+)
+export const fetchProcessingRoute = createAsyncThunk(
+  'admin/fetchProcessingRoute', 
+  async (args,_) => {
+    const {buildingId,routeName} = args;
+    const response = await client.getBuildingProcessingRoute(buildingId,routeName)
+    return response
+  },
+)
+
+export const uploadProcessingRoute = createAsyncThunk(
+  'admin/uploadProcessingRoute', 
+  async (args,_) => {
+    const {buildingId,data} = args;
+    const response = await client.postBuildingProcessingRoute(buildingId,data)
+    return response
+  },
+)
+export const uploadProcessingMap = createAsyncThunk(
+  'admin/uploadProcessingMap', 
+  async (args,_) => {
+    const {buildingId,data} = args;
+    const response = await client.postBuildingProcessingMap(buildingId,data)
+    return response
+  },
+)
 
 const mapInitialState = {
   error:null,
@@ -24,6 +59,10 @@ const mapInitialState = {
   edges:null,
   graphMaps:[],
   cardinalDirections:null,
+  processingMap: null,
+  processingRoutes:null,
+  processingStatus : Status.IDLE,
+  processingError:null
 }
 
 const adminSlice = createSlice({
@@ -54,8 +93,41 @@ const adminSlice = createSlice({
           state.edges = null;
           state.status = Status.FAILED;
           state.error = action.payload.error;
-        })   
-                       
+        })
+        .addCase(fetchProcessingMap.rejected,(state,action) => {
+          state.processingStatus = Status.FAILED
+          state.processingError = action.payload.error;
+        })
+        .addCase(fetchAllProcessingRoutes.rejected,(state,action) => {
+          state.processingStatus = Status.FAILED
+          state.processingError = action.payload.error;
+        }) 
+        .addCase(fetchProcessingRoute.rejected,(state,action) => {
+          state.processingStatus = Status.FAILED
+          state.processingError = action.payload.error;
+        })  
+
+        .addCase(fetchProcessingMap.pending,(state,action) => {
+          state.processingStatus = Status.PENDING
+        })
+        .addCase(fetchAllProcessingRoutes.pending,(state,action) => {
+          state.processingStatus = Status.PENDING
+        }) 
+        .addCase(fetchProcessingRoute.pending,(state,action) => {
+          state.processingStatus = Status.PENDING
+        })  
+        .addCase(fetchProcessingMap.fulfilled,(state,action) => {
+          state.processingMap = action.payload;
+          state.processingStatus = Status.SUCCEEDED
+        })
+        .addCase(fetchAllProcessingRoutes.fulfilled,(state,action) => {
+          state.processingRoutes = action.payload;
+          state.processingStatus = Status.SUCCEEDED
+        }) 
+        .addCase(fetchProcessingRoute.fulfilled,(state,action) => {
+          state.processingRoutes = action.payload;
+          state.processingStatus = Status.SUCCEEDED
+        })           
     }
 
   })
@@ -65,7 +137,12 @@ const adminSlice = createSlice({
   export const selectEdges = state => state.admin.edges;
   export const selectNodes = state => state.admin.nodes;
   export const selectGraphMaps =  state => state.admin.graphMaps
+  export const selectProcessingMap =  state => state.admin.processingMap
+  export const selectProcessingRoutes =  state => state.admin.processingRoutes
+  export const selectProcessingStatus =  state => state.admin.processingStatus
+  export const selectProcessingError =  state => state.admin.processingError
   export const selectCardinalDirections =  state => state.admin.cardinalDirections
+
 
 
   export const {} = adminSlice.actions;

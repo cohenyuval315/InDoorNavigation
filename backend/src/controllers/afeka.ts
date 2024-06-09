@@ -53,12 +53,32 @@ export const afekaBuildingData = {
         latitude:32.113912134046394,
         longitude:34.81804756153953
     },
+
     geoArea:[
         {
-            latitude:32.11346715888711,
-            longitude:34.818165001968
-        }, 
+            latitude:31.93441555065376, 
+            longitude:34.80631845630264
+        },
+        {
+            latitude:31.93439651279175, 
+            longitude:34.80696153568204
+        },
+        {
+            latitude:31.933977678830264, 
+            longitude:34.80699892401805
+        },
+        {
+            latitude:31.934034792664654, 
+            longitude:34.80640818830907
+        },                        
     ],
+
+    // geoArea:[
+    //     {
+    //         latitude:32.11346715888711,
+    //         longitude:34.818165001968
+    //     }, 
+    // ],
     entrances:[
         {
             title:'main-entrance',
@@ -3561,6 +3581,23 @@ function calculateDistance(nodeA, nodeB) {
     const deltaZ = (floorHeights[coordB.floor] || 0) - (floorHeights[coordA.floor] || 0);
 
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+}
+
+function calculateCenterPoint(mapArea) {
+    let totalX = 0;
+    let totalY = 0;
+
+    // Calculate sum of x and y coordinates
+    mapArea.forEach(point => {
+        totalX += point.x;
+        totalY += point.y;
+    });
+
+    // Calculate average x and y coordinates
+    const centerX = totalX / mapArea.length;
+    const centerY = totalY / mapArea.length;
+
+    return { x: centerX, y: centerY };
 }
 
 const k = 
@@ -7356,6 +7393,16 @@ const POIs = [
     },
 ]
 
+const POIsWithCenterPoints = POIs.map((poi) => {
+    const {x,y} = calculateCenterPoint(poi.mapArea)
+    const centerPoint = {
+        x:x,
+        y:y,
+        floor:poi.floor
+    }
+    poi.center = centerPoint;
+    return poi    
+})
 
 const afekaBuildingCardinalDirections = {
     [Direction.DOWN]:CardinalDirection.NORTH,
@@ -7518,11 +7565,12 @@ export const afekaBuildingMapData = {
     minFloor:-1,
     maxFloor:0,
     cardinalDirections:afekaBuildingCardinalDirections,
-    POIs:POIs,
+    POIs:POIsWithCenterPoints,
+
     POIsMaps:[
         {
             floor: -1,
-            pois:svgFloorF_1
+            pois:svgFloorF_1,
         },
         {
             floor: 0,
@@ -7546,4 +7594,17 @@ export const afekaAdminBuildingMapData = {
     ],
     nodes:nodes,
     edges:edges
+}
+
+
+
+export const afekaWifiMap = {
+    buildingId:'324324324343',
+
+}
+
+
+export const afekaMagneticMap = {
+    buildingId:'324324324343',
+
 }

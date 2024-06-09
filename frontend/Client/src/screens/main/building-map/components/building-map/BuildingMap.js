@@ -8,8 +8,6 @@ import { useRef, useState } from "react";
 import SearchBarBottomSheet from "../../../../components/map/search-bar/SearchBarBottomSheet";
 import BuildingMapButtonsOverlay from "./BuildingMapButtonsOverlay";
 import BuildingMapLoadingOverlay from "./BuildingMapLoadingOverlay";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome6Icons from 'react-native-vector-icons/FontAwesome6'
 import BuildingMapPathBuilder from "../path-builder/BuildingMapPathBuilder";
 
 

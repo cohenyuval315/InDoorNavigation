@@ -2,8 +2,6 @@ import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import client from '../../services/server/api-client';
 import Status from '../status';
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
-import { getIsraelPointByGlobalCoordinates } from "../../static-maps/israel";
 import { prepareBuildingsData } from "../../utils/building-data";
 
 

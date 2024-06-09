@@ -1,8 +1,8 @@
 
-import { Alert, Animated, FlatList, ScrollView, Text, View } from "react-native";
-import { useSelector } from "react-redux";
+import { Alert, Animated, FlatList, ScrollView, Text, TextInput, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import { selectAllBuildings } from "../../../app/building/buildings-slice";
-import { Children, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Children, useCallback, useEffect, useMemo, useRef, useState, version } from "react";
 import { selectMap, selectMapsDims, selectMinFloor } from "../../../app/map/map-slice";
 import BuildingDropDown from "../components/building-dropdown";
 import TitleInput from "../components/title-input";
@@ -25,13 +25,13 @@ import useWIFI from "../../../hooks/useWIFI";
 import AvailableDirections from "./components/available-directions";
 import PointData from "./components/point-data";
 import useGPS from "../../../hooks/useGPS";
-import useRotation from "../../../hooks/useRotation";
+import useRotation from "../../../hooks/useRotationVector";
 
-import useLinearAcceleration from "../../../hooks/useLinearAcceleration";
-import useOrientation from "../../../hooks/useOrientation";
+import useLinearAcceleration from "../../../hooks/_old/useLinearAcceleration";
+import useOrientation from "../../../hooks/_old/useOrientation";
 import useSensor from "../../../hooks/useSensor";
 import { SensorKey } from "../../../services/sensors/SensorKey";
-import useGravitySensor from "../../../hooks/useGravitySensor";
+import useGravitySensor from "../../../hooks/_old/useGravitySensor";
 import { SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import TestSwitch from "../components/test-switch";
 import UnsureSwitch from "../components/unsure-switch";
@@ -39,9 +39,23 @@ import DataModalButton from "../components/data-modal-button";
 import ConfirmationModal from "../../../components/modals/confirmation";
 import { openConfirm } from "../../../components/modals/confirmation/ConfirmationModal";
 import DeviceOrientationSelection from "../components/device-orientation-selection";
-import useMagnetometerSensor from "../../../hooks/useMagnetometerSensor";
+import useMagnetometerSensor from "../../../hooks/_old/useMagnetometerSensor";
 import MapModal from "../../../components/map/modals/MapModal";
 import PointOverlay from "../components/point-overlay/PointOverlay";
+import SensorsService from "../../../sensors/sensors-service";
+import { fetchProcessingMap, selectProcessingError, selectProcessingMap, selectProcessingStatus, uploadProcessingMap } from "../../../app/admin/admin-slice";
+import Status from "../../../app/status";
+import GeoLocalization from "../../../navigation/GeoLocalization";
+import { Geolocation } from "../../../sensors/gps-service";
+
+// magnetometerData
+// magnetometerUncalibData
+// rotationVectorData
+// gravityData
+
+// 
+// 
+
 
 const directionAngles = {
     [Direction.DOWN]: 180,
@@ -54,65 +68,143 @@ const directionAngles = {
     [Direction.DOWN_RIGHT]: 135,
 };
 
-
 const DataPointCollectionScreen = () => {
-    const [dataPoints, setDataPoints] = useState([]);
+    const {getWifiData} = useWIFI();
+    const [floorIndex,setFloorIndex] = useState(0);
     const rotationRef = useRef(new Animated.Value(0));
     const mapsDims = useSelector(selectMapsDims);
+    const minFloor = useSelector(selectMinFloor)
+    const maxWidth = SCREEN_WIDTH;
+    const currentDims = mapsDims[floorIndex]
+
+    const floor = floorIndex + minFloor;
     
-    // const AdminBuildingMapMemoized = useMemo(() => React.memo(AdminBuildingMap), []);
+    
+    const ratio = SCREEN_WIDTH / currentDims.width;
+    const maxHeight = ratio * currentDims.height;
+
+    
 
 
-    const directions = Object.values(Direction)
-
-    const buildingCardinalDirections = {
-        [Direction.DOWN]:CardinalDirection.NORTH,
-        [Direction.UP]:CardinalDirection.SOUTH,
-        [Direction.LEFT]: CardinalDirection.EAST,
-        [Direction.RIGHT]: CardinalDirection.WEST,    
-        [Direction.UP_LEFT]: CardinalDirection.SOUTH_EAST,
-        [Direction.UP_RIGHT]: CardinalDirection.SOUTH_WEST,
-        [Direction.DOWN_LEFT]:CardinalDirection.NORTH_EAST,
-        [Direction.DOWN_RIGHT]:CardinalDirection.NORTH_WEST,
-    }
+    const [dataPoints, setDataPoints] = useState([]);
+    const [version,setVersion] = useState("v1");
     const [isHighTurbuance,setIsHighTurbuance] = useState(false);
     const [isTest,setIsTest] = useState(false);
     const [isUnsure,setIsUnsure] = useState(false);
     const [deviceOrientation,setDeviceOrientation] = useState({ roll: 0, pitch: 0, yaw: 0 });
-
-    const {getWifiData} = useWIFI();
-
-    const {gravityGetLastEvent} = useGravitySensor(1,0,async () => {
-    },(event) => {
-        console.log("event:",event.timestamp);
-    },null);
-
-
-    const {magnetometerGetLastEvent} = useMagnetometerSensor(1,0,async () => {
-    },(event) => {
-        console.log("event:",event.timestamp);
-    },null);
-
-
     
-    const [x,setX] = useState(null);
-    const [y,setY] = useState(null);
+    const [x,setX] = useState(0);
+    const [y,setY] = useState(0);
     const [buildingID,setBuildingID] = useState(null);
     const [POIID,setPOIID] = useState(null);
-    const minFloor = useSelector(selectMinFloor)
-    const [floor,setFloor] = useState(null);
+    
+
     const [title,setTitle] = useState(null)
     const [mapDirection,setMapDirection] = useState(Direction.UP);
     const [availableDirections,setAvailableDirections] = useState([]);
     const [points,setPoints] = useState([]);
     const [savedPoints,setSavedPoints] = useState([]);
-    
-    const maxWidth = SCREEN_WIDTH;
 
-    const floorIndex = floor - minFloor;
-    const currentDims = mapsDims[floorIndex]
-    const ratio = SCREEN_WIDTH / currentDims.width;
-    const maxHeight = ratio * currentDims.height;
+    const {subscribeGPS} =useGPS()
+    const gpsData = useRef(null);
+    const magData = useRef(null);
+    const gravData = useRef(null);
+    const rotData = useRef(null)
+    const magUnData = useRef(null);
+    const magErr = useRef(null);
+    const gravErr = useRef(null);
+    const rotErr = useRef(null)
+    const magUnErr = useRef(null);
+
+    // useEffect(() => {
+    //     const subscription = Geolocation.getInstance().subscribeGeoLocation({
+    //         next: (value) => {
+    //             if(value){
+    //                 console.log(value);
+    //                 gpsData.current = value;
+    //             }
+    //         }
+    //     })
+    //     return () => {
+    //         subscription.unsubscribe();
+    //     };
+    // }, []);
+
+
+    const onNext = (data,sensorKey) => {
+        switch(sensorKey){
+            case SensorKey.MAGNETOMETER:{
+                magData.current = data;
+                break;
+            }
+            case SensorKey.MAGNETOMETERUNCALIBRATED:{
+                magUnData.current = data;
+                break;
+            }
+            case SensorKey.ROTATIONVECTOR:{
+                rotData.current = data;
+                break;
+            }
+            case SensorKey.GRAVITY:{
+                gravData.current = data;
+                break;
+            }
+        }
+    }
+    const onError = (err,sensorKey) => {
+        switch(sensorKey){
+            case SensorKey.MAGNETOMETER:{
+                magErr.current = err;
+                break;
+            }
+            case SensorKey.MAGNETOMETERUNCALIBRATED:{
+                magUnErr.current = err;
+                break;
+            }
+            case SensorKey.ROTATIONVECTOR:{
+                rotErr.current = err;
+                break;
+            }
+            case SensorKey.GRAVITY:{
+                gravErr.current = err;
+                break;
+            }
+        }
+    }
+
+    const setupService = async (sensorKey,interval) => {
+        const service = await SensorsService.getInstance().sensor(sensorKey)
+        service.configSensorInterval(interval);
+        service.startSensor();
+        const s = service.subscribe({
+            next:(data) => onNext(data,sensorKey),
+            error:(err) => onError(err,sensorKey),
+        })
+        return s;
+    }
+
+    useEffect(() => {
+        const mag = setupService(SensorKey.MAGNETOMETER,100);
+        const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,100);
+        const grav = setupService(SensorKey.GRAVITY,100);
+        const rot = setupService(SensorKey.ROTATIONVECTOR,100);
+            
+        return () => {
+            mag.then((s)=>{
+                s.unsubscribe()
+            })
+            magUn.then((s)=>{
+                s.unsubscribe()
+            })
+            grav.then((s)=>{
+                s.unsubscribe()
+            })
+            rot.then((s)=>{
+                s.unsubscribe()
+            })
+        }
+        
+    },[])
 
     const generateTitle = () => {
         let poi = POIID ? POIID : "None";
@@ -137,18 +229,9 @@ const DataPointCollectionScreen = () => {
         y,
     ])
 
-
-
-    const handleDirectionOnChange = (value) => {
-        setMapDirection(value);
-    }
-
+   
     const handleBuildingChange = (value) => {
         setBuildingID(value);
-    }
-
-    const handleOnPOIChange = (value) => {
-        setPOIID(value);
     }
 
     const handleTitleOnChange = (value) => {
@@ -156,7 +239,7 @@ const DataPointCollectionScreen = () => {
     }
 
     const handleFloorOnChange = (value) => {
-        setFloor(value)
+        setFloorIndex(value)
     }
     const handleOnXChange = (value) => {
         setX(value)
@@ -181,10 +264,22 @@ const DataPointCollectionScreen = () => {
     const onDeviceOrientationChange = (value) =>{
         setDeviceOrientation(value)
     }
+
     const getData = async () => {
         const wifiData = await getWifiData();
-        const gravityData = await gravityGetLastEvent();
-        const magnetometerData = await magnetometerGetLastEvent();
+        if(typeof wifiData == "string"){
+            console.log(wifiData)
+            return;
+        }
+        const magnetometerData = magData.current;
+        const magnetometerUncalibData = magUnData.current;
+        const rotationVectorData = rotData.current;
+        const gravityData = gravData.current;
+        const gpsData = await Geolocation.getInstance().getCurrentGPSPosition({
+            enableHighAccuracy:true,
+            maximumAge:0,
+            timeout:3000
+        })
         const dataPoint = {
             id:generateUUID(),
             title:generateTitle(),
@@ -196,23 +291,74 @@ const DataPointCollectionScreen = () => {
             y:y,           
             deviceOrientation:deviceOrientation, 
             direction:mapDirection,
-            cardinalDirection: buildingCardinalDirections[mapDirection],
             isHighTurbuance:isHighTurbuance,
-            availableDirections:availableDirections,
-            availableCardinalDirections:availableDirections.map((d) => buildingCardinalDirections[d]),
-            gravityData:gravityData,
             magnetometerData:magnetometerData,
+            magnetometerUncalibData:magnetometerUncalibData,
             wifiData:wifiData,
-            buildingID:buildingID
-            
+            buildingID:buildingID,
+            rotationVectorData:rotationVectorData,
+            gravityData:gravityData,
+            gpsData:gpsData
         }
+        // console.log(dataPoint)
         return dataPoint
     }
 
+
+
     const addNewDataPoint = async () => {
         const newDataPoint = await getData();
-        setPoints(prev => [...prev,newDataPoint]);
+        if (newDataPoint){
+            setPoints(prev => [...prev,newDataPoint]);
+        }
     }
+
+    const dispatch = useDispatch();
+
+    const savePoints = async (points) => {
+        const data = {
+            points:points,
+            buildingId:buildingID,
+            version:version
+        }
+        dispatch(uploadProcessingMap({buildingId:buildingID,data:data}));
+    }
+
+    const processingMap = useSelector(selectProcessingMap);
+    const processingStatus = useSelector(selectProcessingStatus);
+    const processingError = useSelector(selectProcessingError);
+    useEffect(() => {   
+        const searchVersion = "v99";
+        switch(processingStatus){
+            case Status.IDLE : {
+                if(buildingID && searchVersion){
+                    dispatch(fetchProcessingMap({buildingId:buildingID,version:searchVersion}));                    
+                }
+                break;
+            }
+                
+            case Status.SUCCEEDED:{
+                if (!processingMap){
+                    console.log("not found ", searchVersion)
+                }else{
+                    console.log(Object.keys(processingMap))
+                }
+                
+                break;
+            }
+            case Status.FAILED: {
+                console.log("FAILED!...")
+                console.log(processingError)
+                break;
+            }
+            case Status.PENDING:{
+                console.log("PENDING PROCESSING...")
+                break;
+            }
+        }
+
+    },[processingStatus,buildingID,version])    
+
 
     const onSavePoints = () => {
         Alert.alert(
@@ -227,16 +373,16 @@ const DataPointCollectionScreen = () => {
               {
                 text: 'OK',
                 onPress: () => {
-                    setSavedPoints(prev => [...prev,...points])
+                    // setSavedPoints(prev => [...prev,...points])
+                    setSavedPoints(points)
                     setPoints([]);
+                    savePoints(points);
                 },
               },
             ],
             { cancelable: false }
           );
     }
-
-    
 
     const onPointDelete = (index) => {
         //onConfirm()
@@ -260,7 +406,6 @@ const DataPointCollectionScreen = () => {
           );
     }
 
-
     useEffect(() => {
         
         Animated.timing(rotationRef.current, {
@@ -271,16 +416,17 @@ const DataPointCollectionScreen = () => {
     }, [mapDirection]);
 
     
-
     const userPosition = useMemo(() => {
         const userSize = currentDims.height / 33;
         return (
             <PositionOverlay size={userSize} floor={floorIndex} x={x} y={y} rotationRef={rotationRef}/> 
         )
 
-    }, [floor,x,y,rotationRef.current]);   
+    }, [floorIndex,x,y,rotationRef.current]);   
 
     const pointsOverlay = useMemo(() => {
+        console.log(savedPoints)
+        console.log(points)
         const savedPs = savedPoints.filter((p) => p.floor === floor);
         const currentPs = points.filter((p) => p.floor === floor);
         const size = 3;
@@ -314,7 +460,7 @@ const DataPointCollectionScreen = () => {
            
         )
 
-    }, [floor,savedPoints,points]);  
+    }, [floorIndex,savedPoints,points]);  
 
     return (
         <View style={{
@@ -326,22 +472,24 @@ const DataPointCollectionScreen = () => {
 
             
             <BuildingDropDown val={buildingID} onChange={handleBuildingChange} />
-            <POIsDropDown val={POIID} onChange={handleOnPOIChange}/>
-            <FloorSelection initialFloor={floor} onChange={handleFloorOnChange}/>
+            <FloorSelection initialFloor={floorIndex} onChange={handleFloorOnChange}/>
             <TitleInput value={title} onChange={handleTitleOnChange} />
-            <CategorySelection 
-                categories={directions}
-                label={"direction"}
-                onSelect={handleDirectionOnChange}
-                selectedCategory={mapDirection}
-            />          
-            <AvailableDirections
-                onChange={onAvailableDirectionsChange}
-                val={availableDirections}
-            />
+            <View style={{
+
+            }}>
+                <TextInput
+                    style={{
+                        color:"black"
+                    }}
+                    value={version}
+                    onChangeText={(text)=>setVersion(text)}
+                    multiline={false} 
+                />
+            </View>                
             <DeviceOrientationSelection val={deviceOrientation} onChange={onDeviceOrientationChange}/>
             <HighTurbuanceSwitch value={isHighTurbuance} onChange={onHighTurChange}/>
             <TestSwitch value={isTest} onChange={onIsTestChange}/>
+            
             <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
             <PositionSelection 
                 onChangeX={handleOnXChange}
@@ -353,7 +501,7 @@ const DataPointCollectionScreen = () => {
                 initialYBy={maxHeight/10}
                 initialY={y}
             />
-            <AddButton onPress={addNewDataPoint}/>
+        
             <AdminBuildingFloorMap
                 floorIndex={floorIndex}
             >
@@ -361,7 +509,7 @@ const DataPointCollectionScreen = () => {
                  {pointsOverlay}
             </AdminBuildingFloorMap>
 
-
+            <AddButton onPress={addNewDataPoint}/>
             <View style={{
                 paddingVertical:10,
             }}>

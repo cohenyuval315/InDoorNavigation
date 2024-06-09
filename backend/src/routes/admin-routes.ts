@@ -1,5 +1,6 @@
 import * as adminController from '../controllers/admin-controller';
 import * as buildingController from '../controllers/building-controller'
+import * as ProcessingController from '../controllers/processing-controller';
 import {Router, Request, Response, NextFunction } from 'express';
 const adminRouter = Router();
 
@@ -18,6 +19,81 @@ const adminRouter = Router();
  */
 adminRouter.get('/buildings/:id/graph',async (req:Request, res:Response, next:NextFunction) => await  buildingController.getAdminBuildingMapData(req,res,next));
 
+
+
+
+
+/**
+ * @swagger
+ * /processing/map/:buildingId
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.post('/processing/map/:buildingId',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.uploadProcessingMap(req,res,next));
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.get('/processing/map/:buildingId/:version',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getProcessingMap(req,res,next));
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.post('/processing/route/:buildingId',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.uploadRoute(req,res,next));
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.get('/processing/route/:buildingId/:routeName',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getRouteByName(req,res,next));
+
+
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.get('/processing/routes/:buildingId',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getAllRoutes(req,res,next));
 
 
 /**

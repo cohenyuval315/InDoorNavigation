@@ -11,91 +11,97 @@ export const globalCoordinatesToFloats = (globalCoordinates) => {
 
 
 export const mapGlobalCoordinatesToFloats = (globalCoordinates) => {
-    return Object.fromEntries(
-        Object.entries(globalCoordinates).map(([key, values]) => {
-          return [
-            key,
-            {
-              latitude: parseFloat(parseFloat(values.latitude).toFixed(20)),
-              longitude: parseFloat(parseFloat(values.longitude).toFixed(20))
-            }
-          ];
-        })
-    );
+    return globalCoordinates.map((coords) => {
+        return globalCoordinatesToFloats(coords);
+    })
 }
 
-export const getRelativeGlobalCoordinates = (mapGlobalCoordinates) => {
-    const floatCoordinates = mapGlobalCoordinatesToFloats(mapGlobalCoordinates)
-    const topXDiff = floatCoordinates.topRight.longitude - floatCoordinates.topLeft.longitude;
-    const bottomXDiff = floatCoordinates.bottomRight.longitude - floatCoordinates.bottomLeft.longitude;
-    const xDiff = (topXDiff + bottomXDiff) / 2;
+export const getGeoLocationBoundaryBox = (globalCoordinates) => {
+    const floatCoordinates = mapGlobalCoordinatesToFloats(globalCoordinates);
+    const minLatitude = Math.min(...floatCoordinates.map(coord => coord.latitude));
+    const maxLatitude = Math.max(...floatCoordinates.map(coord => coord.latitude));
+    const minLongitude = Math.min(...floatCoordinates.map(coord => coord.longitude));
+    const maxLongitude = Math.max(...floatCoordinates.map(coord => coord.longitude));
+    return {
+        minLatitude,
+        maxLatitude,
+        minLongitude,
+        maxLongitude,
+    }
+}
+
+export const getRelatvieGeoLocationBoundaryBox = (globalCoordinates) => {
+    const minLatitude = Math.min(...globalCoordinates.map(coord => coord.latitude));
+    const maxLatitude = Math.max(...globalCoordinates.map(coord => coord.latitude));
+    const minLongitude = Math.min(...globalCoordinates.map(coord => coord.longitude));
+    const maxLongitude = Math.max(...globalCoordinates.map(coord => coord.longitude));
+
+    return {
+        minLatitude,
+        maxLatitude,
+        minLongitude,
+        maxLongitude,
+    }
+
+}
+
+export const getRelativeGeoCoordinates = (geoLocationBoundaryBox,targetCoordinates) => {
+    const {minLatitude,
+        maxLatitude,
+        minLongitude,
+        maxLongitude} = getRelatvieGeoLocationBoundaryBox(geoLocationBoundaryBox);
+
+    const x = 100 * (targetCoordinates.longitude - minLongitude) / (maxLongitude - minLongitude);
+    const y = 100 * (maxLatitude - targetCoordinates.latitude) / (maxLatitude - minLatitude);
+
+    return { x, y };    
+}
+
+export const getRelativeGlobalCoordinates = (geoLocationBoundaryBox,targetCoordinates) => {
+    const {minLatitude,
+        maxLatitude,
+        minLongitude,
+        maxLongitude} = geoLocationBoundaryBox;
     
-    const leftYDiff = floatCoordinates.topLeft.latitude - floatCoordinates.bottomLeft.latitude;
-    const rightYDiff = floatCoordinates.topRight.latitude - floatCoordinates.bottomRight.latitude;
-    const yDiff = (leftYDiff + rightYDiff) / 2;
+    const x = 100 * (targetCoordinates.longitude - minLongitude) / (maxLongitude - minLongitude);
+    const y = 100 * (maxLatitude - targetCoordinates.latitude) / (maxLatitude - minLatitude);
 
-    const relativeCoordinates = {
-        topLeft:{
-            x:0,
-            y:yDiff,
-            latitude:floatCoordinates.topLeft.latitude,
-            longitude:floatCoordinates.topLeft.longitude
-        },
-        topRight:{
-            x:xDiff,
-            y:yDiff,
-            latitude:floatCoordinates.topRight.latitude,
-            longitude:floatCoordinates.topRight.longitude
-        },
-        bottomRight:{
-            x:xDiff,
-            y:0,
-            latitude:floatCoordinates.bottomRight.latitude,
-            longitude:floatCoordinates.bottomRight.longitude
-        },
-        bottomLeft:{
-            x:0,
-            y:0,
-            latitude:floatCoordinates.bottomLeft.latitude,
-            longitude:floatCoordinates.bottomLeft.longitude
-        }
-    }
-    return relativeCoordinates;
+    return { x, y };    
 }
 
 
-export function getRelativePointByGlobalCoordinatesAndMapGlobalCoordinates(globalCoordinates,mapRelativeCoordinatesData){
-    const xDiffTop = globalCoordinates.longitude - mapRelativeCoordinatesData.bottomLeft.longitude;
-    const xDiffBottom = globalCoordinates.longitude - mapRelativeCoordinatesData.topLeft.longitude;
-    let itemX = (xDiffTop + xDiffBottom) / 2;   
-    if(itemX < 0){
-        itemX = 0;
-    }    
-    const maxX = (mapRelativeCoordinatesData.topRight.longitude + mapRelativeCoordinatesData.bottomRight.longitude) / 2
+// export function getRelativePointByGlobalCoordinatesAndMapGlobalCoordinates(globalCoordinates,mapRelativeCoordinatesData){
+//     const xDiffTop = globalCoordinates.longitude - mapRelativeCoordinatesData.bottomLeft.longitude;
+//     const xDiffBottom = globalCoordinates.longitude - mapRelativeCoordinatesData.topLeft.longitude;
+//     let itemX = (xDiffTop + xDiffBottom) / 2;   
+//     if(itemX < 0){
+//         itemX = 0;
+//     }    
+//     const maxX = (mapRelativeCoordinatesData.topRight.longitude + mapRelativeCoordinatesData.bottomRight.longitude) / 2
 
-    if(itemX > maxX){
-        itemX = maxX;
-    }
-    const yDiffRight = globalCoordinates.latitude - mapRelativeCoordinatesData.bottomRight.latitude;
-    const yDffLeft = globalCoordinates.latitude - mapRelativeCoordinatesData.bottomLeft.latitude;
-    let itemY = (yDiffRight + yDffLeft) / 2;   
-    if(itemY < 0){
-        itemY = 0;
-    }    
-    const maxY = (mapRelativeCoordinatesData.topRight.latitude + mapRelativeCoordinatesData.topLeft.latitude) / 2
-    if(itemY > maxY){
-        itemY = maxY;
-    }
-    return {
-        x:itemX,
-        y:itemY
-    }  
-}
+//     if(itemX > maxX){
+//         itemX = maxX;
+//     }
+//     const yDiffRight = globalCoordinates.latitude - mapRelativeCoordinatesData.bottomRight.latitude;
+//     const yDffLeft = globalCoordinates.latitude - mapRelativeCoordinatesData.bottomLeft.latitude;
+//     let itemY = (yDiffRight + yDffLeft) / 2;   
+//     if(itemY < 0){
+//         itemY = 0;
+//     }    
+//     const maxY = (mapRelativeCoordinatesData.topRight.latitude + mapRelativeCoordinatesData.topLeft.latitude) / 2
+//     if(itemY > maxY){
+//         itemY = maxY;
+//     }
+//     return {
+//         x:itemX,
+//         y:itemY
+//     }  
+// }
 
 
-export const getPointInMapBySize = (point,topRightPoint,width,height) => {
-    return {
-        x: (point.x / topRightPoint.x) * width,
-        y: (point.y / topRightPoint.y) * height
-    }
-}
+// export const getPointInMapBySize = (point,topRightPoint,width,height) => {
+//     return {
+//         x: (point.x / topRightPoint.x) * width,
+//         y: (point.y / topRightPoint.y) * height
+//     }
+// }

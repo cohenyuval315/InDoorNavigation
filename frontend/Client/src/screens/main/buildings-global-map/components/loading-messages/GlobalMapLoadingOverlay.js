@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, ActivityIndicator, Text,Animated,Easing  } from 'react-native';
+import useLoadingMessages from '../../../../../hooks/useLoadingMessages';
 
 
-const GlobalMapLoadingOverlay = ({loadingMessages}) => {
+const GlobalMapLoadingOverlay = () => {
+    const {loadingMessages} = useLoadingMessages()
     const [dots, setDots] = useState('.');
     const prevLoadingMessagesRef = useRef(loadingMessages);
     const fadeAnim = useRef(new Animated.Value(1));
     const deletedMessages = useRef([]);
-
-
+    
     useEffect(() => {
         const intervalId = setInterval(() => {
             setDots(prevDots => {
@@ -22,17 +23,7 @@ const GlobalMapLoadingOverlay = ({loadingMessages}) => {
         return () => clearInterval(intervalId);
     }, []); 
 
-    useEffect(() => {
-        const messagesChanges = [];
-        loadingMessages.forEach((message, index) => {
-            if (prevLoadingMessagesRef.current[index] !== message) {
-                messagesChanges.push(index);
-            }
-        });
-        deletedMessages.current = messagesChanges;
-        // setDeleted(messagesChanges);
-        animateMessages();
-    }, [loadingMessages]);
+
 
 
 
@@ -51,6 +42,21 @@ const GlobalMapLoadingOverlay = ({loadingMessages}) => {
         });
         
     };
+
+    useEffect(() => {
+        const messagesChanges = [];
+        loadingMessages.forEach((message, index) => {
+            if (prevLoadingMessagesRef.current[index] !== message) {
+                messagesChanges.push(index);
+            }
+        });
+        deletedMessages.current = messagesChanges;
+        // setDeleted(messagesChanges);
+        animateMessages();
+        return () => {
+            fadeAnim.current.stopAnimation();
+        }
+    }, [loadingMessages]);
 
 
     return (

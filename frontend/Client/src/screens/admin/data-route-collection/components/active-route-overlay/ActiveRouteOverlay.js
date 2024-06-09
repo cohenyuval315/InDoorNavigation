@@ -3,10 +3,10 @@ import MapOverlay from "../../../../../layouts/map-overlay";
 import { useSelector } from "react-redux";
 import { selectEdges, selectNodes } from "../../../../../app/admin/admin-slice";
 import { SvgXml } from "react-native-svg";
-import { selectMapsDims } from "../../../../../app/map/map-slice";
+import { selectMapsDims, selectMinFloor } from "../../../../../app/map/map-slice";
 
 
-export const generateRouteSvgString = (height,width,nodes, edges, floorIndex) => {
+export const generateRouteSvgString = (height,width,nodes, edges, floor) => {
     let svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" version="1.1">`;
     const nodesOnFloor = nodes.map((node,index) => {
         const nodeWithIndex = {
@@ -14,7 +14,7 @@ export const generateRouteSvgString = (height,width,nodes, edges, floorIndex) =>
             index:index,
         }
         return nodeWithIndex
-    }).filter(node => node.mapCoordinates.floor === floorIndex);
+    }).filter(node => node.mapCoordinates.floor === floor);
 
     edges.forEach(edge => {
         const sourceNode = nodes.find(node => node.id === edge.nodeA);
@@ -33,7 +33,7 @@ export const generateRouteSvgString = (height,width,nodes, edges, floorIndex) =>
       });
       
     edges.forEach(edge => {
-        const nodeA = nodes.find(node => node.id === edge.nodeA && node.mapCoordinates.floor !== floorIndex);
+        const nodeA = nodes.find(node => node.id === edge.nodeA && node.mapCoordinates.floor !== floor);
         if (nodeA){
             const sourceCoordinates = nodeA.mapCoordinates;
             const targetNode = nodes.find(node => node.id === edge.nodeB);
@@ -44,7 +44,7 @@ export const generateRouteSvgString = (height,width,nodes, edges, floorIndex) =>
         }
     });    
     edges.forEach(edge => {
-        const nodeB = nodes.find(node => node.id === edge.nodeB && node.mapCoordinates.floor !== floorIndex);
+        const nodeB = nodes.find(node => node.id === edge.nodeB && node.mapCoordinates.floor !== floor);
         if (nodeB){
             const targetCoordinates = nodeB.mapCoordinates;
             const sourceNode = nodes.find(node => node.id === edge.nodeA);
@@ -62,6 +62,8 @@ const ActiveRouteOverlay = ({route,floorIndex}) => {
     const mapsDims = useSelector(selectMapsDims)
     const nodes = useSelector(selectNodes);
     const edges = useSelector(selectEdges);
+    const minFloor = useSelector(selectMinFloor);
+
     
     const length = route.length;
     let start = "s";
@@ -73,44 +75,9 @@ const ActiveRouteOverlay = ({route,floorIndex}) => {
     if (route.length === 0){
         return null;
     }
-    const svgString = generateRouteSvgString(mapsDims[floorIndex].height,mapsDims[floorIndex].width,route,edges,floorIndex)
+    const svgString = generateRouteSvgString(mapsDims[floorIndex].height,mapsDims[floorIndex].width,route,edges,floorIndex + minFloor)
     return (
         <MapOverlay >
-            {/* {route.map((waypoint,index) => {
-                let title = index;
-                if (index == 0) {
-                    title = start;
-                }
-                if (index == length) {
-                    title = target;
-                }                
-
-                if(index < length){
-                    const nextWaypoint = route[index + 1];
-                }
-                return (
-                    <View key={`route_${waypoint.title}_${index}`} style={{
-                        position: "absolute",
-                        top:100,
-                        left:100,
-                        borderRadius:30,
-
-                    }}>
-                        <View style={{
-                            backgroundColor:"black"
-                        }}>
-                            <Text style={{
-                                
-                            }}>
-                                {index}
-                            </Text>
-                        </View>
-                    </View>
-                )
-
-            })} */}
-
-
             <SvgXml
                 xml={svgString}
             />

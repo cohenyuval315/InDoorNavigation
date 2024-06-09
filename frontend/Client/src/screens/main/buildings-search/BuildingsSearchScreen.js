@@ -27,7 +27,11 @@ const BuildingsSearchScreen = () => {
         <View style={{
             flex:1,
         }}>
-            <SearchBar value={value} onChangeText={onChangeText} />
+            <View>
+                <SearchBar value={value} onChangeText={onChangeText} />
+                
+            </View>
+            
             {filteredBuildings.length === 0 ? (
                 <NoDataFound />
             ) : (

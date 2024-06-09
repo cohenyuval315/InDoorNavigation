@@ -58,6 +58,7 @@ import { fetchBuildingGraphById,selectGraphStatus } from '../app/admin/admin-sli
 import { useTheme } from '../contexts/ThemeContext';
 import BuildingMapPathBuilder from '../screens/main/building-map/components/path-builder/BuildingMapPathBuilder';
 import Status from '../app/status';
+import NavigationWrapper from './NavigationWrapper';
 
 const TestScreen = (props) => {
   const [loading,setLoading] = React.useState(true);
@@ -78,11 +79,11 @@ const TestScreen = (props) => {
   },[dispatch,mapStatus,graphStatus])
   
   const onPress = () => {
-    // props.navigation.navigate("data-points-collection")
-    props.navigation.navigate("data-routes-collection")
+    props.navigation.navigate("data-points-collection")
+    // props.navigation.navigate("data-routes-collection")
     // props.navigation.navigate("buildings-global-map")
     
-    //props.navigation.navigate("buildings-global-map")
+    // props.navigation.navigate("buildings-global-map")
   }
   if(loading){
     return null;
@@ -93,6 +94,13 @@ const TestScreen = (props) => {
     </View>
   )
 }
+
+const WrapperComponent = ({ children }) => {
+  return (
+    <>{children}</>
+  );
+};
+
 
 function RootStackNavigator() {
     const {theme} = useTheme();
@@ -121,79 +129,83 @@ function RootStackNavigator() {
           initialState={null}
           onReady={() => console.log("ready")}
         >
-          <Stack.Navigator initialRouteName='Root'  screenOptions={rootScreenOptions}>
-            <Stack.Screen  name="Root" component={TestScreen} options={{headerShown:true}} />
-            
-            {/* Main Screens */}
-            <Stack.Group screenOptions={{ headerShown:false }}>
-              <Stack.Screen  name="empty" component={EmptyScreen} />
-              <Stack.Screen name="buildings-global-map" component={BuildingsGlobalMapScreen} />
-              <Stack.Screen name='buildings-search' component={BuildingsSearchScreen}/>
+          <NavigationWrapper>
+        
+            <Stack.Navigator initialRouteName='Root'  screenOptions={rootScreenOptions}>
+              <Stack.Screen  name="Root" component={TestScreen} options={{headerShown:true}} />
               
+              {/* Main Screens */}
+              <Stack.Group screenOptions={{ headerShown:false }}>
+                <Stack.Screen  name="empty" component={EmptyScreen} />
+                <Stack.Screen name="buildings-global-map" component={BuildingsGlobalMapScreen} />
+                <Stack.Screen name='buildings-search' component={BuildingsSearchScreen}/>
+                
 
-              
+                
 
-              <Stack.Screen name="building-map" component={BuildingMapDisplayScreen} />
-              <Stack.Screen name="building-POIs-search" component={BuildingPOIsSearchScreen} />
-              
+                <Stack.Screen name="building-map" component={BuildingMapDisplayScreen} />
+                <Stack.Screen name="building-POIs-search" component={BuildingPOIsSearchScreen} />
+                
 
-              <Stack.Screen name="building-pre-navigation" component={BuildingPreNavigationScreen} />
-              <Stack.Screen name="building-navigation" component={BuildingNavigationScreen} />
-            </Stack.Group>    
+                <Stack.Screen name="building-pre-navigation" component={BuildingPreNavigationScreen} />
+                <Stack.Screen name="building-navigation" component={BuildingNavigationScreen} />
+              </Stack.Group>    
 
-            {/* Main Modals Screens */}   
-            <Stack.Group screenOptions={{ headerShown:false ,presentation:"transparentModal"}}>
-                <Stack.Screen name='building-map-path-builder-modal' component={BuildingMapPathBuilder}/>
-            </Stack.Group>  
-            {/* Auth Screens */}
+              {/* Main Modals Screens */}   
+              <Stack.Group screenOptions={{ headerShown:false ,presentation:"transparentModal"}}>
+                  <Stack.Screen name='building-map-path-builder-modal' component={BuildingMapPathBuilder}/>
+              </Stack.Group>  
+              {/* Auth Screens */}
 
-            {isSignedIn ? (
-              <>
+              {isSignedIn ? (
+                <>
+                  <Stack.Group screenOptions={{ headerShown:false }}>
+                    <Stack.Screen name="Profile" component={ProfileScreen} />
+                    <Stack.Screen name="Settings" component={SettingsScreen} />
+                  </Stack.Group>
+                </>
+              ) : (
                 <Stack.Group screenOptions={{ headerShown:false }}>
-                  <Stack.Screen name="Profile" component={ProfileScreen} />
-                  <Stack.Screen name="Settings" component={SettingsScreen} />
+                  <Stack.Screen name="Login" component={LoginScreen} />
+                  <Stack.Screen name="SignUp" component={SignUpScreen} />
                 </Stack.Group>
-              </>
-            ) : (
+              )}
+
+              {/* Admin Screens */}
+              {isSignedIn && isAdmin && (
+
+                <Stack.Group screenOptions={{ headerShown:false }}>
+                  <Stack.Screen name="data-points-collection" component={DataPointCollectionScreen} />
+                  <Stack.Screen name="data-routes-collection" component={DataRouteCollectionScreen} />
+                  <Stack.Screen name="graph-map-collection" component={GraphMapCollectionScreen} />
+                  <Stack.Screen name="pois-collection" component={POICollectionScreen} />
+                </Stack.Group> 
+              )}
+
+              {/* Errors Screens */} 
               <Stack.Group screenOptions={{ headerShown:false }}>
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="SignUp" component={SignUpScreen} />
-              </Stack.Group>
-            )}
+                <Stack.Screen name="no-internet" component={NoInternetScreen} />
+                <Stack.Screen name="servers-down" component={ServersAreDownScreen} />
+                <Stack.Screen name="unknown-error"  component={UnknownErrorScreen} />
+              </Stack.Group>    
 
-            {/* Admin Screens */}
-            {isSignedIn && isAdmin && (
+              {/* General Modals Screens */}   
+              <Stack.Group screenOptions={{ headerShown:false ,presentation:"transparentModal"}}>
+                <Stack.Screen name="permissions" component={PermissionsModal} />
+                <Stack.Screen name="contract" component={ContractModal} />
+                <Stack.Screen name="location-services" component={EnableLocationServicesModal} />
+                <Stack.Screen name="error-message" component={ErrorMessageModal}/> 
+              </Stack.Group>   
 
+              {/* General Screens */}
               <Stack.Group screenOptions={{ headerShown:false }}>
-                <Stack.Screen name="data-points-collection" component={DataPointCollectionScreen} />
-                <Stack.Screen name="data-routes-collection" component={DataRouteCollectionScreen} />
-                <Stack.Screen name="graph-map-collection" component={GraphMapCollectionScreen} />
-                <Stack.Screen name="pois-collection" component={POICollectionScreen} />
-              </Stack.Group> 
-            )}
+                <Stack.Screen name="loading" component={LoadingScreen} />
+                <Stack.Screen name="splash" component={SplashScreen} />
+              </Stack.Group>              
 
-            {/* Errors Screens */} 
-            <Stack.Group screenOptions={{ headerShown:false }}>
-              <Stack.Screen name="no-internet" component={NoInternetScreen} />
-              <Stack.Screen name="servers-down" component={ServersAreDownScreen} />
-              <Stack.Screen name="unknown-error"  component={UnknownErrorScreen} />
-            </Stack.Group>    
-
-            {/* General Modals Screens */}   
-            <Stack.Group screenOptions={{ headerShown:false ,presentation:"transparentModal"}}>
-              <Stack.Screen name="permissions" component={PermissionsModal} />
-              <Stack.Screen name="contract" component={ContractModal} />
-              <Stack.Screen name="location-services" component={EnableLocationServicesModal} />
-              <Stack.Screen name="error-message" component={ErrorMessageModal}/> 
-            </Stack.Group>   
-
-            {/* General Screens */}
-            <Stack.Group screenOptions={{ headerShown:false }}>
-              <Stack.Screen name="loading" component={LoadingScreen} />
-              <Stack.Screen name="splash" component={SplashScreen} />
-            </Stack.Group>              
-
-          </Stack.Navigator>
+            </Stack.Navigator>
+          
+          </NavigationWrapper>
         </NavigationContainer>
     );
   }

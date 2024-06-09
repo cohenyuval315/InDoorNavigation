@@ -6,39 +6,18 @@ import { useDispatch } from "react-redux";
 import { setActiveBuilding } from "../../../../../app/active/active-slice";
 
 const GlobalMapBuilding = ({building,color,zIndex,onBuildingPress}) => {
-    const offset = 0;
     const dispatch = useDispatch();
 
-    
-    
-    function getBottom(value){
-        const percentages = (value / WINDOW_HEIGHT) * 100 ;
-        let v = offset + percentages;
-        if (v < 0){
-            v = offset;
-        }
-        if (v >= 100 - 2 * offset){
-            v = 100 - 2 * offset;
-        }
-        let val = `${v}%`; // 22
-        return val;
-    }
-
-    function getLeft(value){
-        const percentages = (value / WINDOW_WIDTH) * 100 ;
-        return `${percentages}%`;
-    }
     const handleOnBuildingPress = () => {
         dispatch(setActiveBuilding(building));
-        // onBuildingPress(building);
     }
 
     return (
         <View style={{
             position:"absolute",
-            bottom:getBottom(building.mapCoordinates.y), 
-            left: getLeft(building.mapCoordinates.x),
-            zIndex: 3, 
+            top:`${building.mapCoordinates.y}%`, 
+            left:`${building.mapCoordinates.x}%`, 
+            zIndex: 30, 
         }}>
             <TouchableOpacity
             onPress={handleOnBuildingPress}

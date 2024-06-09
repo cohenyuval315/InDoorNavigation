@@ -1,134 +1,329 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CardinalDirection, Direction } from "../../../constants/constants";
-import { Animated, Button, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {  Text, TouchableOpacity, View } from "react-native";
 import BuildingDropDown from "../components/building-dropdown";
 import UnsureSwitch from "../components/unsure-switch";
 import TestSwitch from "../components/test-switch";
 import AdminBuildingMap from "../components/building-map/AdminBuildingMap";
-import { generateUUID } from "../../../utils/uuid";
-import RouteOverlay from "./components/route-overlay";
 import RouteBuilder from "./components/route-builder";
-import PositionOverlay from "../components/position-overlay";
 import ActiveRouteOverlay from "./components/active-route-overlay";
-import { selectMapsDims } from "../../../app/map/map-slice";
-import { useSelector } from "react-redux";
-import RouteTimer from "./components/route-timer";
+import {  selectMinFloor } from "../../../app/map/map-slice";
+import { useDispatch, useSelector } from "react-redux";
 import { TextInput } from "react-native-gesture-handler";
+import { SensorKey } from "../../../services/sensors/SensorKey";
+import SensorsService from "../../../sensors/sensors-service";
+import { WifiService } from "../../../sensors/wifi-service";
+import { useConfirmationModal } from "../../../contexts/ConfirmationModalContext";
+import { fetchProcessingRoute, selectProcessingError, selectProcessingRoutes, selectProcessingStatus, uploadProcessingRoute } from "../../../app/admin/admin-slice";
+import parseErrorStack from "react-native/Libraries/Core/Devtools/parseErrorStack";
+import Status from "../../../app/status";
+import useGPS from "../../../hooks/useGPS";
 
-const directionAngles = {
-    [Direction.DOWN]: 180,
-    [Direction.UP]: 0,
-    [Direction.LEFT]: -90,
-    [Direction.RIGHT]: 90,
-    [Direction.UP_LEFT]: -45,
-    [Direction.UP_RIGHT]: 45,
-    [Direction.DOWN_LEFT]: -135,
-    [Direction.DOWN_RIGHT]: 135,
-};
-
-const directions = Object.values(Direction)
-
-const buildingCardinalDirections = {
-    [Direction.DOWN]:CardinalDirection.NORTH,
-    [Direction.UP]:CardinalDirection.SOUTH,
-    [Direction.LEFT]: CardinalDirection.EAST,
-    [Direction.RIGHT]: CardinalDirection.WEST,    
-    [Direction.UP_LEFT]: CardinalDirection.SOUTH_EAST,
-    [Direction.UP_RIGHT]: CardinalDirection.SOUTH_WEST,
-    [Direction.DOWN_LEFT]:CardinalDirection.NORTH_EAST,
-    [Direction.DOWN_RIGHT]:CardinalDirection.NORTH_WEST,
-}
-
-const UserPosition = () => {
-
-}
-
+WifiService.getInstance().startStream();
 
 const DataRouteCollectionScreen = () => {
+    const minFloor = useSelector(selectMinFloor);
+    const processingRoute = useSelector(selectProcessingRoutes);
+    const processingStatus = useSelector(selectProcessingStatus);
+    const processingError = useSelector(selectProcessingError)
+    const dispatch = useDispatch()
+    const {openConfirm} = useConfirmationModal()
     const [isTest,setIsTest] = useState(false);
     const [isUnsure,setIsUnsure] = useState(false);
+    const [isStart, setIsStart] = useState(false);
 
     const [floorsOpacities,setFloorOpacities] = useState([1,1])
 
-    /** TIMER */
-    const [timeLength, setTimeLength] = useState(30);
-    const [time, setTime] = useState(timeLength);
-    const [isTimeActive, setIsTimeActive] = useState(false);
-
-    /** GENERAL INFO */
     const [buildingID,setBuildingID] = useState(null);
-    const [routeName,setRouteName] = useState();
-
-
-    /** PATH INITIAL STATE */
-    const [initialDeviceOrientationDirection,setInitialDeviceOrientationDirection] = useState();
-    const [initialDirection,setInitialDirection] = useState()
-
-    const [initialPosition,setInitialPosition] = useState();
-    const [targetPosition,setTargetPosition] = useState();
-
-    /** PATH DATA */
-    const [checkpoints,setCheckpoints] = useState();
-
-    
-
+    const [routeName,setRouteName] = useState('routetest');
 
     const [route,setRoute] = useState([]);
-    const [pathType,setPathType] = useState();
-    
-    const [isManual,setIsManual] = useState();
-    const [automaticInterval,setAutomaticInterval] = useState()
-    
-    const [deviceMovement,setDeviceMovement] = useState();
-    const [deviceMovementInterval,setDeviceMovementInterval] = useState(null); // null = static
-    const [userMovement,setUserMovement] = useState()
-    const [accelerometerData,setAccelerometerData] = useState();
-    const [gyroscopeData,setGyroscope] = useState();
-    const [magnetometerData, setMagnetometerData] = useState();
-    const [wifiData,setWifiData] = useState();
-    const [GPSData,setGPSData] = useState()
-    
-
-    const [accelerometerInterval,setAccelerometerInterval] = useState();
-    const [magnetometerInterval,setMagnetometerInterval] = useState();
-    const [gyroscopeInterval,setGyroscopeInterval] = useState();
-    const [wifiInterval,setWifiInterval] = useState();
-    const [deviceOrientation,setDeviceOrientation] = useState();
-    const [rotationVector,setRotationVector] = useState();    
-    const [GPSInterval,setGPSInterval] = useState();
-
-    const [stepsTimestamps,setStepsTimestamps] = useState();
-
-    const [startTime,setStartTime] = useState(0);
-
-    const [routeData,setRouteData] = useState();
-
-    const [data,setData] = useState()
     const [currentFloorIndex ,setCurrentFloorIndex] = useState(0);
-    
-    const [devicesDetails] = useState({
-        device:{
+ 
+    const checkpointsRef = useRef([])
+    const checkpointIndexRef = useRef(null);
 
-        },
-        magnetometer:{
-            name:"MXG4300S Magnetometer",
-            vendor:"",
-            powerConsumption:"1.95 mA",
-            version:2
-        },
-        accelerometer:{
-            name:"LSM6DSOTR Accelerometer",
-            powerConsumption:"0.15 mA",
-            vendor: "STM",
-            version:15933
-        },
-        gyroscope:{
-            name:"LSM6DSOTR Gyroscope",
-            powerConsumption:"0.65 mA",
-            vendor: "STM",
-            version:1
+    const sensorsDataRef = useRef([]);
+    const wifiRef = useRef([]);
+    const GPSDataRef = useRef([]);
+    const {subscribeGPS} = useGPS()
+    useEffect(() => {
+        const subscription = subscribeGPS({
+            next: (value) => {
+                if(value){
+                    GPSDataRef.current.push(value)
+                }
+            }
+        })
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+    useEffect(() => {
+        const subscription = WifiService.getInstance().subscribeWifi({
+            next: (value) => {
+                wifiRef.current.push(value)
+            }
+        });
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
+    const activeRoute = useMemo(() => {
+        return (
+            <ActiveRouteOverlay 
+                route={route}
+                floorIndex={currentFloorIndex}
+            />
+        )
+    },[route,currentFloorIndex])
+
+    const setupService = async (sensorKey,interval) => {
+        const service = await SensorsService.getInstance().sensor(sensorKey)
+        service.configSensorInterval(interval);
+        service.startSensor();
+        const s = service.subscribe({
+            next:onNext,
+            error:onError,
+        })
+        return s;
+    }
+
+    useEffect(() => {
+        const acc = setupService(SensorKey.ACCELEROMETER,100);
+        const grav = setupService(SensorKey.GRAVITY,5000);
+        const gyr = setupService(SensorKey.GYROSCOPE,100);
+        const gyroUn = setupService(SensorKey.GYROSCOPEUNCALIBRATED,5000);
+        const lin = setupService(SensorKey.LINEARACCELERATION,5000);
+        const mag = setupService(SensorKey.MAGNETOMETER,100);
+        const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,5000);
+        const rot = setupService(SensorKey.ROTATIONVECTOR,100);
+        const sd = setupService(SensorKey.STEPDETECTOR,100);
+        
+        return () => {
+            acc.then((s)=>{
+                s.unsubscribe()
+            })
+            grav.then((s)=>{
+                s.unsubscribe()
+            })
+            gyr.then((s)=>{
+                s.unsubscribe()
+            })
+            gyroUn.then((s)=>{
+                s.unsubscribe()
+            })
+            lin.then((s)=>{
+                s.unsubscribe()
+            })
+            mag.then((s)=>{
+                s.unsubscribe()
+            })
+            magUn.then((s)=>{
+                s.unsubscribe()
+            })
+            rot.then((s)=>{
+                s.unsubscribe()
+            })
+            sd.then((s)=>{
+                s.unsubscribe()
+            })
         }
-    })
+    },[])
+
+    useEffect(() => {   
+        const searchRouteName = "routetest3";
+        switch(processingStatus){
+            case Status.IDLE : {
+                if(buildingID && routeName){
+                    console.log("IDLE")
+                    console.log(buildingID)
+                    console.log(routeName)
+                    dispatch(fetchProcessingRoute({buildingId:buildingID,routeName:searchRouteName}));
+                    
+                }
+                break;
+            }
+                
+            case Status.SUCCEEDED:{
+                console.log("completed")
+                if (!processingRoute){
+                    console.log("not found ", searchRouteName)
+                }else{
+                    console.log("found ", searchRouteName)
+                    console.log(Object.keys(processingRoute))
+
+                    let sensors = [...processingRoute.sensorsData];
+                    sensors.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                    const startTime = sensors[0].timestamp
+                    const lastTime = sensors[processingRoute.sensorsData.length - 1].timestamp
+                    console.log("first",startTime)
+                    console.log("last:",lastTime)
+                    const d1 = new Date(startTime)
+                    const d2 = new Date(lastTime)
+                    console.log(d1)
+                    console.log(d2)
+                    const diff = d2 - d1;
+                    console.log("diff",diff)
+
+                    
+                }
+                
+                break;
+            }
+            case Status.FAILED: {
+                console.log("FAILED!...")
+                console.log(processingError)
+                break;
+            }
+            case Status.PENDING:{
+                console.log("PENDING PROCESSING...")
+                break;
+            }
+        }
+
+    },[processingStatus,buildingID,routeName])
+
+    useEffect(() => {
+        onReset();
+        if (route.length > 0){
+            alignRouteMap(0);
+        }else{
+            setCurrentFloorIndex(0);
+        }
+    },[route])
+
+    const getRouteData = () => {
+        const data = {
+            routeName:routeName,
+            checkpoints:checkpointsRef.current,
+            sensorsData:sensorsDataRef.current,
+            wifiData:wifiRef.current,
+            buildingId:buildingID,
+            isTest:isTest,
+            route:route,
+            gpsData:GPSDataRef.current
+        }
+        console.log(
+            data.routeName,
+            data.checkpoints.length,
+            data.sensorsData.length,
+            data.wifiData.length,
+            data.buildingId,
+            data.isTest,
+            data.route.length
+        )
+        return data;
+    }
+
+
+    const onNext = (data) => {
+        try{
+            sensorsDataRef.current.push(data);
+        }catch(error){
+            console.log(error)
+        }
+        
+        
+        
+    }
+
+    const onError = (error) => {
+        try{
+            sensorsDataRef.current.push(error)
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+
+    const alignRouteMap = (index) => {
+        if (route.length > index && index >= 0){
+            const checkpoint = route[index];
+            const currentFloor = checkpoint.mapCoordinates.floor // 0
+            const floorIndex = currentFloor - minFloor;
+            if(currentFloorIndex != floorIndex){
+                setCurrentFloorIndex(floorIndex);
+            }
+        }
+    }
+
+      const handleStart = () => {
+        if (route.length > 1){
+            checkpointIndexRef.current = 0;
+            wifiRef.current = [];
+            sensorsDataRef.current = [];
+            GPSDataRef.current = [];
+            wifiRef.current = [];
+            checkpointsRef.current = [{
+                index:0,
+                point:route[0],
+                time:new Date(),
+            }];
+            
+            setIsStart(true);
+        }
+      };
+
+
+      const onReset = () => {
+        setIsStart(false);
+        checkpointIndexRef.current = null;
+      }
+      
+    
+      const handleRecord = async () => {
+        console.log("num:",checkpointIndexRef.current)
+        if(!isStart){
+            return
+        }
+        if(isNaN(checkpointIndexRef.current)){
+            return;
+        }
+        checkpointIndexRef.current = checkpointIndexRef.current + 1;
+        if (route.length > checkpointIndexRef.current){
+            alignRouteMap(checkpointIndexRef.current);
+            checkpointsRef.current.push({
+                index: checkpointIndexRef.current,
+                point:route[checkpointIndexRef.current],
+                time:new Date(),
+            });
+
+        }
+        if(route.length - 1 == checkpointIndexRef.current){
+            await handleOnFinish();
+        }        
+      };
+    
+      const handleOnFinish = async () => {
+        setIsStart(false)
+        console.log("FINISH");
+        // checkpointIndexRef.current = 0;
+        // console.log(checkpointsRef);
+        // console.log(sensorsDataRef.current)
+        alignRouteMap(route[0]);
+        const data = getRouteData();
+        openConfirm(
+            "save route",
+            "are u sure to save?",
+            () => {
+                dispatch(uploadProcessingRoute({buildingId:buildingID,data:data}))
+                // dispatch(fetchProcessingRoute({buildingId:buildingID,routeName:routeName}))
+                
+     
+            })
+       
+
+      };
+
+      const handleReset = () => {
+        onReset();
+      }
+
+
+
+
 
     const onIsTestChange = (value)  => {
         setIsTest(value)
@@ -141,93 +336,11 @@ const DataRouteCollectionScreen = () => {
         setBuildingID(value);
     }
 
-    // useEffect(() => {
-        
-    //     Animated.timing(rotationRef.current, {
-    //         toValue: directionAngles[],
-    //         duration: 100,
-    //         useNativeDriver: true,
-    //     }).start();
-
-    // }, []);
-    const [marker,setMarker] = useState();
-    
-    const getData = () => {
-        const r = {
-            id:generateUUID(),
-            routeName:routeName,
-            test:isTest,
-            uncertain:isUnsure,
-            checkpoints:checkpoints,
-            buildingID:buildingID,
-            deviceMovement:deviceMovement,
-            deviceMovementInterval:deviceMovementInterval,
-            initialDeviceOrientationDirection:initialDeviceOrientationDirection,
-            initialDirection:initialDirection,
-            initialCardinalDirection:buildingCardinalDirections[initialDirection],
-            totalTime:totalTime,
-        }
-        return r;
-    }
-
-    const save = () => {
-
-    }
-
-    const addToRoute = () => {
-
-    }
-
     const onRouteChange = (value) => {
         setRoute(value)
     }
-    const onStartPress = () => {
-        if (route.length <= 1) {
-            return;
-        }
-    }
 
 
-    const activeRoute = useMemo(() => {
-        return (
-            <ActiveRouteOverlay 
-
-                route={route}
-                floorIndex={currentFloorIndex}
-            />
-        )
-    },[route])
-    
-    const onTestPress = () => {
-        console.log("test")
-        setCurrentFloorIndex(0)
-    }
-
-
-      const [timerDuration, setTimerDuration] = useState(null);
-      const [currentTimer, setCurrentTimer] = useState(null);
-      const checkpointsRef = useRef([])
-      const timeRef = useRef(0);
-      const handleStart = () => {
-        checkpointsRef.current = [];
-        setTimerDuration(timeLength); // Set the timer duration to 60 seconds
-        setCurrentTimer(timeLength);
-      };
-
-      const handleOnTick = (t) => {
-        timeRef.current = t;
-      }
-      
-    
-      const handleRecord = () => {
-        checkpointsRef.current.push(timeRef.current)
-      };
-    
-      const handleTimeEnd = () => {
-        setCurrentTimer(null);
-        setTimerDuration(null);
-        console.log(checkpointsRef.current)
-      };
     return (
         <View style={{
             flex:1,
@@ -237,17 +350,16 @@ const DataRouteCollectionScreen = () => {
                 width:"100%",
                 height:"100%"
             }} nestedScrollEnabled>
-                <Button  title="test_button" onPress={onTestPress}/>
+                <TextInput style={{
+                    backgroundColor:"black"
+                }}   value={routeName} onChangeText={(val) => {
+                    setRouteName(val)
+                }}/>
                 <BuildingDropDown val={buildingID} onChange={handleBuildingChange} />
                 <TestSwitch value={isTest} onChange={onIsTestChange}/>
                 <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
                 <RouteBuilder route={route} onChange={onRouteChange} />
-                <TextInput style={{
-                    backgroundColor:"black"
-                }}  keyboardType="numeric" value={`${timeLength}`} onChangeText={(val) => {
-                    setTimeLength(val)
-                }}/>
-                <RouteTimer onTick={handleOnTick} duration={timerDuration} onStart={() => setCurrentTimer(timerDuration)} onTimeEnd={handleTimeEnd} />
+
                 <AdminBuildingMap 
                     currentFloorIndex={currentFloorIndex} 
                     floorsOpacities={floorsOpacities}>
@@ -255,32 +367,55 @@ const DataRouteCollectionScreen = () => {
                    
                     {activeRoute}
                 </AdminBuildingMap>
-                <TouchableOpacity style={{
-                    padding:20,
-                    backgroundColor:"lightblue"
-                }}  onPress={handleStart}>
-                    <Text style={{
-                        color:"black",
-                        textAlign:'center'
+
+
+
+                {isStart ? (
+                    <View style={{
+                        padding:10,
                     }}>
-                        Start
-                    </Text>
-                </TouchableOpacity>
-                <View style={{
-                    padding:10,
-                }}>
-                    <TouchableOpacity onPress={handleRecord} style={{
-                        padding:20,
-                        backgroundColor:"lightblue"
-                    }}>
-                        <Text style={{
-                            color:"black",
-                            textAlign:'center'
+                        <TouchableOpacity onPress={handleRecord} style={{
+                            padding:20,
+                            backgroundColor:"lightblue"
                         }}>
-                            record checkpoint
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                            <Text style={{
+                                color:"black",
+                                textAlign:'center'
+                            }}>
+                                record checkpoint
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={handleReset} style={{
+                            padding:20,
+                            backgroundColor:"lightblue"
+                        }}>
+                            <Text style={{
+                                color:"black",
+                                textAlign:'center'
+                            }}>
+                                reset
+                            </Text>
+                        </TouchableOpacity>                        
+                    </View>
+                ): (
+                    <>
+                        <TouchableOpacity style={{
+                            padding:20,
+                            backgroundColor:"lightblue"
+                        }}  onPress={handleStart}>
+                            <Text style={{
+                                color:"black",
+                                textAlign:'center'
+                            }}>
+                                start
+                            </Text>
+                        </TouchableOpacity>
+                        
+
+                    </>
+                )}
+
                 
             </View>
         </View>

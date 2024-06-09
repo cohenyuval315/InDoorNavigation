@@ -28,14 +28,27 @@ const PositionSelection = ({initialX,initialXBy,initialYBy,initialY,onChangeX,on
     },[maxHeight,maxWidth]);
 
     const onXChange = (value) => {
-        const val = normalizeX(value);
+        let val = value;
+        if (!isNaN(value)){
+            val = normalizeX(value);
+        }        
         setX(`${val}`)
-        onChangeX(val)
+        if (val && !isNaN(val)){
+            onChangeX(val)
+        }
+    
+        
     }
-    const onYChange = (value) => {     
-        const val = normalizeY(value);
+    const onYChange = (value) => {   
+        let val = value;
+        if (!isNaN(value)){
+            val = normalizeY(value);
+        }
         setY(`${val}`)
-        onChangeY(val)
+        if (val && !isNaN(val)){
+            onChangeY(val)
+        }
+        
     }
     const normalizeX = (value) => {
         let val = parseInt(value);

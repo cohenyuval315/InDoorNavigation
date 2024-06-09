@@ -1,46 +1,55 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Ionicons from 'react-native-vector-icons/Ionicons';
-// import BuildingMap from "./../components/building-map/BuildingMap";
-import client from "../../../services/server/api-client";
-import BuildingMap from "../components/BuildingMap";
+import { useEffect, useState } from "react";
+import { BackHandler, StyleSheet,View } from "react-native";
 import { useSelector } from "react-redux";
-import { selectMap,selectMapData, selectMapError, selectMapStatus } from "../../../app/map/map-slice";
+import { selectMapError, selectMapStatus } from "../../../app/map/map-slice";
 import Status from "../../../app/status";
 import { LoadingScreen } from "../../general";
-import BuildingMapSVG from "./components/building-map/BuildingMapSVG";
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../utils/scaling";
 import BuildingPOIsMapBottomDrawer from "./components/search-bar-bottom-drawer/BuildingPOIsMapBottomDrawer";
 import LoadingModal from "../../../components/modals/loading";
 import BuildingMapDisplayMap from "./BuildingMapDisplayMap";
-
+import { useConfirmationModal } from "../../../contexts/ConfirmationModalContext";
 
 
 const BuildingMapDisplayScreen = (props) => {
     const mapStatus = useSelector(selectMapStatus);
     const mapError = useSelector(selectMapError);
     const [loading,setLoading] = useState(true);
-    const [isModalVisible,setIsModalVisible] = useState(false);
     const [mapComponent, setMapComponent] = useState(null);
+    const {openConfirm} = useConfirmationModal();
+
+
+    useEffect(() => {
+        
+        const backAction = () => {
+            openConfirm(
+                "Return to Building Selection",
+                "Are you sure you want to return to the building selection screen?",
+                () => {
+                    props.navigation.navigate("buildings-global-map")
+                },
+            );
+            return true;
+        };
+        
+        
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+      
+        return () => backHandler.remove();
+    }, [])
+
+    // USE LAYOUT EFFECT BEFORE PAIN THE SCREEN , GOOD IDEA.
+
+
 
     useEffect(() => {
         switch(mapStatus){
             case Status.SUCCEEDED:{
                 setLoading(false);
                 break;
-            }
-            // case Status.FAILED:{
-            //     console.error(mapError)
-            //     setLoading(true);
-            // }
-            // case Status.IDLE:{
-            //     console.error("map was not even called ...")
-            //     setLoading(true);
-            // }
-            // case Status.PENDING:{
-            //     setLoading(true);
-            // }
-                
+            }   
         }
     }, [mapStatus])
 
@@ -55,16 +64,17 @@ const BuildingMapDisplayScreen = (props) => {
     }, [props]);
 
 
-    if (loading) {
-        return <LoadingScreen/>
-    }
-
     return (
         <View style={styles.container}>
-            <BuildingPOIsMapBottomDrawer />
-            {mapComponent || (
-                <LoadingModal visible={true} />
-            )}
+            {loading ? (<LoadingScreen />) : (
+                    <>
+                        <BuildingPOIsMapBottomDrawer />
+                        {mapComponent || (
+                            <LoadingModal visible={true} />
+                        )}
+                    </>
+                )
+            }
         </View>
     )
 

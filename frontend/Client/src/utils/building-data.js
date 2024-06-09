@@ -1,9 +1,9 @@
 import { BuildingType } from "../constants/constants";
-import { getIsraelPointByGlobalCoordinates } from "../static-maps/israel";
+import { getIsraelPointByGlobalCoordinates, getRelativeCoordsByIsrael } from "../static-maps/israel";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "./scaling";
 import { isOpen, stringifySchedule } from "./schedule-formatter";
 
-const offsetFunction = (globalCoordinates) => getIsraelPointByGlobalCoordinates(globalCoordinates,WINDOW_WIDTH,WINDOW_HEIGHT);
+const offsetFunction = (globalCoordinates) => getRelativeCoordsByIsrael(globalCoordinates);
 
 const buildingIcon = (building) => {
     switch(building.buildingType){
@@ -22,6 +22,9 @@ export const prepareBuildingsData = (buildings) => {
 }
 const prepareBuildingData = (building) => {
     const buildingDetails = building.details;
+    console.log(building.globalCoordinates)
+    const mapCoords = offsetFunction(building.globalCoordinates);
+    console.log(mapCoords);
     return {
         ...building,
         mapCoordinates:offsetFunction(building.globalCoordinates),

@@ -8,8 +8,8 @@ const FloorSelection = ({initialFloor,onChange}) => {
     const minFloor = useSelector(selectMinFloor);
     const floorsDropdownItems = Array.from({length:numFloors}).map((_,index)=>{
         return {
-            label: `floor ${index+minFloor}`,
-            value: index+minFloor
+            label: `floor ${index + minFloor}`,
+            value: index
         }
     })
     const [floor, setFloor] = useState(initialFloor);
@@ -20,6 +20,7 @@ const FloorSelection = ({initialFloor,onChange}) => {
         setFloor(val);
     }
     useEffect(() => {
+
         onFloorChange(floorsDropdownItems[0].value)
     },[])
     

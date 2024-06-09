@@ -4,9 +4,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useEffect, useState } from "react";
 
 const BuildingDropDown = ({val,onChange}) => {
-    const Buildings = useSelector(selectAllBuildings);
+    const buildings = useSelector(selectAllBuildings);
     const [open,setOpen] = useState(false);
-    const buildingsDropdownItems = Buildings.map((item) => {
+    const buildingsDropdownItems = buildings.map((item) => {
         return {
             label:item.details.title,
             value:item.id

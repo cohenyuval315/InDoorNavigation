@@ -167,7 +167,6 @@ const RouteBuilder = ({route,onChange}) => {
                         </Text>
                     )}
                     {route.map((item,index) => {
-                        console.log(item)
                         const { floor, x, y } = item.mapCoordinates;
                         const mapAreaString = `(${x.toFixed(0)},${y.toFixed(0)})`;
 

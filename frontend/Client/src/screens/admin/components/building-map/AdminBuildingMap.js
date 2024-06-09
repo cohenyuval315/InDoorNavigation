@@ -35,8 +35,6 @@ const AdminBuildingMap = ({floorsOpacities,currentFloorIndex,imageProps={},child
         setOpacities(floorsOpacities)
     },[floorsOpacities])
 
-    console.log('full render',opacitiesRef.current)
-    console.log('full render',floorsOpacities)
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
@@ -63,7 +61,7 @@ const AdminBuildingMap = ({floorsOpacities,currentFloorIndex,imageProps={},child
                     <Animated.View 
                         key={`map_svg_${index}`} 
                         style={[{ 
-                            opacity: opacitiesRef.current[index],
+                            // opacity: opacitiesRef.current[index],
                             zIndex: currentFloorIndex === index ? 1 : 0,
                             display:currentFloorIndex === index ? "flex" : "none",
                         },styles.floorMapContainer]} 
@@ -72,15 +70,12 @@ const AdminBuildingMap = ({floorsOpacities,currentFloorIndex,imageProps={},child
                                 data={maps[index]}
                             />
                             <BuildingMapFloorPOIsOverlay 
-                                floorIndex={maps[index].floor}
+                                floorIndex={maps[index].floor - minFloor}
                                 rotationRef={null}
                                 onPOIPress={() => {}}
                             />
-                                <BuildingMapFloorPOIsAreaOverlay floor={maps[index].floor} />
-
-                                {/* TEMPORARY TODO */}
-                                    <BuildingMapGraphDataOverlay floor={maps[index].floor} />
-                                {/* TEMPORARY */}                            
+                            <BuildingMapFloorPOIsAreaOverlay floorIndex={maps[index].floor - minFloor} />
+                            <BuildingMapGraphDataOverlay floorIndex={maps[index].floor - minFloor} />           
                     </Animated.View>
                 ))}  
                 {children}

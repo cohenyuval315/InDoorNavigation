@@ -1,3 +1,5 @@
+import { getGeoLocationBoundaryBox, getRelativeGlobalCoordinates } from "../static-maps/utils"
+
 export const israelSVG = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created for MapSVG plugin: http://mapsvg.com -->
@@ -46,10 +48,28 @@ export const israelSVG = `
 </svg>
 `
 
+export const israelGeoCoordinates = [
+   
+      {
+            latitude:33.46271387962399,
+            longitude:33.98456308167754
+      },
+      {
+            latitude:33.390728823670116,
+            longitude:36.194520379667985
+      },
+      {
+            latitude:29.228522626174648,
+            longitude:36.16165251072175
+      },
+      {
+            latitude:29.33585498211702,
+            longitude:33.92616062503983
+      }
+      
+]
 
-
-export const israelLocationMapSVG = {
-   xml:`
+export const israelMapSVGXML = `
    <svg
       xmlns:svg="http://www.w3.org/2000/svg"
       xmlns="http://www.w3.org/2000/svg"
@@ -391,24 +411,11 @@ export const israelLocationMapSVG = {
       id="polyline148" />
          </g>
       </svg>
-   `,
-   globalCoordinates:{
-      topLeft:{
-         latitude:"33.46271387962399",
-         longitude:"33.98456308167754"
-     },
-     topRight:{
-         latitude:"33.390728823670116",
-         longitude:"36.194520379667985"
-     },
-     bottomRight: {
-         latitude:"29.228522626174648",
-         longitude:"36.16165251072175"
-     },
-     bottomLeft:{
-         latitude:"29.33585498211702",
-         longitude:"33.92616062503983"
-     }
-   },
-   
+`
+
+export const israelBoundaryBox = getGeoLocationBoundaryBox(israelGeoCoordinates)
+
+
+export const getRelativeCoordsByIsrael = (targetCoordinates) => {
+      return getRelativeGlobalCoordinates(israelBoundaryBox,targetCoordinates)
 }

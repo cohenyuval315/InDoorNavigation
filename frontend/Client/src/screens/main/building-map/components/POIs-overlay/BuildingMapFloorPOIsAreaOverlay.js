@@ -6,7 +6,7 @@ import { SvgXml } from "react-native-svg";
 import { useEffect } from "react";
 import Status from "../../../../../app/status";
 
-const BuildingMapFloorPOIsAreaOverlay = ({floorIndex = 0}) => {
+const BuildingMapFloorPOIsAreaOverlay = ({floorIndex}) => {
     const poisData = useSelector(selectPOIsMaps)
     const mapStatus = useSelector(selectMapStatus);
 
@@ -16,7 +16,6 @@ const BuildingMapFloorPOIsAreaOverlay = ({floorIndex = 0}) => {
         }
     },[mapStatus])
 
-    console.log(poisData.length)
     return (
         <MapOverlay>    
             <SvgXml

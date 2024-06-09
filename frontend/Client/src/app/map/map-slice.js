@@ -22,7 +22,8 @@ const mapInitialState = {
   maps:null,
   POIs:null,
   POIsMaps:null,
-  dims:null
+  dims:null,
+  globalCoordinatesBoundary:null
 }
 
 const mapSlice = createSlice({
@@ -39,9 +40,10 @@ const mapSlice = createSlice({
         })
         .addCase(fetchBuildingByMapId.fulfilled, (state, action) => {
           let buildingMapData = action.payload.data;
+          state.globalCoordinatesBoundary = buildingMapData.globalCoordinatesBoundary;
           const floorsFiles = action.payload.floorsFiles.sort((a, b) => a.floor - b.floor);
           floorsFiles.forEach((mapFile,index) => {
-            const normalPOIs = normalizePOIsPoints(buildingMapData.POIs, mapFile.width,mapFile.height,mapFile.floor,WINDOW_HEIGHT,WINDOW_WIDTH)
+            const normalPOIs = normalizePOIsPoints(buildingMapData.POIs, mapFile.width,mapFile.height,mapFile.floor,WINDOW_WIDTH,WINDOW_HEIGHT)
             buildingMapData = {
               ...buildingMapData,
               POIs: normalPOIs
@@ -84,6 +86,7 @@ const mapSlice = createSlice({
   export const selectMapError = state => state.map.error;
   export const selectMapsDims = state => state.map.dims;
   export const selectPOIsMaps = state => state.map.POIsMaps;
+  export const selectMapGlobalCoordinates = state => state.map.globalCoordinatesBoundary;
   // export const selectPOIById = POIId => state => state.map.POIs.find(POI => POI.id === POIId);
   export const {} = mapSlice.actions;
   export default mapSlice.reducer;

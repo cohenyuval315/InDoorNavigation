@@ -8,28 +8,25 @@ import { useSelector } from 'react-redux';
 import { calculateBottomLeftOffset } from '../../../../utils/map-data';
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from '../../../../utils/scaling';
 const PositionOverlay = ({floor,x,y,rotationRef,size}) => {  
-    if (!x || !y) {
-        return null;
-    }
     const maps = useSelector(selectMap)
     const mapWidth = maps[floor].width;
     const mapHeight = maps[floor].height;
-    const {offsetX , offsetY} = calculateBottomLeftOffset(mapWidth,mapHeight,WINDOW_WIDTH,WINDOW_HEIGHT);
+    
 
-    const [left,setLeft] = useState(new Animated.Value(x || 0))
-    const [bottom,setBottom] = useState(new Animated.Value(y || 0))
+    const [left,setLeft] = useState(new Animated.Value(x))
+    const [top,setTop] = useState(new Animated.Value(y))
 
     useEffect(()=>{
         setLeft(x)
     },[x])
 
     useEffect(()=>{
-        setBottom(y)
+        setTop(y)
     },[y])
 
     const halfSize = size / 2;
     const translateX = -halfSize;
-    const translateY = halfSize;    
+    const translateY = -halfSize;    
     return (
         <MapOverlay styles={{
             // backgroundColor:'red'
@@ -39,8 +36,8 @@ const PositionOverlay = ({floor,x,y,rotationRef,size}) => {
                     position: 'absolute', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    left:offsetX + left,
-                    bottom:offsetY + bottom,
+                    left:left,
+                    top:top,
                     transform: [{ translateX }, { translateY }],
                 }}
             >

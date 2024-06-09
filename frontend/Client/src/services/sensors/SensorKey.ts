@@ -1,10 +1,4 @@
 export enum SensorKey{
-    // ACCELEROMETER = "accelerometer",
-    // GYROSCOPE = "gyroscope",
-    // MAGNETOMETER = "magnetometer",
-    // BAROMETER = "barometer",
-    // ORIENTATION = "orientation",
-    // GRAVITY = "gravity",
     ACCELEROMETER = "accelerometer",
     ACCELEROMETERLIMITEDAXES = "accelerometerLimitedAxes",
     ACCELEROMETERLIMITEDAXESUNCALIBRATED = "accelerometerLimitedAxesUncalibrated",

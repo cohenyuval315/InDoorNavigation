@@ -7,7 +7,7 @@ import { selectGraphMaps, selectGraphStatus } from "../../../../app/admin/admin-
 import Status from "../../../../app/status";
 import { useEffect } from "react";
 
-const BuildingMapGraphDataOverlay = ({floorIndex = 0}) => {
+const BuildingMapGraphDataOverlay = ({floorIndex}) => {
     const graphData = useSelector(selectGraphMaps);
     const graphStatus = useSelector(selectGraphStatus);
     

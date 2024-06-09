@@ -11,17 +11,15 @@ const PointOverlay = ({floor,x,y,color,size}) => {
     const maps = useSelector(selectMap)
     const mapWidth = maps[floor].width;
     const mapHeight = maps[floor].height;
-    const {offsetX , offsetY} = calculateBottomLeftOffset(mapWidth,mapHeight,WINDOW_WIDTH,WINDOW_HEIGHT);
-
     const [left,setLeft] = useState(new Animated.Value(x || 0))
-    const [bottom,setBottom] = useState(new Animated.Value(y || 0))
+    const [top,setTop] = useState(new Animated.Value(y || 0))
 
     useEffect(()=>{
         setLeft(x)
     },[x])
 
     useEffect(()=>{
-        setBottom(y)
+        setTop(y)
     },[y])
 
     const halfSize = size / 2;
@@ -35,8 +33,8 @@ const PointOverlay = ({floor,x,y,color,size}) => {
                     position: 'absolute', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    left:offsetX + left,
-                    bottom:offsetY + bottom,
+                    left:left,
+                    top:top,
                     transform: [{ translateX }, { translateY }],
 
                 }}
