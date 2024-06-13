@@ -22,6 +22,7 @@ import { ErrorHandlingMiddlewareFunction } from "mongoose";
 import bodyParser from "body-parser";
 // import { initAWSConfigurations } from "./config/aws-config";
 import { initConfig } from "./config/config";
+import { seedAllBuilding, seedBuilding } from "./seeding/seed";
 
 
 
@@ -64,8 +65,9 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 if (process.env.MONGODB_URI){
     mongoose.connect(process.env.MONGODB_URI);
-    mongoose.connection.on('connected', () => {
+    mongoose.connection.on('connected', async () => {
       console.log('MongoDB connected successfully');
+      await seedAllBuilding();
     });  
     mongoose.connection.on('disconnected', () => {
       console.log('MongoDB disconnected');

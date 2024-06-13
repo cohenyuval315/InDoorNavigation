@@ -9,6 +9,7 @@ export const fetchBuildings = createAsyncThunk(
   'buildings/fetchBuildings', 
   async (state, thunkAPI) => {
     const response = await client.getBuildings();
+    console.log(response)
     return response.data
     
   },
@@ -38,6 +39,7 @@ const buildingsSlice = createSlice({
         .addCase(fetchBuildings.fulfilled, (state, action) => {
           // buildingsAdapter.setAll(state,action.payload); make it one item 
           state.entities = prepareBuildingsData(action.payload)
+          
           state.status = Status.SUCCEEDED;
         })
         .addCase(fetchBuildings.rejected, (state, action) => {

@@ -1,21 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { BackHandler, StyleSheet,View } from "react-native";
-import { useSelector } from "react-redux";
-import { selectMapError, selectMapStatus } from "../../../app/map/map-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBuildingByMapId, selectMapError, selectMapStatus } from "../../../app/map/map-slice";
 import Status from "../../../app/status";
 import { LoadingScreen } from "../../general";
 import BuildingPOIsMapBottomDrawer from "./components/search-bar-bottom-drawer/BuildingPOIsMapBottomDrawer";
 import LoadingModal from "../../../components/modals/loading";
 import BuildingMapDisplayMap from "./BuildingMapDisplayMap";
 import { useConfirmationModal } from "../../../contexts/ConfirmationModalContext";
+import { selectActiveBuilding } from "../../../app/active/active-slice";
 
 
 const BuildingMapDisplayScreen = (props) => {
+    const dispatch = useDispatch();
     const mapStatus = useSelector(selectMapStatus);
     const mapError = useSelector(selectMapError);
     const [loading,setLoading] = useState(true);
     const [mapComponent, setMapComponent] = useState(null);
     const {openConfirm} = useConfirmationModal();
+    const selectedBuilding = useSelector(selectActiveBuilding);
 
 
     useEffect(() => {
@@ -41,7 +44,9 @@ const BuildingMapDisplayScreen = (props) => {
     }, [])
 
     // USE LAYOUT EFFECT BEFORE PAIN THE SCREEN , GOOD IDEA.
-
+    useLayoutEffect(() => {
+        dispatch(fetchBuildingByMapId(selectedBuilding.id));
+    },[])
 
 
     useEffect(() => {

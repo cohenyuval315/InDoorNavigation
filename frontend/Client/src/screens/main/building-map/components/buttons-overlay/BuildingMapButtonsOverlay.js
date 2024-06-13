@@ -5,12 +5,20 @@ import FoundationIcons from 'react-native-vector-icons/Foundation';
 import MapOverlay from "../../../../../layouts/map-overlay";
 import { useNavigation } from "@react-navigation/native";
 
-const BuildingMapButtonsOverlay = ({containerRef}) => {
+const BuildingMapButtonsOverlay = ({isInitUserPosition,centerOnRef,userPositionRef}) => {
     const navigation = useNavigation();
     const onPathBuilderPress = () => {
         navigation.navigate('building-map-path-builder-modal');
     }
     const onCenterOnUserPress = () => {
+        if(isInitUserPosition){
+            centerOnRef.current = {
+                x: 100,
+                y: 100,
+                scale: 1,
+                duration: 300,
+            }
+        }
 
     }
 
@@ -19,7 +27,13 @@ const BuildingMapButtonsOverlay = ({containerRef}) => {
     }
 
     const onActionOnUserPress = () =>{
-
+        if(centerOnRef.current == null){
+            console.log("reached")
+            onCenterOnUserPress()
+        }else{
+            console.log("reached")
+            onLockOnUserPress();
+        }
     }
 
     return (
@@ -53,8 +67,13 @@ const BuildingMapButtonsOverlay = ({containerRef}) => {
                 <Text style={{
                     color:"black"
                 }}>
-                    <MaterialCommunityIcons name="target" color={"black"} size={30} />
-                    <FoundationIcons name="target-two" color={"black"} size={30} />
+                    {centerOnRef.current == null ? (
+                        <MaterialCommunityIcons name="target" color={"black"} size={30} />
+                    ): (
+                        <FoundationIcons name="target-two" color={"black"} size={30} />
+                    )}
+                    
+                    
                 </Text>
                 
             </TouchableOpacity>   

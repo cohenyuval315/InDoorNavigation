@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 
-const mapCoordinateSchema = new Schema({
+const mapCoordinateSchema = new Schema<MapCoordinates>({
    x:{
     type:Number,
     require:true

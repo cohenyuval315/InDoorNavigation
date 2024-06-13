@@ -1,6 +1,38 @@
+# version: '3.8'
+
+# services:
+#   react-native:
+#     image: reactnativecommunity/react-native-android
+#     ports:
+#       - "8081:8081"
+#     volumes:
+#       - ./Client:/app
+#     devices:
+#       - "/dev/bus/usb:/dev/bus/usb"  # Mount the USB devices for ADB
+#     environment:
+#       - ANDROID_HOME=/opt/android-sdk
+#       - PATH=/opt/android-sdk/platform-tools:/opt/android-sdk/tools:$PATH
+#     stdin_open: true
+#     tty: true
+version: '3.8'
+
 services:
-  frontend:
-    container_name: indoor-client
+  reactnative:
+    container_name: rnandroid
     build:
-      context: ./.docker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./.docker/Dockerfile.android.rn
+    # volumes:
+    #   - ./Client:/app
+      # - /dev/bus/usb:/dev/bus/usb  # Mount the USB devices for ADB
+    # stdin_open: true
+    # ports:
+    #   - "5037:5037"
+    #   - "8081:8081"
+    # tty: true
+    # privileged: true    
+    environment:
+      - ANDROID_ADB_SERVER_ADDRESS=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: sh -c "cd /app && npm run android"

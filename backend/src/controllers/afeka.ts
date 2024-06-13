@@ -1,109 +1,7 @@
 // @ts-nocheck
 
-import { BuildingStatus, CardinalDirection, Direction, POIType, SegmentPathType, WaypointFacilityType, WaypointPathType } from "../constants/constants";
-export const afekaBuildingData = {
-    id:'324324324343',
-    status:'PRODUCTION',
-    details:{
-        title:'Afeka',
-        description:'afeka college',
-        buildingType:'COLLEGE',
-        address:'Mivtsa Kadesh St 38',
-        city:'Tel Aviv-Yafo',
-        zipCode:6998812,
-        openingHours:{
-            "Sunday": { open: 9, close: 21 },
-            "Monday": { open: 9, close: 21 },
-            "Tuesday": { open: 9, close: 21 },
-            "Wednesday": { open: 9, close: 21 },
-            "Thursday": { open: 9, close: 21 },
-            "Friday": { open: 9, close: 13 },
-            "Saturday": { open: null, close: null } // Closed all day
-        },
-        // `
-        //     Sunday	    9 am - 9 pm
-        //     Monday	    9 am - 9 pm
-        //     Tuesday	    9 am - 9 pm
-        //     Wednesday	9 am - 9 pm
-        //     Thursday	9 am - 9 pm
-        //     Friday	    9 am - 1 pm
-        //     Saturday	Closed
-        // `,
-        
-        websiteLink:`https://www.afeka.ac.il/`,
-        phonenumbers:`03-768-8600`,
-        buildingOpeningDate: new Date('1996-01-01'),
-        accessibility:{
-            elevator:true,
-            parking:true,
-            wheelchairAccessibleParking:true,
-            wheelchairAccessibleToilet:true,
-            wheelchairAccessibleEntrance:true
-        },
-        activities:{
-            toilets:true,
-            freeWifi:true,
-            restaurants:false,
-            delis:true,
-            convenienceStores:false,
-            smokingArea:true
-        }
-    },
-    globalCoordinates:{
-        latitude:32.113912134046394,
-        longitude:34.81804756153953
-    },
+import { BuildingStatus, BuildingType, CardinalDirection, Direction, POIType, SegmentPathType, WaypointFacilityType, WaypointPathType } from "../constants/constants";
 
-    geoArea:[
-        {
-            latitude:31.93441555065376, 
-            longitude:34.80631845630264
-        },
-        {
-            latitude:31.93439651279175, 
-            longitude:34.80696153568204
-        },
-        {
-            latitude:31.933977678830264, 
-            longitude:34.80699892401805
-        },
-        {
-            latitude:31.934034792664654, 
-            longitude:34.80640818830907
-        },                        
-    ],
-
-    // geoArea:[
-    //     {
-    //         latitude:32.11346715888711,
-    //         longitude:34.818165001968
-    //     }, 
-    // ],
-    entrances:[
-        {
-            title:'main-entrance',
-            description:" afeka campus main entrance",
-            isMain:true,
-            floor:0,
-            isEmployeeOnly:false,
-            isAvailable:true,
-            geoTransitionArea:[
-                {
-                    latitude:32.11346715888711,
-                    longitude:34.818165001968
-                }
-            ],
-            doorGeoCoordinate:{
-                direction:'NORTH',
-                latitude:32.11346715888711,
-                longitude:34.818165001968
-            }
-
-        },
-
-    ]
-   
-}
 
 
 const nodes =[ 
@@ -3600,18 +3498,6 @@ function calculateCenterPoint(mapArea) {
     return { x: centerX, y: centerY };
 }
 
-const k = 
-{
-    id:"edge_",
-    title:"",
-    nodeA:"",
-    nodeB:"",
-    pathType:SegmentPathType.TRAIL,
-    isAvailable:true,
-    visualMapArea:null,
-    availableHeadings:null,
-    weight:null,
-}
 
 
 const edges = [
@@ -5682,6 +5568,8 @@ const edges = [
 
 const edgesWithWeights = [];
 
+
+
 edges.forEach(edge => {
     const nodeA = nodes.find(node => node.id === edge.nodeA);
     const nodeB = nodes.find(node => node.id === edge.nodeB);
@@ -7560,13 +7448,104 @@ const svgFloorF_1 = generateSVGForAreasByFloor(poiColorMapF_1,POIs,1326,1207,-1)
 const poiColorMapF0 = {}
 const svgFloorF0 = generateSVGForAreasByFloor(poiColorMapF0,POIs,1326,1207,0)
 
+const afekaBuildingId = "afeka-building-identifier";
+
+export const afekaBuildingData = {
+    id:afekaBuildingId,
+    status:BuildingStatus.PRODUCTION,
+    details:{
+        title:'Afeka',
+        description:'afeka college',
+        buildingType:BuildingType.COLLEGE,
+        address:{
+            country: "israel",
+            state: "Tel Aviv District",
+            city: "Tel Aviv-Yafo",
+            street: "Mivtsa Kadesh",
+            streetNumber: "38",
+            postalCode:6998812,
+        },
+        openingHours:{
+            "Sunday": { open: 9, close: 21 },
+            "Monday": { open: 9, close: 21 },
+            "Tuesday": { open: 9, close: 21 },
+            "Wednesday": { open: 9, close: 21 },
+            "Thursday": { open: 9, close: 21 },
+            "Friday": { open: 9, close: 13 },
+            "Saturday": { open: null, close: null } // Closed all day
+        },
+        owner:null,
+        
+        websiteLink:`https://www.afeka.ac.il/`,
+        phoneNumbers:{
+            "secretery":`03-768-8600`
+        },
+        buildingOpeningDate: new Date('1996-01-01'),
+        accessibility:{
+            elevator:true,
+            parking:true,
+            wheelchairAccessibleParking:true,
+            wheelchairAccessibleToilet:true,
+            wheelchairAccessibleEntrance:true
+        },
+        activities:{
+            toilets:true,
+            freeWifi:true,
+            restaurants:false,
+            delis:true,
+            convenienceStores:false,
+            smokingArea:true
+        }
+    },
+    geoArea:[
+        {
+            latitude:31.93441555065376, 
+            longitude:34.80631845630264
+        },
+        {
+            latitude:31.93439651279175, 
+            longitude:34.80696153568204
+        },
+        {
+            latitude:31.933977678830264, 
+            longitude:34.80699892401805
+        },
+        {
+            latitude:31.934034792664654, 
+            longitude:34.80640818830907
+        },                        
+    ],
+    entrances:[
+        {
+            title:'main-entrance',
+            description:" afeka campus main entrance",
+            isMain:true,
+            floor:0,
+            isEmployeeOnly:false,
+            isAvailable:true,
+            geoTransitionArea:[
+                {
+                    latitude:32.11346715888711,
+                    longitude:34.818165001968
+                }
+            ],
+            doorGeoCoordinate:{
+                latitude:32.11346715888711,
+                longitude:34.818165001968
+            }
+
+        },
+
+    ]
+}
+
 export const afekaBuildingMapData = {
-    buildingId:'324324324343',
+    buildingId:afekaBuildingId,
     minFloor:-1,
     maxFloor:0,
     cardinalDirections:afekaBuildingCardinalDirections,
     POIs:POIsWithCenterPoints,
-
+    floorHeights:floorHeights,
     POIsMaps:[
         {
             floor: -1,
@@ -7580,7 +7559,7 @@ export const afekaBuildingMapData = {
 }
 
 export const afekaAdminBuildingMapData = {
-    buildingId:'324324324343',
+    buildingId:afekaBuildingId,
     cardinalDirections:afekaBuildingCardinalDirections,
     graphMaps:[
         {
@@ -7598,13 +7577,34 @@ export const afekaAdminBuildingMapData = {
 
 
 
-export const afekaWifiMap = {
-    buildingId:'324324324343',
 
+
+
+export const afekaBuildingGraphMap = {
+    buildingId:afekaBuildingId,
+    cardinalDirections:afekaBuildingCardinalDirections,
+    graphMaps:[
+        {
+            floor:-1,
+            graph:generateSVGForNodesAndEdges(poiColorMapF_1,nodes,edges,1326,1207,-1),
+        },
+        {
+            floor:0,
+            graph:generateSVGForNodesAndEdges(poiColorMapF0,nodes,edges,1326,1207,0),
+        }
+    ],
+    nodes:nodes,
+    edges:edges
 }
 
 
-export const afekaMagneticMap = {
-    buildingId:'324324324343',
+export const afekaBuildingWifiMap = {
+    buildingId:afekaBuildingId,
 
 }
+
+export const afekaBuildingMagneticMap = {
+    buildingId:afekaBuildingId,
+
+}
+

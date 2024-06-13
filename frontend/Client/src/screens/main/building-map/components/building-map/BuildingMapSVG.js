@@ -9,11 +9,10 @@ const BuildingMapSVG = memo(({
     data,
     styles = {},
 }) => {
-    const mapSvgData = data.file;
+    const mapSvgData = data.map;
     const mapFloor = data.floor;
     const mapHeight = data.height;
     const mapWidth = data.width;
-    console.log(`rrerender ${mapFloor}`);
     const viewBox =`0 0 ${mapWidth} ${mapHeight}`
     return (
         <View style={{ 

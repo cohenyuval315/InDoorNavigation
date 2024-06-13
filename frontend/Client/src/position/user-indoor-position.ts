@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Observer, Subscribable, interval, of, share, withLatestFrom  } from "rxjs";
+import { BehaviorSubject, Observable, Observer, Subscribable, combineLatest, interval, of, share, withLatestFrom  } from "rxjs";
 import { Geolocation } from "../sensors/gps-service";
 import { start } from "../services/sensors/rnsensors";
 import SensorsService from "../sensors/sensors-service";
@@ -41,8 +41,10 @@ export class UserIndoorPositionService {
     private static instance: UserIndoorPositionService;
     private subject:BehaviorSubject<UserIndoorPosition  | null>;
     private buildingBoundaryBox:any;
-    private geolocationStream: any
     private isStreaming:boolean
+    private sensorInterval = 100;
+
+    private geolocationStream: any
 
     private constructor() {
         this.subject = new BehaviorSubject<UserIndoorPosition  | null>(null);
@@ -65,17 +67,12 @@ export class UserIndoorPositionService {
         
     }
 
-    setConfig(){
+    async setConfig(){
         const gpsStream = Geolocation.getInstance().getObservable();
-        // SensorsService.getInstance().sensor(SensorKey.ACCELEROMETER)
-        // SensorsService.getInstance().sensor(SensorKey.MAGNETOMETER)
-        // SensorsService.getInstance().sensor(SensorKey.ROTATIONVECTOR)
-        // SensorsService.getInstance().sensor(SensorKey.GYROSCOPE)
-        // SensorsService.getInstance().sensor(SensorKey.STEPDETECTOR)
-        // SensorsService.getInstance().sensor(SensorKey.LINEARACCELERATION)
-        // SensorsService.getInstance().sensor(SensorKey.GRAVITY)
-        // SensorsService.getInstance().sensor(SensorKey.MAGNETOMETERUNCALIBRATED)
-        // SensorsService.getInstance().sensor(SensorKey.GYROSCOPEUNCALIBRATED)
+
+
+        // await SensorsService.getInstance().sensor(SensorKey.MAGNETOMETERUNCALIBRATED)
+        // await SensorsService.getInstance().sensor(SensorKey.GYROSCOPEUNCALIBRATED)
 
     }
 
@@ -117,15 +114,70 @@ export class UserIndoorPositionService {
         }
     }
 
-    startStream() {
+    async startSensors(){
+        const accelerometer = await SensorsService.getInstance().sensor(SensorKey.ACCELEROMETER)
+        accelerometer?.configSensorInterval(this.sensorInterval);
+        accelerometer?.startSensor();
+        
+        const magnetometer = await SensorsService.getInstance().sensor(SensorKey.MAGNETOMETER)
+        magnetometer?.configSensorInterval(this.sensorInterval);
+        magnetometer?.startSensor();
+        
+        const rotationVector = await SensorsService.getInstance().sensor(SensorKey.ROTATIONVECTOR)
+        rotationVector?.configSensorInterval(this.sensorInterval);
+        rotationVector?.startSensor();
+        
+        
+        const gyroscope = await  SensorsService.getInstance().sensor(SensorKey.GYROSCOPE)
+        gyroscope?.configSensorInterval(this.sensorInterval);
+        gyroscope?.startSensor();
+
+        const stepdetector = await SensorsService.getInstance().sensor(SensorKey.STEPDETECTOR)
+        stepdetector?.configSensorInterval(this.sensorInterval);
+        stepdetector?.startSensor();
+
+        const linear = await SensorsService.getInstance().sensor(SensorKey.LINEARACCELERATION)
+        linear?.configSensorInterval(this.sensorInterval);
+        linear?.startSensor();
+
+
+        const gravity = await SensorsService.getInstance().sensor(SensorKey.GRAVITY)
+        gravity?.configSensorInterval(this.sensorInterval);
+        gravity?.startSensor();
+        
+        return {
+            gravity:gravity,
+            linear:linear,
+            stepdetector:stepdetector,
+            accelerometer:accelerometer,
+            magnetometer:magnetometer,
+            rotationVector:rotationVector,
+            gyroscope:gyroscope,
+        }
+    }
+
+    async startStream() {
         if(this.isStreaming){
             return;
         }
+        const sensors = await this.startSensors();
+        sensors.accelerometer?.subscribe
         Geolocation.getInstance().startStream({
             distanceFilter:0,
             enableHighAccuracy:true,
             maximumAge:0,
         })
+        // combineLatest(
+        //     sensors.accelerometer,
+        //     sensors.gravity,
+        // )
+        // (accelerometerData, rotationVectorData, gyroscopeData) => {
+        //     // Perform sensor fusion and navigation calculations
+        //     const userPosition = calculatePosition(accelerometerData, rotationVectorData, gyroscopeData);
+        //     // Update UI or send user position data to server
+        //     updatePosition(userPosition);
+        // }
+
         this.geolocationStream = Geolocation.getInstance().subscribeGeoLocation({
             next:(value) => {
                 if(value){
@@ -134,19 +186,6 @@ export class UserIndoorPositionService {
                 }
             }
         })
-        
-        // this.geolocationStream = Geolocation.getInstance().getObservable().pipe(share()).subscribe({
-        //     next:(value) => {
-        //         if(value){
-        //             console.log("NEXT VAL:",value)
-        //         }else{
-        //             console.log("vvvv")
-        //         }
-                
-        //         const position = this.calculateNextPositionGPS(value);
-        //         this.subject.next(position);
-        //     }
-        // })
         
         // const magnetometer$ = Magnetometer.getInstance().magnetometer$.pipe(share()); // Share the execution among all subscribers
         // const accelerometer$ = Accelerometer.getInstance().accelerometer$.pipe(

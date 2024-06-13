@@ -16,7 +16,7 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
 
-  
+    console.log("thistype:",Object.keys(maps[currentFloorIndex]))
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
@@ -48,11 +48,11 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
                                     data={maps[index]}
                                 />
                                 <BuildingMapFloorPOIsOverlay 
-                                    floorIndex={minFloor + maps[index].floor}
+                                    floorIndex={maps[index].floor - minFloor}
                                     rotationRef={rotationRef}
                                     onPOIPress={onPOIPress}
                                 />
-                                <BuildingMapFloorPOIsAreaOverlay floorIndex={minFloor + maps[index].floor} />
+                                <BuildingMapFloorPOIsAreaOverlay floorIndex={maps[index].floor - minFloor} />
                         </Animated.View>
                     )
                 }

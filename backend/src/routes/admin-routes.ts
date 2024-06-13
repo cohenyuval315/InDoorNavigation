@@ -17,7 +17,7 @@ const adminRouter = Router();
  *       500:
  *         description: Internal Server Error
  */
-adminRouter.get('/buildings/:id/graph',async (req:Request, res:Response, next:NextFunction) => await  buildingController.getAdminBuildingMapData(req,res,next));
+adminRouter.get('/buildings/:buildingId/graph',async (req:Request, res:Response, next:NextFunction) => await  buildingController.getAdminBuildingMapData(req,res,next));
 
 
 

@@ -24,14 +24,14 @@ const userSVG = `
 `;
 
 
-const BuildingMapUserPositionOverlay = ({rotationRef}) => {
+const BuildingMapUserPositionOverlay = ({userPositionRef,onFloorChange,onInitUserPosition}) => {
     
     const [mapFloor,setMapFloor] = useState(0); 
     const maps = useSelector(selectMap);
     const map = maps[mapFloor];    
     const mapWidth = map.width;
     const mapHeight = map.height;
-    const positionRef = useRef(null);
+    // const positionRef = useRef(null);
     const userBuildingMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
     const [isInitialPositionSet, setIsInitialPositionSet] = useState(false);
 
@@ -56,6 +56,7 @@ const BuildingMapUserPositionOverlay = ({rotationRef}) => {
                             x:x,
                             y:y
                         })
+                        onInitUserPosition()
                         setIsInitialPositionSet(true);
                     }else{
                         setPosition(
@@ -75,21 +76,20 @@ const BuildingMapUserPositionOverlay = ({rotationRef}) => {
     }, [])
 
     const setPosition = (x,y) => {
-        console.log(userBuildingMapCoordinates);
         if(userBuildingMapCoordinates){
             Animated.timing(userBuildingMapCoordinates, {
                 toValue: {
                     x:x,
                     y:y
                 },
-                duration: 100, // Adjust duration as needed
+                duration: 100,
                 easing: Easing.out(Easing.quad),
                 useNativeDriver: false,
             }).start();
         }
 
     }
-    console.log(userBuildingMapCoordinates)
+ 
 
     if (!isInitialPositionSet){
         return null;

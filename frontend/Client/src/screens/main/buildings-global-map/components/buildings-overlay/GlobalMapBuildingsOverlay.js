@@ -21,7 +21,7 @@ const GlobalMapBuildingsOverlay = memo(() => {
                 {buildings && buildings.map((building) => {
                     return (
                         <GlobalMapBuilding 
-                            key={building.id}
+                            key={building.id || building._id}
                             building={building}
                             color={selectedBuilding && selectedBuilding.id === building.id ? "blue": "red"}
                             zIndex={selectedBuilding && selectedBuilding.id === building.id ? 10 : 3}

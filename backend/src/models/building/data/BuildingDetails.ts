@@ -30,25 +30,33 @@ const buildingDetailsSchema = new Schema({
         require:false
     },
     openingHours:{
-        type:String,
-        require:false
-    },
-    closingHours:{
-        type:String,
+        type:Object,
         require:false
     },
     websiteLink:{
         type:String,
         require:false
     },
-    phonenumbers:{
-        type:String,
+    phoneNumbers:{
+        type:Object,
         require:false
     },
     buildingOpeningDate:{
         type:Date,
         require:false
     },
+    accessibility:{
+        type:Object,
+        require:false
+    },
+    activities:{
+        type:Object,
+        require:false
+    },
+
+
+
+    
     storageImageKey:{
         type:String,
         require:false

@@ -23,24 +23,25 @@ const BuildingMapFloorPOIsOverlay = ({floorIndex,rotationRef,onPOIPress}) => {
     return (
         <MapOverlay styles={{
         }}>
-            <View style={{
+            {/* <View style={{
                 position:'relative',
                 height:"100%",
-                width:"100%"
-            }}>
-
-            {floorPOIs.map((POI,index) => {
-                return (
-                    <BuildingMapPOI 
-                        key={`POI_${POI.id}_${index}`} 
-                        POI={POI}
-                        onPOIPress={()=>handleOnPOIPress(POI)}
-                        rotationRef={rotationRef}
-                        isSelected={selectedPOI && selectedPOI.id === POI.id}
-                    />                        
-                )
-            })} 
-            </View>
+                width:"100%",
+                pointerEvents:"box-none",
+                zIndex:20,
+            }}> */}
+                {floorPOIs.map((POI,index) => {
+                    return (
+                        <BuildingMapPOI 
+                            key={`POI_${POI.id}_${index}`} 
+                            POI={POI}
+                            onPOIPress={()=>handleOnPOIPress(POI)}
+                            rotationRef={rotationRef}
+                            isSelected={selectedPOI && selectedPOI.id === POI.id}
+                        />                        
+                    )
+                })} 
+            {/* </View> */}
         </MapOverlay>
     )
 }

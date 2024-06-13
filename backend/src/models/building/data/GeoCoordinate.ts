@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
 const geoCoordinateSchema = new Schema({
-    laptitude: {
+    latitude: {
         type: Number,
         require:true
     },   
@@ -11,7 +11,7 @@ const geoCoordinateSchema = new Schema({
     },
 }, { 
     _id:false,
-    timestamps: true,
+    timestamps: false,
     autoCreate: false,
 });
 export default geoCoordinateSchema;

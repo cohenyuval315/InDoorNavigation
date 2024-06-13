@@ -15,6 +15,28 @@ const buildingIcon = (building) => {
         }
     }
 }
+
+function findGeographicalCenter(locations) {
+    if (locations.length === 0) {
+        return null; // No locations to calculate the center
+    }
+
+    let totalLongitude = 0;
+    let totalLatitude = 0;
+
+    locations.forEach(location => {
+        totalLongitude += location.longitude;
+        totalLatitude += location.latitude;
+    });
+
+    const centerLongitude = totalLongitude / locations.length;
+    const centerLatitude = totalLatitude / locations.length;
+
+    return {
+        longitude: centerLongitude,
+        latitude: centerLatitude
+    };
+}
 export const prepareBuildingsData = (buildings) => {
     return buildings.map((building) => {
         return prepareBuildingData(building);
@@ -22,12 +44,13 @@ export const prepareBuildingsData = (buildings) => {
 }
 const prepareBuildingData = (building) => {
     const buildingDetails = building.details;
-    console.log(building.globalCoordinates)
-    const mapCoords = offsetFunction(building.globalCoordinates);
+    // console.log(building.globalCoordinates)
+    const center = findGeographicalCenter(building.geoArea)
+    const mapCoords = offsetFunction(center);
     console.log(mapCoords);
     return {
         ...building,
-        mapCoordinates:offsetFunction(building.globalCoordinates),
+        mapCoordinates:mapCoords,
         scheduleString:stringifySchedule(buildingDetails.openingHours),
         openStatus:isOpen(buildingDetails.openingHours),
         icon:buildingIcon(building),

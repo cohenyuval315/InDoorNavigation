@@ -6,7 +6,7 @@ export const fetchBuildingGraphById = createAsyncThunk(
   'admin/fetchBuildingGraphById', 
   async (buildingId,_) => {
     const response = await client.getBuildingGraphMap(buildingId)
-    return response
+    return response.data
   },
 )
 export const fetchAllProcessingRoutes = createAsyncThunk(

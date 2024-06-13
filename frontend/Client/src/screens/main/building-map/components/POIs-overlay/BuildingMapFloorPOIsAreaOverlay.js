@@ -8,8 +8,11 @@ import Status from "../../../../../app/status";
 
 const BuildingMapFloorPOIsAreaOverlay = ({floorIndex}) => {
     const poisData = useSelector(selectPOIsMaps)
+    // console.log("DATAINDEX:",floorIndex);
+    // console.log("DATA:",poisData[floorIndex]);
+    // console.log(poisData)
     const mapStatus = useSelector(selectMapStatus);
-
+    // return null;
     useEffect(() => {
         if(mapStatus !== Status.SUCCEEDED){
             return null;
@@ -17,9 +20,11 @@ const BuildingMapFloorPOIsAreaOverlay = ({floorIndex}) => {
     },[mapStatus])
 
     return (
-        <MapOverlay>    
+        <MapOverlay styles={{
+            pointerEvents:'none'
+        }}>    
             <SvgXml
-                xml={poisData[floorIndex].pois}
+                xml={poisData[floorIndex].map}
             />
         </MapOverlay>
     )

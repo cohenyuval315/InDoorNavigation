@@ -1,8 +1,13 @@
 import { Schema } from 'mongoose';
 import POIDetailsSchema from './POIDetails';
 import mapCoordinateSchema from './MapCoordinate';
+import { MapPOI } from '../../../core/path-finding/MapPOI';
 
-const POISchema = new Schema({
+const POISchema = new Schema<MapPOI>({
+    id:{
+        type:String,
+        require:true
+    },
     mapArea:{
         type:[mapCoordinateSchema],
         require:true,
@@ -13,6 +18,10 @@ const POISchema = new Schema({
             message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
         }        
     },
+    center:{
+        type:mapCoordinateSchema,
+        require:true,
+    },
     isAvailable:{
         type:Boolean,
         require:true,
@@ -21,7 +30,6 @@ const POISchema = new Schema({
     floor:{
         type:Number,
         require:true,
-        default:0,
     },
     isEmployeeOnly:{
         type:Boolean,
@@ -33,6 +41,7 @@ const POISchema = new Schema({
         require:true
     }
 }, { 
+    _id:false,
     timestamps: true,
     autoCreate: false,
 });

@@ -4,7 +4,11 @@ import buildingDetailsSchema from './building/data/BuildingDetails';
 import entranceSchema from './building/data/Entrance';
 import { BuildingStatus } from '../constants/constants';
 
-const buildingDataSchema = new Schema({    
+const buildingDataSchema = new Schema({   
+    _id: {
+        type: Schema.Types.ObjectId, 
+        require:true
+    },  
     status: {
         type: String, 
         enum: Object.values(BuildingStatus),

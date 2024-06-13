@@ -31,7 +31,7 @@ const entranceSchema = new Schema({
         require:true,
         validate: {
             validator: function(v:any) {
-                return v.length >= 3;
+                return v.length >= 1;
             },
             message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
         }    
@@ -41,7 +41,7 @@ const entranceSchema = new Schema({
         require:true
     }     
 }, { 
-    // _id:false,
+    _id:false,
     timestamps: true,
     autoCreate: false,
 });

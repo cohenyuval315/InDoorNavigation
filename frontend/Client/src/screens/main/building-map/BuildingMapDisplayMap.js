@@ -16,7 +16,6 @@ const BuildingMapDisplayMap = () => {
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
     const selectedActivePOI = useSelector(selectActivePOI);
-    const [loading,setLoading] = useState(true);
 
     const containerRef = useRef(null);
     const rotationRef = useRef(new Animated.Value(0)); 
@@ -25,34 +24,84 @@ const BuildingMapDisplayMap = () => {
     const opacitiesRef = useRef(initialOpacitiesValues);
 
     const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
-    const [centerOn,setCenterOn] = useState(null);
-    // const mapStatus = useSelector(selectMapStatus);
-    // useEffect(() => {
-    //     switch(mapStatus){
-    //         case Status.SUCCEEDED:{
-    //             setLoading(false);
-    //             break;
-    //         }   
-    //     }
-    // }, [mapStatus])
+    const centerOnRef = useRef(null)
 
-    // if(!loading){
-    //     return null;
-    // }
+    const userBuildingMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+    const prevUserBuildingMapCoordinates = useRef({ x: 0, y: 0 });
+    const [isInitUserPosition,setIsInitUserPositon] = useState(false);
+    const [isLock,setIsLock] = useState(false)
+
+    const onInitUserPosition = () => {
+        setIsInitUserPositon(true);
+    }
+
+    const centerListener = (x,y) => {
+        centerOnRef.current = { 
+            x, 
+            y,
+            // duration:100,
+        };
+    }
+
+    const lockOnUser = () => {
+        if(isInitUserPosition && !isLock){
+            userBuildingMapCoordinates.addListener(centerListener);
+            setIsLock(true);
+        }
+    }
+
+    const stopLockOnUser = () => {
+        if(isLock){
+            userBuildingMapCoordinates.removeListener(centerListener);
+        }
+        
+    }
+
+
+
+    useEffect(() => {
+        console.log("CTNER CURRENT",centerOnRef.current)
+        if(centerOnRef.current == null) { 
+
+        }else{
+
+        }
+    },[centerOnRef.current])
+
 
 
     const onPanMove = (data) => {
-        setCenterOn(null);
+        // setCenterOn(null);
+        // containerRef.current.reset()
+        stopLockOnUser();
+        centerOnRef.current = null;
+    }
+
+    const setCenterOn = (x,y,scale,duration=300) => {
+        containerRef.current.centerOn({
+            x: x,
+            y: y,
+            scale: scale,
+            duration: duration,
+        })
+    }
+
+    const stopCenterOn = () => {
+        containerRef.current.centerOn(null)
+    }
+
+    const getCenterOn = () => {
+        containerRef.current
     }
 
 
     const onPOIPress = (POI) => {
-        containerRef.current.centerOn({
-            x: WINDOW_WIDTH /2 - POI.center.x,
-            y: (WINDOW_HEIGHT * 3 / 5  - POI.center.y) * -1,
-            scale: 2,
-            duration: 300,
-        })
+        // containerRef.current.centerOn({
+        //     x: POI.center.x,
+        //     y: (WINDOW_HEIGHT - POI.center.y) * -1,
+        //     scale: 2,
+        //     duration: 300,
+        // })
         const newOpacities = opacitiesRef.current.map((_,index) => POI.floor === minFloor + index ? 1 : 0);
         opacitiesRef.current.forEach((opacityRef, index) => {
             Animated.timing(opacityRef, {
@@ -80,8 +129,31 @@ const BuildingMapDisplayMap = () => {
     const test = () => {
         console.log("toogle")
         setCurrentFloorIndex(prevIndex => (prevIndex === 0 ? 1 : 0));
-
     }
+
+    // useEffect(() => {
+    //     const timeoutId = setTimeout(() => {
+    //         userBuildingMapCoordinates.setValue({ x: 20, y: 20, floor: -1 });
+    //     }, 5000);
+
+    //     const listener = userBuildingMapCoordinates.addListener(({ floor }) => {
+    //         if (floor  !== prevUserBuildingMapCoordinates.current.floor) {
+    //             console.log('floor changed:', floor);
+    //             setCurrentFloorIndex(floor - minFloor);
+    //             prevUserBuildingMapCoordinates.current.floor = floor;
+    //         }
+    //     });
+    //     return () => {
+    //         userBuildingMapCoordinates.removeListener(listener);
+    //         clearTimeout(timeoutId);
+    //     };        
+    // },[])
+
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         userBuildingMapCoordinates.setValue({ x: 20, y: 20, floor: -1 });
+    //     }, 5000)
+    // },[])
 
     const toggleTest = () => {
         const newOpacities = opacitiesRef.current.map((_, index) =>
@@ -99,6 +171,8 @@ const BuildingMapDisplayMap = () => {
         });
     };
 
+    // const setCenterOn 
+
     
     useEffect(() => {
         toggleTest()
@@ -111,18 +185,27 @@ const BuildingMapDisplayMap = () => {
         y:null,
     });
 
+    const onFloorChange = (floor) => {
+        const newFloor = floor - minFloor
+        if(currentFloorIndex != newFloor){
+            setCurrentFloorIndex(newFloor);
+        }
+        
+    }
 
     return (
         <View style={styles.container}> 
             <Button title="clickme" onPress={test}/>
             <BuildingMapButtonsOverlay
-                centerOn={centerOn}
-                containerRef={containerRef} 
+                isInitUserPosition={isInitUserPosition}
+                centerOnRef={centerOnRef}
+                userPositionRef={userBuildingMapCoordinates}
+                
             />                    
             <BuildingMapWidgetsOverlay  />
              
             <BuildingMap 
-                centerOn={centerOn}
+                centerOn={centerOnRef.current}
                 containerRef={containerRef}
                 opacitiesRef={opacitiesRef}
                 currentFloorIndex={currentFloorIndex}
@@ -132,8 +215,9 @@ const BuildingMapDisplayMap = () => {
                 onPOIPress={onPOIPress}
             >
                 <BuildingMapUserPositionOverlay 
-                        opacitiesRef={opacitiesRef} 
-                        rotationRef={rotationRef} 
+                    userPositionRef={userBuildingMapCoordinates}
+                    onFloorChange={onFloorChange}
+                    onInitUserPosition={onInitUserPosition}
                 />  
             </BuildingMap>
         </View>

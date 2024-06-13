@@ -11,7 +11,7 @@ import BuildingCard from "../../../components/BuildingCard";
 // import SearchBarDisplay from "./SearchBarDisplay";
 // import BuildingDisplay from "./BuildingDisplay";
 
-
+const snapPoints = ["22%","100%"]
 const BuildingsGlobalMapBottomDrawer = ({
     // bottomSheetRef,
     // onBuildingSearchItemPress,
@@ -71,10 +71,11 @@ const BuildingsGlobalMapBottomDrawer = ({
       }, [isSearchVisible]);  
       
   
+    
     return (
             <BottomDrawer
                 onSheetChange={handleSheetChanges}
-                snapPoints={["22%","100%"]}
+                snapPoints={snapPoints}
                 bottomSheetRef={bottomSheetRef}
             >
                     {selectedBuilding !== null ? (

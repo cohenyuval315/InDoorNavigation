@@ -63,7 +63,7 @@ import NavigationWrapper from './NavigationWrapper';
 const TestScreen = (props) => {
   const [loading,setLoading] = React.useState(true);
   const dispatch = useDispatch()
-  const buildingId = "324324324343";
+  const buildingId = "E384F534F12C984588D8868E";
   React.useEffect(()=>{
     dispatch(fetchBuildingByMapId(buildingId));
     dispatch(fetchBuildingGraphById(buildingId));
@@ -79,9 +79,9 @@ const TestScreen = (props) => {
   },[dispatch,mapStatus,graphStatus])
   
   const onPress = () => {
-    props.navigation.navigate("data-points-collection")
+    // props.navigation.navigate("data-points-collection")
     // props.navigation.navigate("data-routes-collection")
-    // props.navigation.navigate("buildings-global-map")
+    props.navigation.navigate("buildings-global-map")
     
     // props.navigation.navigate("buildings-global-map")
   }

@@ -1,0 +1,17 @@
+FROM reactnativecommunity/react-native-android
+
+WORKDIR /app
+# RUN apt-get update
+# RUN apt-get install usbutils
+
+# COPY /Client /app
+
+# RUN npm install
+
+# RUN adb start-server && \
+#     sleep 3
+
+
+# docker run -it --privileged -v .:/app -v /dev/bus/usb:/dev/bus/usb reactnativecommunity/react-native-android   
+
+# adb -a nodaemon server start &> /dev/null &

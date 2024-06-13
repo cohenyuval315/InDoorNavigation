@@ -11,7 +11,7 @@ const BuildingMapPOI = ({
   }) => {
 
     return (
-
+          
             <BuildingPOIIcon 
               POI={POI} 
               rotationRef={rotationRef}

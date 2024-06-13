@@ -56,6 +56,15 @@ const buildingNavigationData = new Schema({
     autoCreate: true,
 });
 
-
+// facilitiesWaypointsIds:{ // without invisible waypoints needed for navigation
+//     type: [Schema.Types.ObjectId], 
+//     require:true,
+//     validate: {
+//         validator: function(v:any) {
+//             return v.length >= 1;
+//         },
+//         message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
+//     }            
+// }
 const BuildingNavigationData = model('BuildingNavigationData', buildingNavigationData);
 export default BuildingNavigationData;

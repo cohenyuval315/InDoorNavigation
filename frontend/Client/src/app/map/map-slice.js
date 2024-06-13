@@ -8,9 +8,13 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
 
 export const fetchBuildingByMapId = createAsyncThunk(
   'map/fetchBuildingMapById', 
-  async (buildingId) => {
+  async (buildingId,{rejectWithValue}) => {
     const response = await client.getBuildingMap(buildingId)
-    return response
+    if (response){
+      console.log(Object.keys(response.data))
+      return response.data;
+    }
+    return rejectWithValue("not found")
   },
 )
 
@@ -39,9 +43,9 @@ const mapSlice = createSlice({
           state.error = null;
         })
         .addCase(fetchBuildingByMapId.fulfilled, (state, action) => {
-          let buildingMapData = action.payload.data;
-          state.globalCoordinatesBoundary = buildingMapData.globalCoordinatesBoundary;
-          const floorsFiles = action.payload.floorsFiles.sort((a, b) => a.floor - b.floor);
+          let buildingMapData = action.payload;
+          // state.globalCoordinatesBoundary = buildingMapData.globalCoordinatesBoundary;
+          const floorsFiles = action.payload.mapFloors.sort((a, b) => a.floor - b.floor);
           floorsFiles.forEach((mapFile,index) => {
             const normalPOIs = normalizePOIsPoints(buildingMapData.POIs, mapFile.width,mapFile.height,mapFile.floor,WINDOW_WIDTH,WINDOW_HEIGHT)
             buildingMapData = {

@@ -9,6 +9,16 @@ const BuildingSearchItemBottomDrawer = ({building}) => {
     const handleOnBuildingSearchItemPress = () => {
         dispatch(setActiveBuilding(building));
     }
+    
+    const address = building.details.address;
+    const {
+        country,
+        state,
+        city,
+        street,
+        streetNumber,
+        postalCode,        
+    } = address;
     return (
         <TouchableOpacity 
         onPress={handleOnBuildingSearchItemPress}
@@ -41,7 +51,7 @@ const BuildingSearchItemBottomDrawer = ({building}) => {
                     fontSize:16,
                     color:"black"
                 }}>
-                    {building.details.city}, {building.details.address}
+                    {country}, {state}, {city}, {street} {streetNumber}, {postalCode}
                 </Text>
             </View>
         </TouchableOpacity>

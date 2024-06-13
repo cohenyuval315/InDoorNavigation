@@ -8,8 +8,9 @@ import * as storageService from '../services/storage-service';
 export const createBuildingData = async (req:Request,res:Response,next:NextFunction) => {
     try{
         const body = req.body;
-        const {newBuildingData} = body;
-        return await buildingsService.createBuildingData(newBuildingData)
+        const {buildingId,newBuildingData,override} = body;
+
+        return await buildingsService.createBuildingData(buildingId,newBuildingData,override)
     }catch(error){
         next(error);
     }
@@ -50,8 +51,8 @@ export const deleteAllBuildingsData = async (req:Request,res:Response,next:NextF
 export const createBuildingMapData = async (req:Request,res:Response,next:NextFunction) => {
     try{
         const body = req.body;
-        const {newBuildingMapData} = body;
-        return await buildingsService.createBuildingMapData(newBuildingMapData);
+        const {buildingId,newBuildingMapData,override} = body;
+        return await buildingsService.createBuildingMapData(buildingId,newBuildingMapData,override);
     }catch(error){
         next(error);
     }       

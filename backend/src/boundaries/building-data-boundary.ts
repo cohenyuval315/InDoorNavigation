@@ -39,7 +39,32 @@ class BuildingDataBoundary {
             laptitude:number,
             longitude:number
         },
-    }[];
+    }[];    
+    constructor(building:any) {
+        this.id = building.id;
+        this.details = {
+            title:building.details.title,
+            description:building.details.description,
+            buildingType:building.details.buildingType,
+            address:building.details.address,
+            owner:building.details.owner,
+            openingHours:building.details.openingHours,
+            closingHours:building.details.closingHours,
+            websiteLink:building.details.websiteLink,
+            phonenumbers:building.details.phonenumbers,
+            buildingOpeningDate:building.details.buildingOpeningDate,
+            storageImageKey:building.details.storageImageKey,
+            imageUri:building.details.imageUri,
+        };
+        this.geoArea = building.geoArea;
+        this.entrances = building.entrances
+    }
+
+    toJSON(){
+
+    }
+
+
 
 }
 

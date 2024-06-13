@@ -1,9 +1,9 @@
 
 import { Schema } from 'mongoose';
 import { POIType } from '../../../constants/constants';
+import { MapPOIDetails } from '../../../core/path-finding/MapPOI';
 
-
-const POIDetailsSchema = new Schema({
+const POIDetailsSchema = new Schema<MapPOIDetails>({
     title:{
         type:String,
         require:true
@@ -18,11 +18,7 @@ const POIDetailsSchema = new Schema({
         require:true
     },
     openingHours:{
-        type:String,
-        require:false
-    },
-    closingHours:{
-        type:String,
+        type:Object,
         require:false
     },
     websiteLink:{
@@ -48,7 +44,7 @@ const POIDetailsSchema = new Schema({
 
 
 }, { 
-    // _id:false,
+    _id:false,
     timestamps: true,
     autoCreate: false,
 });

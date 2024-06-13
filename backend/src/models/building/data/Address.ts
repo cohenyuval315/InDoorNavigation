@@ -1,6 +1,7 @@
 import { Schema } from 'mongoose';
+import { BuildingAddress } from '../../../core/BuildingAddress';
 
-const addressSchema = new Schema({
+const addressSchema = new Schema<BuildingAddress>({
     country:{
         type:String,
         require:true
@@ -16,14 +17,18 @@ const addressSchema = new Schema({
     street:{
         type:String,
         require:true
-    },  
+    },
+    streetNumber:{
+        type:String,
+        require:true
+    },
     postalCode:{
         type:String,
         require:false
     },     
 }, { 
-    // _id:false,
-    timestamps: true,
+    _id:false,
+    timestamps: false,
     autoCreate: false,
 });
 

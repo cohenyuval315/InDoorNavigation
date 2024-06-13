@@ -55,9 +55,11 @@ const BuildingPOIIcon = ({POI,rotationRef,onPOIPress}) => {
             transform: [{ rotate }],
         }}>
             <TouchableOpacity style={{
+                height:"100%",
+                width:"100%",
             }} onPress={onPOIPress}>
                 <Text style={{
-                    backgroundColor:"black",
+                    backgroundColor:"white",
                     borderRadius:30,
                 }}>
                     <MaterialCommunityIcons name={iconName}  size={iconSize} color={"black"} />
