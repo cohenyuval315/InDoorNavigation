@@ -5,7 +5,7 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "tes2t": "set NODE_ENV=test && jest ./tests/user.test.js --env=./.env.test --testTimeout=5000",
+    "test2": "set NODE_ENV=test && jest ./tests/user.test.js --env=./.env.test --testTimeout=5000",
     "test": "set NODE_ENV=test && jest ./tests/user.test.js",
     "start": "tsc && node --experimental-specifier-resolution=node dist/app.js",
     "build": "tsc",

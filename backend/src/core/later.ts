@@ -1,0 +1,8 @@
+enum EventPayloadType { 
+
+}
+
+class EventPayload{
+
+}
+
