@@ -22,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: ./.docker/Dockerfile.android.rn
+<<<<<<< Updated upstream
     # volumes:
     #   - ./Client:/app
       # - /dev/bus/usb:/dev/bus/usb  # Mount the USB devices for ADB
@@ -36,3 +37,35 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: sh -c "cd /app && npm run android"
+=======
+    tty: true
+    healthcheck:
+      disable: true
+    # privileged: true 
+    # network_mode: host
+    ports:
+    - "5022:22"
+    - "8081:8081"
+    - "5901:5901"    
+    # volumes:
+    #   - ./:/Client/:delegated
+    #   - notused:/./node_modules
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb 
+      - ~/.android:/root/.android  # Mount ADB keys into the container
+
+    # entrypoint: [
+    #   'bash', 
+    #   '-c', 'adb connect localhost:8081 && npm run android']
+    command: >
+      sh -c "
+      echo 'Starting Android application';
+      adb connect localhost:8081;
+      npm run android --verbose;
+      sleep infinity;
+      
+      "
+volumes:
+  notused:
+  
+>>>>>>> Stashed changes

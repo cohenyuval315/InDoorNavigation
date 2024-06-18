@@ -9,7 +9,6 @@ export const fetchBuildings = createAsyncThunk(
   'buildings/fetchBuildings', 
   async (state, thunkAPI) => {
     const response = await client.getBuildings();
-    console.log(response)
     return response.data
     
   },

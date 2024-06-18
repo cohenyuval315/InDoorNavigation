@@ -18,7 +18,6 @@ class ApiClient{
             headers:{
                 'Content-Type': 'application/json'
             },
-            body:undefined
         });
         if(response.ok){
             const results = await response.json();
@@ -120,11 +119,7 @@ class ApiClient{
                 data: data
             })
         });
-        console.log(response,"postBuildingProcessingMap")
-        if(response.ok){
-            const results = await response.json();
-            return results;
-        }
+        return response
     }
 
     async getBuildingProcessingMap(buildingId,version){
@@ -136,11 +131,8 @@ class ApiClient{
                 'Content-Type': 'application/json'
             },
         });
-        console.log(response.status,"getBuildingProcessingMap")
-        if(response.ok){
-            const results = await response.json();
-            return results;
-        }
+        return response
+
     }
 
     async getSystemConfigurations(data){
@@ -175,6 +167,25 @@ class ApiClient{
             return results;
         }
 
+    }
+    async getNavigationRoute(buildingId ,destinationPOIId,
+        currentLocation,
+        accessability){
+            console.log("request this")
+            console.log(buildingId)
+        const path = `/navigation/buildings/${buildingId}`;
+        const response = await fetch(this.base_url + path,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                destinationPOIId,
+                currentLocation,
+                accessability
+            })
+        });
+        return response
     }
 }
 

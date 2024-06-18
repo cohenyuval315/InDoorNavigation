@@ -7289,21 +7289,21 @@ const afekaBuildingData = {
     },
     geoArea:[
         {
-            latitude:31.93441555065376, 
-            longitude:34.80631845630264
+            longitude: 34.817755000000005, 
+            latitude: 32.11344833333333
+        }, 
+        {
+            longitude: 34.81849833333333, 
+            latitude: 32.11331833333334
+        }, 
+        {
+            longitude: 34.817658333333334, 
+            latitude: 32.112855
         },
         {
-            latitude:31.93439651279175, 
-            longitude:34.80696153568204
-        },
-        {
-            latitude:31.933977678830264, 
-            longitude:34.80699892401805
-        },
-        {
-            latitude:31.934034792664654, 
-            longitude:34.80640818830907
-        },                        
+            longitude: 34.818381552078776, 
+            latitude: 32.11272592560912
+        }            
     ],
     entrances:[
         {
@@ -7336,6 +7336,7 @@ const afekaBuildingMapData = {
     numFloors:2,
     cardinalDirections:afekaBuildingCardinalDirections,
     POIs:POIs,
+    unitInMeters: 1,
     floorHeights:{
         [-1]: 1,
         0: 1, 

@@ -11,6 +11,7 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../utils/scaling";
 import { openConfirm } from "../../../components/modals/confirmation/ConfirmationModal";
 import useGPS from "../../../hooks/useGPS";
 import Status from "../../../app/status";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const BuildingMapDisplayMap = () => {
     const numberOfFloors = useSelector(selectNumberOfFloors);
@@ -23,13 +24,15 @@ const BuildingMapDisplayMap = () => {
     const initialOpacitiesValues = Array.from({ length: numberOfFloors }, (_, index) => index + minFloor == 0 ? new Animated.Value(1) : new Animated.Value(0))
     const opacitiesRef = useRef(initialOpacitiesValues);
 
-    const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
     const centerOnRef = useRef(null)
 
     const userBuildingMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
     const prevUserBuildingMapCoordinates = useRef({ x: 0, y: 0 });
     const [isInitUserPosition,setIsInitUserPositon] = useState(false);
     const [isLock,setIsLock] = useState(false)
+    const [openDropdown,setOpenDropdown] = useState(false)
+    const numFloors = useSelector(selectNumberOfFloors);
+    const [floorIndex,setFloorIndex] = useState(0);
 
     const onInitUserPosition = () => {
         setIsInitUserPositon(true);
@@ -128,7 +131,7 @@ const BuildingMapDisplayMap = () => {
 
     const test = () => {
         console.log("toogle")
-        setCurrentFloorIndex(prevIndex => (prevIndex === 0 ? 1 : 0));
+        setFloorIndex(prevIndex => (prevIndex === 0 ? 1 : 0));
     }
 
     // useEffect(() => {
@@ -157,7 +160,7 @@ const BuildingMapDisplayMap = () => {
 
     const toggleTest = () => {
         const newOpacities = opacitiesRef.current.map((_, index) =>
-          currentFloorIndex === index ? 1 : 0
+          floorIndex === index ? 1 : 0
         );
     
         opacitiesRef.current.forEach((opacityRef, index) => {
@@ -176,7 +179,7 @@ const BuildingMapDisplayMap = () => {
     
     useEffect(() => {
         toggleTest()
-    },[currentFloorIndex])
+    },[floorIndex])
 
     const [userPosition,setUserPosition] = useState({
         timestamp:null,
@@ -187,15 +190,29 @@ const BuildingMapDisplayMap = () => {
 
     const onFloorChange = (floor) => {
         const newFloor = floor - minFloor
-        if(currentFloorIndex != newFloor){
-            setCurrentFloorIndex(newFloor);
+        if(floorIndex != newFloor){
+            setFloorIndex(newFloor);
         }
         
     }
+    const floors = Array.from({length:numFloors}).map((_,index) => {
+        return {
+            label: `floor ${index + minFloor}`,
+            value: index
+        }
+    })
 
     return (
         <View style={styles.container}> 
             <Button title="clickme" onPress={test}/>
+            <DropDownPicker
+                    items={floors}
+                    open={openDropdown}
+                    setOpen={setOpenDropdown}
+                    setValue={setFloorIndex}
+                    value={floorIndex}
+                    listMode="MODAL"
+                />
             <BuildingMapButtonsOverlay
                 isInitUserPosition={isInitUserPosition}
                 centerOnRef={centerOnRef}
@@ -208,7 +225,7 @@ const BuildingMapDisplayMap = () => {
                 centerOn={centerOnRef.current}
                 containerRef={containerRef}
                 opacitiesRef={opacitiesRef}
-                currentFloorIndex={currentFloorIndex}
+                currentFloorIndex={floorIndex}
                 rotationRef={rotationRef}
                 onPanMove={onPanMove}
                 rotateChildren={true}

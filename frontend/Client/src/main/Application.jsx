@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useConfirmationModal } from "../contexts/ConfirmationModalContext";
 import AppPreLoading from "./AppPreLoading";
 import { BackHandler } from "react-native";
+import './test';
 
 const Application = () => {
     const {openConfirm} = useConfirmationModal();

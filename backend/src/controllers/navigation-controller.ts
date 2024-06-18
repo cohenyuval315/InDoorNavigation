@@ -4,26 +4,23 @@ import * as navigationService from '../services/navigation-service';
 import BuildingWifiMap from '../models/BuildingWifiMap';
 
 export const getNavigationRoute = async (req:Request,res:Response,next:NextFunction) => {
-    const buildingId = req.params.id;
-    // const { 
-    //   srcWaypoint,
-    //   checkpointsWaypoints, 
-    //   destWaypoint, 
-    //   isInOrder } = req.body;
+  console.log(`Request IP: ${req.ip}`);
+   const buildingId = req.params.buildingId;
     try{
       const body = req.body;
       const {
-        destination,
+        destinationPOIId,
         currentLocation,
         accessability
       } = body;
-      const route = await navigationService.getNavigationRoute(
+      const route = await navigationService.getNavigationInitialRoute(
         buildingId,
         currentLocation,
-        destination,
+        destinationPOIId,
         accessability
       );
-      return res.status(200).json(route);
+      res.status(200).json({data:route});
+      return
     }catch(error){
       next(error);
     }

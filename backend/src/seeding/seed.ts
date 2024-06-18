@@ -21,6 +21,9 @@ import { generateColorMap, generateGraphMaps } from '../utils/maps-generation';
 import { getEdgesWithIds } from '../utils/edges';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+console.log('__dirname:', __dirname);
+
+const isWindows = process.platform === 'win32';
 const baseBuildingAssetsPath = path.join(__dirname, '..','..','src','seeding')
 
 export async function seedBuilding(buildingSeed:BuildingSeed){
@@ -30,7 +33,7 @@ export async function seedBuilding(buildingSeed:BuildingSeed){
         
         const floorMapsPromises = mapFloors.map(async (mapFloor) => {
             const {floor,height,width,floorHeight} = mapFloor;
-            const mapSvgPath = path.join(baseBuildingAssetsPath,buildingTitle, 'maps', `_${floor}.svg`).slice(3);
+            const mapSvgPath = path.join(baseBuildingAssetsPath,buildingTitle, 'maps', `_${floor}.svg`);//.slice(3);
             const mapSvg = await fs.readFile(mapSvgPath,'utf-8')
             return {
                 map:mapSvg,

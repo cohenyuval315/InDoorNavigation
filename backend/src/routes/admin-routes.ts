@@ -51,6 +51,37 @@ adminRouter.post('/processing/map/:buildingId',async (req:Request, res:Response,
  */
 adminRouter.get('/processing/map/:buildingId/:version',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getProcessingMap(req,res,next));
 
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.get('/processing/map/:buildingId',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getAllProcessingMaps(req,res,next));
+
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+adminRouter.get('/processing/routes/:buildingId/titles',async (req:Request, res:Response, next:NextFunction) => await  ProcessingController.getAllRoutesTitles(req,res,next));
+
+
 /**
  * @swagger
  * /admin/buildings/:id/graph

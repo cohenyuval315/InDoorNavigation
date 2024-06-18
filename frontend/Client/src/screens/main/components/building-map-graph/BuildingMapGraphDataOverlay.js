@@ -20,7 +20,7 @@ const BuildingMapGraphDataOverlay = ({floorIndex}) => {
     return (
         <MapOverlay>    
             <SvgXml
-                xml={graphData[floorIndex].graph}
+                xml={graphData[floorIndex].map}
             />
         </MapOverlay>
     )

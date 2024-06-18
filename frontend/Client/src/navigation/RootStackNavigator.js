@@ -80,8 +80,8 @@ const TestScreen = (props) => {
   
   const onPress = () => {
     // props.navigation.navigate("data-points-collection")
-    // props.navigation.navigate("data-routes-collection")
-    props.navigation.navigate("buildings-global-map")
+    props.navigation.navigate("data-routes-collection")
+    // props.navigation.navigate("buildings-global-map")
     
     // props.navigation.navigate("buildings-global-map")
   }

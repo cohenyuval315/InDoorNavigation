@@ -1,0 +1,40 @@
+FROM reactnativecommunity/react-native-android:v13.0
+
+# Adds user and group node
+RUN groupadd --gid 1000 node \
+  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+
+# set our node environment, either development or production
+# defaults to production, compose overrides this to development on build and run
+ARG NODE_ENV=development
+ENV NODE_ENV $NODE_ENV
+
+# default to port 19006 for node, and 19001 and 19002 (tests) for debug
+ARG PORT=5037
+ENV PORT $PORT
+
+
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH /home/node/.npm-global/bin:$PATH
+
+
+
+# WORKDIR /app
+
+# COPY Client/package*.json ./
+
+# RUN npm install
+
+# COPY Client .
+
+RUN mkdir /Client && chown node:node /Client
+
+WORKDIR /Client
+
+ENV PATH /Client/node_modules/.bin:$PATH
+
+
+
+USER node
+
+RUN yarn install

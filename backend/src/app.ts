@@ -16,15 +16,17 @@ import mongoose from 'mongoose';
 
 import http from 'http';
 // import socketIo from 'socket.io';
-import {WebSocketServer} from 'ws';
+import {RawData, WebSocketServer} from 'ws';
 // import {errorHandler} from './middlewares/error-handler';
 import { ErrorHandlingMiddlewareFunction } from "mongoose";
 import bodyParser from "body-parser";
 // import { initAWSConfigurations } from "./config/aws-config";
 import { initConfig } from "./config/config";
 import { seedAllBuilding, seedBuilding } from "./seeding/seed";
+import navigationRouter from "./routes/navigation-routes";
+import { errorHandler } from "./exceptions";
 
-
+import compression from "compression";
 
 
 initConfig();
@@ -32,7 +34,11 @@ initConfig();
 
 export const app = express();
 
-app.use(bodyParser.json())
+// app.use(bodyParser.json({ limit: '500mb' }));
+// app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
+app.use(bodyParser.json({ limit: '1gb' })); 
+app.use(bodyParser.urlencoded({ limit: '1gb', extended: true }));
+app.use(compression());
 app.use(morgan('dev'));
 
 app.use(cors()); 
@@ -128,20 +134,44 @@ app.get('/', (req, res) => {
 app.use('/',userRouter);
 app.use('/auth',authRouter);
 app.use('/admin',adminRouter);
-
-
+app.use('/navigation',navigationRouter);
+app.use(errorHandler)
 
 wss.on('connection', (ws) => {
   console.log('A client connected via WebSocket');
+  let index = 1;
   // Handle events from the client
-  ws.on('message', (message) => {
-      console.log('Received message from client:', message);
+  ws.on('message', (message:RawData) => {
+      console.log('Received message from client:', message.toString());
+      let initialData = null;
+      try {
+          initialData = JSON.parse(message.toString());
+      } catch (error) {
+          console.error('Error parsing initial data:', error);
+          return;
+      }
+
+      const responseData = {
+        message: `Hello  ! Welcome to the WebSocket server. ${index}`,
+        status: 'Initialized'
+      };
+      index += 1;
+      ws.send(JSON.stringify(responseData));
+
+
   });
-  // Send data to the client
-  ws.send('Hello from server!');
+      // Send data to the client
+    ws.on('close', () => {
+        console.log('WebSocket connection closed');
+    });
+
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      // Optionally handle the error (e.g., log, take corrective action)
+    });
 });
 
-// app.use(errorHandler)
+
 
 
 const appServer = server.listen(PORT, () => {

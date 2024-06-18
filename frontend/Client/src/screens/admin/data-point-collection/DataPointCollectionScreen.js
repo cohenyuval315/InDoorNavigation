@@ -1,5 +1,5 @@
 
-import { Alert, Animated, FlatList, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, Animated, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAllBuildings } from "../../../app/building/buildings-slice";
 import { Children, useCallback, useEffect, useMemo, useRef, useState, version } from "react";
@@ -46,7 +46,8 @@ import SensorsService from "../../../sensors/sensors-service";
 import { fetchProcessingMap, selectProcessingError, selectProcessingMap, selectProcessingStatus, uploadProcessingMap } from "../../../app/admin/admin-slice";
 import Status from "../../../app/status";
 import GeoLocalization from "../../../navigation/GeoLocalization";
-import { Geolocation } from "../../../sensors/gps-service";
+import { Geolocation, GeolocationService } from "../../../sensors/gps-service";
+import client from "../../../services/server/api-client";
 
 // magnetometerData
 // magnetometerUncalibData
@@ -74,25 +75,31 @@ const DataPointCollectionScreen = () => {
     const rotationRef = useRef(new Animated.Value(0));
     const mapsDims = useSelector(selectMapsDims);
     const minFloor = useSelector(selectMinFloor)
-    const maxWidth = SCREEN_WIDTH;
+
+    const processingMap = useSelector(selectProcessingMap);
+    const processingStatus = useSelector(selectProcessingStatus);
+    const processingError = useSelector(selectProcessingError);
+
+    const [searchedData,setSearchedData] = useState(null);
     const currentDims = mapsDims[floorIndex]
+    const maxWidth = currentDims.width;
 
     const floor = floorIndex + minFloor;
     
     
     const ratio = SCREEN_WIDTH / currentDims.width;
-    const maxHeight = ratio * currentDims.height;
+    const maxHeight = currentDims.height;
 
     
 
-
+    const [error,setError] = useState('');
     const [dataPoints, setDataPoints] = useState([]);
-    const [version,setVersion] = useState("v1");
+    const [version,setVersion] = useState("loc1");
     const [isHighTurbuance,setIsHighTurbuance] = useState(false);
     const [isTest,setIsTest] = useState(false);
     const [isUnsure,setIsUnsure] = useState(false);
     const [deviceOrientation,setDeviceOrientation] = useState({ roll: 0, pitch: 0, yaw: 0 });
-    
+    const [message,setMessage] = useState('')
     const [x,setX] = useState(0);
     const [y,setY] = useState(0);
     const [buildingID,setBuildingID] = useState(null);
@@ -104,7 +111,15 @@ const DataPointCollectionScreen = () => {
     const [availableDirections,setAvailableDirections] = useState([]);
     const [points,setPoints] = useState([]);
     const [savedPoints,setSavedPoints] = useState([]);
+    const [isWifi,setIsWifi] = useState(true);
+    const onIsWifiChange = () => {
+        setIsWifi(prev => !prev);
+    }
 
+    const [isGps,setIsGps] = useState(true);
+    const onIsGpsChange = () => {
+        setIsGps(prev => !prev);
+    }
     const {subscribeGPS} =useGPS()
     const gpsData = useRef(null);
     const magData = useRef(null);
@@ -266,24 +281,59 @@ const DataPointCollectionScreen = () => {
     }
 
     const getData = async () => {
-        const wifiData = await getWifiData();
-        if(typeof wifiData == "string"){
-            console.log(wifiData)
-            return;
+        setMessage('loading...')
+        let wifiData = null;
+        if(isWifi){
+            const samePoints = points.filter((p) => p.x == x && p.y == y)
+            const atleastOneWifi = samePoints.some(obj => obj.wifiData !== null);
+            if (!atleastOneWifi){
+                wifiData = await getWifiData();
+                setMessage("fetching wifi data for this point...")
+                if(typeof wifiData == "string"){
+                    setMessage("cannot fetch wifi data for this point yet...",wifiData)
+                    return;
+                }else{
+                    setMessage('got wifi,')
+                }
+            }else{
+                setMessage("already have wifi")
+            }
         }
+
+        
         const magnetometerData = magData.current;
         const magnetometerUncalibData = magUnData.current;
         const rotationVectorData = rotData.current;
         const gravityData = gravData.current;
-        const gpsData = await Geolocation.getInstance().getCurrentGPSPosition({
-            enableHighAccuracy:true,
-            maximumAge:0,
-            timeout:3000
-        })
+        let gpsData = null;
+        if(isGps){
+            try {
+                gpsData = await GeolocationService.getInstance().getCurrentGPSPosition({
+                    enableHighAccuracy:true,
+                    maximumAge:0,
+                    timeout:3000
+                })
+                if(isWifi){
+                    setMessage(prev => prev + ",got gps")
+                }else{
+                    setMessage("got gps")
+                }
+                
+            }catch(error){
+                if(isWifi){
+                    setMessage(prev => prev + "cant get gps")
+                }else{
+                    setMessage("cant get gps")
+                }
+            }
+        }
+
+
         const dataPoint = {
             id:generateUUID(),
             title:generateTitle(),
             timestamp:createTimestamp(new Date()),
+            rawDate:new Date(),
             test:isTest,
             uncertain:isUnsure,
             floor:floor,
@@ -301,6 +351,12 @@ const DataPointCollectionScreen = () => {
             gpsData:gpsData
         }
         // console.log(dataPoint)
+        if(isGps || isWifi){
+            setMessage(prev => prev + ",got sensors");
+        }else{
+            setMessage(",got sensors")
+        }
+        
         return dataPoint
     }
 
@@ -321,43 +377,35 @@ const DataPointCollectionScreen = () => {
             buildingId:buildingID,
             version:version
         }
+        console.log("version saving...",version)
         dispatch(uploadProcessingMap({buildingId:buildingID,data:data}));
     }
 
-    const processingMap = useSelector(selectProcessingMap);
-    const processingStatus = useSelector(selectProcessingStatus);
-    const processingError = useSelector(selectProcessingError);
-    useEffect(() => {   
-        const searchVersion = "v99";
-        switch(processingStatus){
-            case Status.IDLE : {
-                if(buildingID && searchVersion){
-                    dispatch(fetchProcessingMap({buildingId:buildingID,version:searchVersion}));                    
-                }
-                break;
-            }
-                
-            case Status.SUCCEEDED:{
-                if (!processingMap){
-                    console.log("not found ", searchVersion)
-                }else{
-                    console.log(Object.keys(processingMap))
-                }
-                
-                break;
-            }
-            case Status.FAILED: {
-                console.log("FAILED!...")
-                console.log(processingError)
-                break;
-            }
-            case Status.PENDING:{
-                console.log("PENDING PROCESSING...")
-                break;
-            }
-        }
 
-    },[processingStatus,buildingID,version])    
+    // useEffect(() => {   
+    //     switch(processingStatus){
+    //         case Status.IDLE : {
+    //         }
+                
+    //         case Status.SUCCEEDED:{
+    //             if (!processingMap){
+    //                 setError('SOMETHING WRONG')
+    //             }else{
+    //                 setError('')
+    //             }
+    //             break;
+    //         }
+    //         case Status.FAILED: {
+    //             setError(processingError)
+    //             break;
+    //         }
+    //         case Status.PENDING:{
+    //             setError('')
+    //             console.log("PENDING PROCESSING...")
+    //         }
+    //     }
+
+    // },[processingStatus,buildingID,version])    
 
 
     const onSavePoints = () => {
@@ -462,6 +510,23 @@ const DataPointCollectionScreen = () => {
 
     }, [floorIndex,savedPoints,points]);  
 
+
+
+    const onToggleSearchPress = async () => {
+        if(searchedData){
+            setSearchedData(null)
+        }else{
+            const response = await client.getBuildingProcessingMap(buildingID,version)
+            if(response.ok){
+                const res = await response.json()
+                setSearchedData(res);
+            }else{
+                setSearchedData({
+                    message:"failed"
+                })
+            }
+        }
+    }
     return (
         <View style={{
             flex:1,
@@ -475,20 +540,50 @@ const DataPointCollectionScreen = () => {
             <FloorSelection initialFloor={floorIndex} onChange={handleFloorOnChange}/>
             <TitleInput value={title} onChange={handleTitleOnChange} />
             <View style={{
-
+                flexDirection:"row",
+                justifyContent:"center",
+                alignItems:"center",
             }}>
-                <TextInput
-                    style={{
-                        color:"black"
-                    }}
-                    value={version}
-                    onChangeText={(text)=>setVersion(text)}
-                    multiline={false} 
-                />
-            </View>                
+    
+                    <TextInput
+                        style={{
+                            color:"black"
+                        }}
+                        value={version}
+                        onChangeText={(text)=>setVersion(text)}
+                        multiline={false} 
+                    />
+                
+            <TouchableOpacity onPress={onToggleSearchPress} style={{
+                padding:10,
+            }}>
+                <Text style={{
+                    color:"black",
+                    backgroundColor:"red"
+                }}>
+                   {!searchedData ? "search" : "clear"} 
+                </Text>
+            </TouchableOpacity>
+
+
+
+
+            </View>
+            <ScrollView style={{
+                height:100,
+            }}>
+                <Text style={{
+                    color:"black"
+                }}>
+                    {searchedData && JSON.stringify(searchedData,null,2) }
+                </Text>
+            </ScrollView>      
+
             <DeviceOrientationSelection val={deviceOrientation} onChange={onDeviceOrientationChange}/>
             <HighTurbuanceSwitch value={isHighTurbuance} onChange={onHighTurChange}/>
-            <TestSwitch value={isTest} onChange={onIsTestChange}/>
+            <TestSwitch title={"gps"} value={isGps} onChange={onIsGpsChange}/>
+            <TestSwitch title={"wifi"} value={isWifi} onChange={onIsWifiChange}/>
+            <TestSwitch title={"test"} value={isTest} onChange={onIsTestChange}/>
             
             <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
             <PositionSelection 
@@ -508,7 +603,16 @@ const DataPointCollectionScreen = () => {
                  {userPosition}
                  {pointsOverlay}
             </AdminBuildingFloorMap>
-
+            <Text style={{
+                color:"black"
+            }}>
+                {message}
+            </Text>
+            <Text style={{
+                color:"black"
+            }}>
+                {error}
+            </Text>
             <AddButton onPress={addNewDataPoint}/>
             <View style={{
                 paddingVertical:10,

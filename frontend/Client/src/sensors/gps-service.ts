@@ -146,8 +146,8 @@ export interface AndroidGeolocationStreamOptions extends GeolocationStreamOption
 
 
 
-export class Geolocation {
-  private static instance: Geolocation;
+export class GeolocationService {
+  private static instance: GeolocationService;
   private gpsSubject: Subject<GeolocationResponse | null>;
   private watchSubscription: Subscription | null = null;
   
@@ -155,12 +155,12 @@ export class Geolocation {
     this.gpsSubject = new Subject<GeolocationResponse | null>();
   }  
 
-  static getInstance(): Geolocation {
-    if (!Geolocation.instance) {
-      Geolocation.instance = new Geolocation();
+  static getInstance(): GeolocationService {
+    if (!GeolocationService.instance) {
+      GeolocationService.instance = new GeolocationService();
        
     }
-    return Geolocation.instance;
+    return GeolocationService.instance;
   }  
  
   getCurrentGPSPosition = async (options:GeolocationOptions): Promise<GeolocationResponse> => {
@@ -223,10 +223,10 @@ export class Geolocation {
   }
 
   watchPosition(options?: GeolocationStreamOptions): Observable<Geoposition> {
-    return new Observable<Geoposition>((observer: any) => {
+    return new Observable<Geoposition>((observer: Observer<Geoposition>) => {
       const watchId = RNGeolocation.watchPosition(
-        (position:GeolocationResponse) => observer.next(position),
-        (error:GeolocationError) => observer.error(error),
+        (position: GeolocationResponse) => observer.next(position as Geoposition),
+        (error: GeolocationError) => observer.error(error),
         options
       );
       return () => RNGeolocation.clearWatch(watchId);
@@ -273,187 +273,4 @@ export class Geolocation {
   }
 
 
-
-
-
 }
-
-
-type AuthorizationLevel = 'whenInUse' | 'always' | 'auto';
-type LocationProvider = 'playServices' | 'android' | 'auto';
-
-const authorizationLevelOptions: AuthorizationLevel[] = ['whenInUse', 'always', 'auto'];
-const locationProviderOptions: LocationProvider[] = ['playServices', 'android', 'auto'];
-
-// export class GPS {
-//   private static instance: GPS;
-//   private watchId: number | null
-//   private gpsSubject: BehaviorSubject<GeolocationResponse | null>;
-
-//   private constructor() {
-//     this.watchId = null;
-//     this.gpsSubject = new BehaviorSubject<GeolocationResponse | null>(null);
-//     // Private constructor to prevent instantiation outside the class
-//   }
-//   static getInstance(): GPS {
-//     if (!GPS.instance) {
-//         GPS.instance = new GPS();
-       
-//     }
-//     return GPS.instance;
-//   }
-//   startGpsStream() {
-//     return new Observable<GeolocationResponse>((subscriber) => {
-//       this.watchId = Geolocation.watchPosition(
-//         (position) => {
-//           this.gpsSubject.next(position);
-//           subscriber.next(position);
-//         },
-//         (error) => subscriber.error(error),
-//         {
-//           enableHighAccuracy: true,
-//           distanceFilter: 10,
-//         }
-//       );
-
-//       // Cleanup function
-//       return () => {
-//         if (this.watchId !== null) {
-//           Geolocation.clearWatch(this.watchId);
-//         }
-//       };
-//     });
-//   }
-//   getGpsObservable() {
-//     return this.gpsSubject.asObservable();
-//   }
-
-//   setGPSConfigurations = (
-//       skipPermissionRequests:boolean=true,
-//       authorizationLevel:AuthorizationLevel = 'auto',
-//       enableBackgroundLocationUpdates:boolean=true,
-//       locationProvider:LocationProvider = 'auto',
-//       ) => {
-//     const config:GeolocationConfiguration =  { 
-//       skipPermissionRequests: skipPermissionRequests, //default false
-//       authorizationLevel: authorizationLevel, // 'always' | 'whenInUse' | 'auto'
-//       enableBackgroundLocationUpdates: enableBackgroundLocationUpdates,
-//       locationProvider: locationProvider, // 'playServices' | 'android' | 'auto
-//     }
-//     Geolocation.setRNConfiguration(config);
-//   }
-
-//   getCurrentGPSPosition = async ({
-//     enableHighAccuracy = true,
-//     timeout,
-//     maximumAge,
-//   }: {
-//     enableHighAccuracy?: boolean,
-//     timeout?: number,
-//     maximumAge?: number,
-//   }): Promise<GeolocationResponse> => {
-//     return new Promise((resolve, reject) => {
-//       Geolocation.getCurrentPosition(
-//         position => resolve(position),
-//         error => reject(error),
-//         {
-//           ...(timeout !== undefined ? { timeout } : {}),
-//           ...(maximumAge !== undefined ? { maximumAge } : {}),
-//           enableHighAccuracy,
-//         }
-//       );
-//     });
-//   };
-
-//   getCurrentGPSPositionCallback = (
-//     onSuccessCallback: (position: GeolocationResponse) => void,
-//     onErrorCallback: (err: GeolocationError) => void,
-//     {
-//       enableHighAccuracy=true,
-//       timeout,
-//       maximumAge,
-//     }: {
-//       enableHighAccuracy?: boolean,
-//       timeout?: number,
-//       maximumAge?: number,
-//     }
-//   ) => {
-//     Geolocation.getCurrentPosition(
-//       position => onSuccessCallback(position),
-//       error => onErrorCallback(error),
-//       {
-//         ...(timeout !== undefined ? { timeout } : {}),
-//         ...(maximumAge !== undefined ? { maximumAge } : {}),
-//         enableHighAccuracy,
-//       }
-//     );
-//   };
-
-//   requestAuthorizationCallback = (
-//     onSuccessCallback: () => void,
-//     onErrorCallback: (err: GeolocationError) => void,
-//     ): void => {    
-//       return Geolocation.requestAuthorization(
-//         () => onSuccessCallback(),
-//         (error: GeolocationError) => onErrorCallback(error)
-//     ); 
-//   }
-
-//   requestAuthorization = async (): Promise<void> => {
-//       return new Promise((resolve, reject) => {
-//         Geolocation.requestAuthorization(
-//           () => resolve(),
-//           (error: GeolocationError) => reject(error),    
-//         );
-//       });      
-//   };  
-
-//   requestClearWatch(watchID: number){
-//     if(this.watchId){
-//       Geolocation.clearWatch(this.watchId);
-//     }
-//     Geolocation.clearWatch(watchID);
-//   }
-
-//   requestWatchPosition = async  (
-//     onSuccessCallback: (position: GeolocationResponse) => void,
-//     onErrorCallback: (err: GeolocationError) => void,
-//     {
-//       interval,
-//       fastestInterval,
-//       timeout,
-//       maximumAge,
-//       enableHighAccuracy,
-//       distanceFilter,
-//       useSignificantChanges,
-//     }: {
-//       interval?: number,
-//       fastestInterval?: number,
-//       timeout?: number,
-//       maximumAge?: number,
-//       enableHighAccuracy?: boolean,
-//       distanceFilter?: number,
-//       useSignificantChanges?: boolean,
-//     },
-//     ) => {
-//       const options = {
-//         ...(interval !== undefined ? { interval } : {}),
-//         ...(fastestInterval !== undefined ? { fastestInterval } : {}),
-//         ...(timeout !== undefined ? { timeout } : {}),
-//         ...(maximumAge !== undefined ? { maximumAge } : {}),
-//         ...(enableHighAccuracy !== undefined ? { enableHighAccuracy } : {}),
-//         ...(distanceFilter !== undefined ? { distanceFilter } : {}),
-//         ...(useSignificantChanges !== undefined ? { useSignificantChanges } : {}),
-//       };
-    
-//       const watchID = Geolocation.watchPosition(
-//         position => onSuccessCallback(position),
-//         error => onErrorCallback(error),
-//         options
-//       );
-//       this.watchId = watchID;
-//       return watchID;
-//   }
-// }
-
-

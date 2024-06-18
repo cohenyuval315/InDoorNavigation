@@ -40,7 +40,7 @@ export function filterEdgesByAccessibility(edges:MapEdge[], accessibility:MapAcc
     const filteredEdges = edges.filter((edge) => {
         switch(edge.pathType){
             case SegmentPathType.STAIRS:{
-                if(accessibility.stairs){
+                if(accessibility.stairs == false){
                     return false;
                 }
             }
@@ -83,4 +83,24 @@ export function findNearestNode(userPosition:MapCoordinates, nodes: MapNode[]): 
         }
     }
     return nearest;
+}
+
+
+export function getRouteTotalWeight(nodesRoute: MapNode[], edges: MapEdge[]): number {
+    let totalDistance = 0;
+
+    for (let i = 0; i < nodesRoute.length - 1; i++) {
+        const currentNode = nodesRoute[i];
+        const nextNode = nodesRoute[i + 1];
+
+        // Find the edge connecting currentNode to nextNode
+        const edge = edges.find(e => (e.nodeA === currentNode.id && e.nodeB === nextNode.id) ||
+                                     (e.nodeB === currentNode.id && e.nodeA === nextNode.id));
+
+        if (edge) {
+            totalDistance += edge.weight || 0; // Assuming weight is the distance in meters
+        }
+    }
+
+    return totalDistance;
 }

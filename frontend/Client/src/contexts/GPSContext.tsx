@@ -1,6 +1,6 @@
 // GPSContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Geolocation, GeolocationStreamOptions } from '../sensors/gps-service';
+import { GeolocationService, GeolocationStreamOptions } from '../sensors/gps-service';
 import { GeolocationResponse } from '@react-native-community/geolocation';
 import { Observer, Subscription } from 'rxjs';
 
@@ -21,7 +21,7 @@ export const GPSProvider = ({ children }: {children:any}) => {
 
   const getIsGPSAvailable = async () => {
     try {
-      const response = await Geolocation.getInstance().getCurrentGPSPosition(currentLocationOptions);
+      const response = await GeolocationService.getInstance().getCurrentGPSPosition(currentLocationOptions);
       return true;
     }catch(error){
       return false;
@@ -29,7 +29,7 @@ export const GPSProvider = ({ children }: {children:any}) => {
   }
 
   const getIsGPSListening = () => {
-    const response = Geolocation.getInstance().isStreaming();
+    const response = GeolocationService.getInstance().isStreaming();
     if (response) {
       return true
     } else {
@@ -42,23 +42,23 @@ export const GPSProvider = ({ children }: {children:any}) => {
   const startGPS = async (config: GeolocationStreamOptions | undefined) => {
     const isListening = getIsGPSListening();
     if (!isListening){
-      Geolocation.getInstance().startStream(config,true);
+      GeolocationService.getInstance().startStream(config,true);
     }
   }
 
   const stopGPS = () => {
     const isListening = getIsGPSListening();
     if (isListening){
-      Geolocation.getInstance().stopStream();
+      GeolocationService.getInstance().stopStream();
     }
   }
 
   const isGPSStreaming = () => {
-    return Geolocation.getInstance().isStreaming();
+    return GeolocationService.getInstance().isStreaming();
   }
 
   const observeGPS = (observer: Partial<Observer<GeolocationResponse | null>> | ((value: GeolocationResponse | null) => void) | undefined):Subscription =>  {
-    return Geolocation.getInstance().subscribeGeoLocation(observer);
+    return GeolocationService.getInstance().subscribeGeoLocation(observer);
   }
 
 

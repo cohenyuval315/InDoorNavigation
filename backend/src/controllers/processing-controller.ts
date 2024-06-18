@@ -81,6 +81,16 @@ export const getAllRoutes = async (req:Request,res:Response,next:NextFunction) =
     }
 }    
 
+export const getAllRoutesTitles = async (req:Request,res:Response,next:NextFunction) => {
+    try {
+        const buildingId = req.params.buildingId;
+        const routesTitles = await processingService.getAllRoutesTitles(buildingId)
+        res.status(200).json({ data: routesTitles });
+    }catch(error){
+        next(error);
+    }
+}    
+
 
 export const getRouteByName = async (req:Request,res:Response,next:NextFunction) => {
     try {
@@ -94,6 +104,16 @@ export const getRouteByName = async (req:Request,res:Response,next:NextFunction)
         }else{
             res.status(404).json({ message: 'Route not found' });
         }
+    }catch(error){
+        next(error);
+    }
+}
+
+export const getAllProcessingMaps = async (req:Request,res:Response,next:NextFunction) => {
+    try {
+        const buildingId = req.params.buildingId;
+        const processingData = await processingService.getAllProcessingMaps(buildingId)
+        res.status(200).json({ data: processingData });
     }catch(error){
         next(error);
     }

@@ -5,28 +5,49 @@ import MapNode from "../core/path-finding/MapNode";
 import MapEdge from "../core/path-finding/MapEdge";
 
 import * as BuildingService  from "./buildings-service";
-import { filterEdgesByAccessibility, findNearestNode, removeIsolatedNodes } from "../utils/graph-utils";
+import { filterEdgesByAccessibility, findNearestNode, getRouteTotalWeight, removeIsolatedNodes } from "../utils/graph-utils";
 import { calculateDirection, euclideanDistance } from "../utils/distance";
+import { createFloorsPathSVG } from "../utils/maps-generation";
+import NoValidPathError from "../exceptions/no-valid-path-error";
 
+const AVERAGE_METER_PER_SECOND_WALK_SPEED = 1.6;
 
-export const getNavigationRoute = async (buildingId:string,userPosition:MapCoordinates,destinationNodeId:string,accessability:MapAccessibility) => {
+export const getNavigationInitialRoute = async (buildingId:string,userPosition:MapCoordinates,destinationPOIId:string,accessability:MapAccessibility) => {
     const graphData = await BuildingService.getBuildingGraphMapData(buildingId)
+    if (!graphData){
+        throw new Error("invalid graph data");
+    }
+    const buildingMapData = await BuildingService.getBuildingMapData(buildingId)
+    if (!buildingMapData){
+        throw new Error("invalid map data");
+    }
+
+    
+
+    const pois = buildingMapData.POIs.filter((poi) => poi.id === destinationPOIId);
+    
+    if (pois.length !== 1){
+        throw new Error("Destination POI Id is not valid")
+    }
+
+    const destPOI = pois[0];
+    
     const edges = graphData.edges
     const nodes = graphData.nodes;
-    const destinationNodeList = nodes.filter((node) => node.id === destinationNodeId)
-    if (destinationNodeId.length !== 1){
-        throw new Error("Destination Node Id is not valid")
+    const destinationNodeList = nodes.filter((node) => node.POIId === destPOI.id)
+    if (destinationNodeList.length !== 1){
+        throw new Error("error in nodes and pois, its not aligned")
     }
     const destinationNode = destinationNodeList[0];
     
     const buildingGraph = new MapGraph();
     const filteredEdges = filterEdgesByAccessibility(edges,accessability);
     const filteredNodes = removeIsolatedNodes(filteredEdges,nodes);
-
-    buildingGraph.addEdges(filteredEdges);
+    
     buildingGraph.addNodes(filteredNodes);
 
-    const nearestNode = findNearestNode(userPosition,nodes)
+
+    const nearestNode = findNearestNode(userPosition,filteredNodes)
     if (!nearestNode){
         throw new Error(" couldnt not find nearest node");
     }
@@ -65,18 +86,39 @@ export const getNavigationRoute = async (buildingId:string,userPosition:MapCoord
     }
 
     buildingGraph.addNode(currentLocationNode);
+
+    buildingGraph.addEdges(filteredEdges);
     buildingGraph.addEdge(virtualEdge);
-    const route = buildingGraph.shortestPath(currentLocationNode.id,destinationNode.id);
+    
+    
+    const nodesRoute = buildingGraph.shortestPath(currentLocationNode.id,destinationNode.id);
+    if (nodesRoute.length === 0){
+        throw new NoValidPathError("no valid path found")
+    }
+    // console.log("possible:",buildingGraph.validateConnectivity())
+    // console.log("route",nodesRoute)
+    const pathsFloors = createFloorsPathSVG(nodesRoute,edges,buildingMapData.mapFloors);
+    const totalWeight = getRouteTotalWeight(nodesRoute,edges);
+    const unitInMeters = buildingMapData.unitInMeters;
+    const totalDistance = totalWeight * unitInMeters;
+    const inOrderPathsFloors = pathsFloors.sort((a,b) => a.floor - b.floor)
+    
+    const data = {
+        pathsFloors:inOrderPathsFloors,
+        distance:totalDistance,
+        timeLength:totalDistance / AVERAGE_METER_PER_SECOND_WALK_SPEED
+    }
+    return data;
     
 
 }
 
-export const getNewNavigationRoute = async () => {
-    // const pathLength = navigationRoute.length - 1; // Length of the path is the number of edges minus one
-    // if (pathLength > distanceThreshold) {
-    //     // Perform rerouting (this could involve recalculating the path using a different algorithm or adjusting parameters)
-    //     // For simplicity, we'll just find a new path from the user's current node to the destination
-    //     navigationRoute = graph.shortestPath(userNode, destinationNode, accessible);
-    // }
+// export const getNewNavigationRoute = async () => {
+//     // const pathLength = navigationRoute.length - 1; // Length of the path is the number of edges minus one
+//     // if (pathLength > distanceThreshold) {
+//     //     // Perform rerouting (this could involve recalculating the path using a different algorithm or adjusting parameters)
+//     //     // For simplicity, we'll just find a new path from the user's current node to the destination
+//     //     navigationRoute = graph.shortestPath(userNode, destinationNode, accessible);
+//     // }
 
-}
+// }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {  Text, TouchableOpacity, View } from "react-native";
+import {  ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BuildingDropDown from "../components/building-dropdown";
 import UnsureSwitch from "../components/unsure-switch";
 import TestSwitch from "../components/test-switch";
@@ -17,14 +17,20 @@ import { fetchProcessingRoute, selectProcessingError, selectProcessingRoutes, se
 import parseErrorStack from "react-native/Libraries/Core/Devtools/parseErrorStack";
 import Status from "../../../app/status";
 import useGPS from "../../../hooks/useGPS";
+import { Geolocation } from "../../../sensors/gps-service";
+import client from "../../../services/server/api-client";
+import { UserSpatialDataStreamService } from "../../../position/UserSpatialDataStreamService";
+import FloorSelection from "../components/floor-selection";
 
-WifiService.getInstance().startStream();
+
 
 const DataRouteCollectionScreen = () => {
+    
     const minFloor = useSelector(selectMinFloor);
     const processingRoute = useSelector(selectProcessingRoutes);
     const processingStatus = useSelector(selectProcessingStatus);
     const processingError = useSelector(selectProcessingError)
+    const [searchedRoute,setSearchedRoute] = useState(null);
     const dispatch = useDispatch()
     const {openConfirm} = useConfirmationModal()
     const [isTest,setIsTest] = useState(false);
@@ -33,11 +39,13 @@ const DataRouteCollectionScreen = () => {
 
     const [floorsOpacities,setFloorOpacities] = useState([1,1])
 
+
     const [buildingID,setBuildingID] = useState(null);
     const [routeName,setRouteName] = useState('routetest');
 
     const [route,setRoute] = useState([]);
     const [currentFloorIndex ,setCurrentFloorIndex] = useState(0);
+    const [error,setError] = useState('');
  
     const checkpointsRef = useRef([])
     const checkpointIndexRef = useRef(null);
@@ -45,29 +53,99 @@ const DataRouteCollectionScreen = () => {
     const sensorsDataRef = useRef([]);
     const wifiRef = useRef([]);
     const GPSDataRef = useRef([]);
-    const {subscribeGPS} = useGPS()
+    const allDataRef = useRef([]);
+    const onDataNext = (data) => {
+        if(allDataRef.current){
+            allDataRef.current.push(data)
+        }
+        
+    }
+    const onDataComplete = () => {
+        console.log("route data complete");
+    }
+    
+    const onDataError = (error) => {
+        console.log("route data error", error);
+    }
+
     useEffect(() => {
-        const subscription = subscribeGPS({
-            next: (value) => {
-                if(value){
-                    GPSDataRef.current.push(value)
-                }
-            }
+
+        const userStream = UserSpatialDataStreamService.getInstance().startStream().then((stream) => {
+            return UserSpatialDataStreamService.getInstance().subscribe({
+                next:(data) => onDataNext(data),
+                error:(err) => onDataError(err),
+                complete:onDataComplete,
+            })
         })
         return () => {
-            subscription.unsubscribe();
-        };
-    }, []);
-    useEffect(() => {
-        const subscription = WifiService.getInstance().subscribeWifi({
-            next: (value) => {
-                wifiRef.current.push(value)
-            }
-        });
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, []);
+            userStream.then((sub) => {
+                sub.unsubscribe();
+            })
+        }
+    },[])
+    // const {subscribeGPS} = useGPS()
+    // useEffect(() => {
+    //     const subscription = subscribeGPS({
+    //         next: (value) => {
+    //             if(value){
+    //                 GPSDataRef.current.push(value)
+    //             }
+    //         }
+    //     })
+    //     return () => {
+    //         subscription.unsubscribe();
+    //     };
+    // }, []);
+
+    // useEffect(() => {
+    //     const gpsData =  Geolocation.getInstance().startStream(
+    //         {
+    //             enableHighAccuracy:true,
+    //             maximumAge:0,
+    //             distanceFilter:0,
+    //             timeout:3000,
+    //         }
+    //     );
+    //     try {
+    //         Geolocation.getInstance().subscribeGeoLocation({
+    //             next:(data) => {
+    
+    //                 console.log(data``)
+    //             },
+    //             error:() => {
+    //                 console.log("err")
+    //             }
+    //         })
+    //     }
+    //     catch(error){
+    //         console.log("some err")
+    //     }
+
+
+    // },[])
+    const searchRoute = async () => {
+        if(searchedRoute){
+            setSearchedRoute(null);
+            return;
+        }
+        const res = await client.getBuildingProcessingRoute(buildingID,routeName);
+        if(res){
+            setSearchedRoute(res);
+        }else{
+            setSearchedRoute({message:"failed"});
+        }
+    }
+    // useEffect(() => {
+    //     WifiService.getInstance().startStream();
+    //     const subscription = WifiService.getInstance().subscribeWifi({
+    //         next: (value) => {
+    //             wifiRef.current.push(value)
+    //         }
+    //     });
+    //     return () => {
+    //         subscription.unsubscribe();
+    //     };
+    // }, []);
 
     const activeRoute = useMemo(() => {
         return (
@@ -78,112 +156,116 @@ const DataRouteCollectionScreen = () => {
         )
     },[route,currentFloorIndex])
 
-    const setupService = async (sensorKey,interval) => {
-        const service = await SensorsService.getInstance().sensor(sensorKey)
-        service.configSensorInterval(interval);
-        service.startSensor();
-        const s = service.subscribe({
-            next:onNext,
-            error:onError,
-        })
-        return s;
-    }
+    // const setupService = async (sensorKey,interval) => {
+    //     const service = await SensorsService.getInstance().sensor(sensorKey)
+    //     service.configSensorInterval(interval);
+    //     service.startSensor();
+    //     const s = service.subscribe({
+    //         next:onNext,
+    //         error:onError,
+    //     })
+    //     return s;
+    // }
 
-    useEffect(() => {
-        const acc = setupService(SensorKey.ACCELEROMETER,100);
-        const grav = setupService(SensorKey.GRAVITY,5000);
-        const gyr = setupService(SensorKey.GYROSCOPE,100);
-        const gyroUn = setupService(SensorKey.GYROSCOPEUNCALIBRATED,5000);
-        const lin = setupService(SensorKey.LINEARACCELERATION,5000);
-        const mag = setupService(SensorKey.MAGNETOMETER,100);
-        const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,5000);
-        const rot = setupService(SensorKey.ROTATIONVECTOR,100);
-        const sd = setupService(SensorKey.STEPDETECTOR,100);
+    // useEffect(() => {
+    //     const acc = setupService(SensorKey.ACCELEROMETER,100);
+    //     const grav = setupService(SensorKey.GRAVITY,5000);
+    //     const gyr = setupService(SensorKey.GYROSCOPE,100);
+    //     const gyroUn = setupService(SensorKey.GYROSCOPEUNCALIBRATED,5000);
+    //     const lin = setupService(SensorKey.LINEARACCELERATION,5000);
+    //     const mag = setupService(SensorKey.MAGNETOMETER,100);
+    //     const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,5000);
+    //     const rot = setupService(SensorKey.ROTATIONVECTOR,100);
+    //     const sd = setupService(SensorKey.STEPDETECTOR,100);
         
-        return () => {
-            acc.then((s)=>{
-                s.unsubscribe()
-            })
-            grav.then((s)=>{
-                s.unsubscribe()
-            })
-            gyr.then((s)=>{
-                s.unsubscribe()
-            })
-            gyroUn.then((s)=>{
-                s.unsubscribe()
-            })
-            lin.then((s)=>{
-                s.unsubscribe()
-            })
-            mag.then((s)=>{
-                s.unsubscribe()
-            })
-            magUn.then((s)=>{
-                s.unsubscribe()
-            })
-            rot.then((s)=>{
-                s.unsubscribe()
-            })
-            sd.then((s)=>{
-                s.unsubscribe()
-            })
-        }
-    },[])
+    //     return () => {
+    //         acc.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         grav.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         gyr.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         gyroUn.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         lin.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         mag.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         magUn.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         rot.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //         sd.then((s)=>{
+    //             s.unsubscribe()
+    //         })
+    //     }
+    // },[])
 
-    useEffect(() => {   
-        const searchRouteName = "routetest3";
-        switch(processingStatus){
-            case Status.IDLE : {
-                if(buildingID && routeName){
-                    console.log("IDLE")
-                    console.log(buildingID)
-                    console.log(routeName)
-                    dispatch(fetchProcessingRoute({buildingId:buildingID,routeName:searchRouteName}));
+
+    // useEffect(() => {   
+    //     const searchRouteName = "routetest3";
+    //     switch(processingStatus){
+    //         case Status.IDLE : {
+    //             if(buildingID && routeName){
+    //                 console.log("IDLE")
+    //                 console.log(buildingID)
+    //                 console.log(routeName)
+    //                 dispatch(fetchProcessingRoute({buildingId:buildingID,routeName:searchRouteName}));
                     
-                }
-                break;
-            }
+    //             }
+    //             break;
+    //         }
                 
-            case Status.SUCCEEDED:{
-                console.log("completed")
-                if (!processingRoute){
-                    console.log("not found ", searchRouteName)
-                }else{
-                    console.log("found ", searchRouteName)
-                    console.log(Object.keys(processingRoute))
+    //         case Status.SUCCEEDED:{
+    //             console.log("completed")
+    //             if (!processingRoute){
+    //                 console.log("not found ", searchRouteName)
+    //                 setError('SOMETHING WRONG')
+    //             }else{
+    //                 console.log("found ", searchRouteName)
+    //                 console.log(Object.keys(processingRoute))
 
-                    let sensors = [...processingRoute.sensorsData];
-                    sensors.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    //                 let sensors = [...processingRoute.sensorsData];
+    //                 sensors.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-                    const startTime = sensors[0].timestamp
-                    const lastTime = sensors[processingRoute.sensorsData.length - 1].timestamp
-                    console.log("first",startTime)
-                    console.log("last:",lastTime)
-                    const d1 = new Date(startTime)
-                    const d2 = new Date(lastTime)
-                    console.log(d1)
-                    console.log(d2)
-                    const diff = d2 - d1;
-                    console.log("diff",diff)
-
+    //                 const startTime = sensors[0].timestamp
+    //                 const lastTime = sensors[processingRoute.sensorsData.length - 1].timestamp
+    //                 console.log("first",startTime)
+    //                 console.log("last:",lastTime)
+    //                 const d1 = new Date(startTime)
+    //                 const d2 = new Date(lastTime)
+    //                 console.log(d1)
+    //                 console.log(d2)
+    //                 const diff = d2 - d1;
+    //                 console.log("diff",diff)
+    //                 setError('')
                     
-                }
+    //             }
                 
-                break;
-            }
-            case Status.FAILED: {
-                console.log("FAILED!...")
-                console.log(processingError)
-                break;
-            }
-            case Status.PENDING:{
-                console.log("PENDING PROCESSING...")
-                break;
-            }
-        }
+    //             break;
+    //         }
+    //         case Status.FAILED: {
+    //             console.log("FAILED!...")
+    //             console.log(processingError)
+    //             setError(processingError)
+    //             break;
+    //         }
+    //         case Status.PENDING:{
+    //             console.log("PENDING PROCESSING...")
+    //             setError('')
+    //             break;
+    //         }
+    //     }
 
-    },[processingStatus,buildingID,routeName])
+    // },[processingStatus,buildingID,routeName])
 
     useEffect(() => {
         onReset();
@@ -196,27 +278,24 @@ const DataRouteCollectionScreen = () => {
 
     const getRouteData = () => {
         const data = {
-            routeName:routeName,
-            checkpoints:checkpointsRef.current,
-            sensorsData:sensorsDataRef.current,
-            wifiData:wifiRef.current,
             buildingId:buildingID,
-            isTest:isTest,
+            routeName:routeName,
             route:route,
-            gpsData:GPSDataRef.current
+            checkpoints:checkpointsRef.current,
+            data:{
+                alldata:allDataRef.current,
+                sensorsData:sensorsDataRef.current,
+                wifiData:wifiRef.current,
+                isTest:isTest,
+                route:route,
+                gpsData:GPSDataRef.current,
+            }
         }
-        console.log(
-            data.routeName,
-            data.checkpoints.length,
-            data.sensorsData.length,
-            data.wifiData.length,
-            data.buildingId,
-            data.isTest,
-            data.route.length
-        )
         return data;
     }
-
+    const handleFloorOnChange = (value) => {
+        setCurrentFloorIndex(value)
+    }
 
     const onNext = (data) => {
         try{
@@ -256,6 +335,7 @@ const DataRouteCollectionScreen = () => {
             sensorsDataRef.current = [];
             GPSDataRef.current = [];
             wifiRef.current = [];
+            allDataRef.current = [];
             checkpointsRef.current = [{
                 index:0,
                 point:route[0],
@@ -274,7 +354,6 @@ const DataRouteCollectionScreen = () => {
       
     
       const handleRecord = async () => {
-        console.log("num:",checkpointIndexRef.current)
         if(!isStart){
             return
         }
@@ -308,13 +387,20 @@ const DataRouteCollectionScreen = () => {
             "save route",
             "are u sure to save?",
             () => {
-                dispatch(uploadProcessingRoute({buildingId:buildingID,data:data}))
+                // setSearchedRoute(data)
+                console.log(data.data.alldata.length)
+                console.log(data.data.alldata.filter((i) => i.wifi))
+
+
+                dispatch(uploadProcessingRoute({
+                    buildingId:buildingID,
+                    data:data
+                }))
+                
                 // dispatch(fetchProcessingRoute({buildingId:buildingID,routeName:routeName}))
                 
      
             })
-       
-
       };
 
       const handleReset = () => {
@@ -350,13 +436,44 @@ const DataRouteCollectionScreen = () => {
                 width:"100%",
                 height:"100%"
             }} nestedScrollEnabled>
-                <TextInput style={{
-                    backgroundColor:"black"
-                }}   value={routeName} onChangeText={(val) => {
-                    setRouteName(val)
-                }}/>
+                <View>
+                    <View style={{
+                        flexDirection:"row",
+                        justifyContent:"center",
+                        alignItems:"center"
+                    }}>
+                    <TextInput style={{
+                        flex:1,
+                        backgroundColor:"black"
+                    }}   value={routeName} onChangeText={(val) => {
+                        setRouteName(val)
+                    }}/>
+                    <TouchableOpacity onPress={searchRoute}>
+                        <Text style={{
+                            color:"black",
+                            padding:10,
+                            backgroundColor:"red"
+                        }}>
+                            {!searchedRoute ? "search" : "clear"}
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
+                    <ScrollView style={{
+                        height:100
+                    }}>
+                    <Text style={{
+                            color:"black"
+                        }}>
+                        {searchedRoute && JSON.stringify(searchedRoute,null,2)}
+                    </Text>
+                    </ScrollView>
+                </View>
                 <BuildingDropDown val={buildingID} onChange={handleBuildingChange} />
-                <TestSwitch value={isTest} onChange={onIsTestChange}/>
+                <FloorSelection initialFloor={currentFloorIndex} onChange={handleFloorOnChange}/>
+                <Text>
+                    current: {checkpointIndexRef && checkpointIndexRef.current && checkpointIndexRef.current}
+                </Text>
+                <TestSwitch title={"test"} value={isTest} onChange={onIsTestChange}/>
                 <UnsureSwitch value={isUnsure} onChange={onIsUnsureChange}/>
                 <RouteBuilder route={route} onChange={onRouteChange} />
 
@@ -368,7 +485,11 @@ const DataRouteCollectionScreen = () => {
                     {activeRoute}
                 </AdminBuildingMap>
 
-
+                <Text style={{
+                    color:"black"
+                }}>
+                    {error}
+                </Text>
 
                 {isStart ? (
                     <View style={{

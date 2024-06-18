@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { fetchBuildingByMapId } from "../../../app/map/map-slice";
 import { setDestinationToActivePath, setActivePOI } from "../../../app/active/active-slice";
+import { setDestinationPOI } from "../../../app/navigation/navigation-slice";
 
 const TabBar = ({ tabs, selectedIndex, onSelect }) => {
     return (
@@ -246,6 +247,7 @@ const BuildingPOICard = ({POI,onClose}) => {
     const onNavigatePress = () => {
         setDestinationToActivePath(POI)
         navigation.navigate('building-pre-navigation')
+        dispatch(setDestinationPOI(POI));
     }
 
     return (

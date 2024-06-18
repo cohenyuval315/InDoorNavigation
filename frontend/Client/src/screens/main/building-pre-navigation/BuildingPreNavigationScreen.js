@@ -1,37 +1,73 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Animated, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSelector } from "react-redux";
-import { selectActivePath } from "../../../app/active/active-slice";
-import { selectNumberOfFloors } from "../../../app/map/map-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectActiveBuilding, selectActivePath } from "../../../app/active/active-slice";
+import { selectMinFloor, selectNumberOfFloors } from "../../../app/map/map-slice";
 import BuildingMap from "../components/BuildingMap";
 import LoadingModal from "../../../components/modals/loading";
 import RouteSVG from "../components/PathSVG";
 import MapOverlay from "../../../layouts/map-overlay";
+import { fetchNavigationPath, resetPaths, selectNavigationDestinationPOI, selectNavigationError, selectNavigationPathDistance, selectNavigationPathTimeLength, selectNavigationPaths, selectNavigationPathsSVGs, selectNavigationStatus, setDestinationPOI } from "../../../app/navigation/navigation-slice";
+import Status from "../../../app/status";
+import DropDownPicker from "react-native-dropdown-picker";
+import NavigationPathsSVGs from "./components/navigation-paths-svgs/NavigationPathsSVGs";
 
-const PathesRoutes = () => {
-    const examplePath = {
 
+const getSecondsTimeLengthString = (seconds) => {
+    if (seconds < 60) {
+        return `${seconds} seconds`;
+    } else if (seconds < 3600) { // Less than one hour
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        
+        if (remainingSeconds === 0) {
+            return `${minutes} minutes`;
+        } else {
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds} minutes`;
+        }
+    } else { // One hour or more
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+
+        if (minutes === 0 && remainingSeconds === 0) {
+            return `${hours} hours`;
+        } else if (remainingSeconds === 0) {
+            return `${hours}:${minutes < 10 ? '0' : ''}${minutes} hours`;
+        } else {
+            return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds} hours`;
+        }
     }
-    return (
-        <MapOverlay>
-                <RouteSVG
-                    width={300}
-                    height={700}
-                    routeCoordinates={[
-                        [50, 50],  // Start
-                        [50, 150], // Stop 1
-                        [150, 150],// Stop 2
-                        [150, 250],// Destination
-                    ]}
-                    boxSize={20} // Size of the boxes
-                />
-        </MapOverlay>
-    )
-}
+};
 
 const BuildingPreNavigationScreen = (props) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const destinationPOI = useSelector(selectNavigationDestinationPOI);
+    const pathsSVGs = useSelector(selectNavigationPathsSVGs);
+    const pathDistance = useSelector(selectNavigationPathDistance);
+    const pathTimeLength = useSelector(selectNavigationPathTimeLength);
+    
+    
+
+
+    const navigationError = useSelector(selectNavigationError);
+    const navigationStatus = useSelector(selectNavigationStatus);
+    const building = useSelector(selectActiveBuilding);
+    const minFloor = useSelector(selectMinFloor);
+    const numFloors = useSelector(selectNumberOfFloors);
+    const [floorIndex,setFloorIndex] = useState(0);
+
+    const currentLocation = {
+        x:0,
+        y:0,
+        floor:0
+    }
+    const accessability = {
+        stairs:true,
+    }
+
 
 
     const numberOfFloors = useSelector(selectNumberOfFloors);
@@ -40,35 +76,10 @@ const BuildingPreNavigationScreen = (props) => {
     const containerRef = useRef(null);
     const rotationRef = useRef(new Animated.Value(0)); 
     const opacitiesRef = useRef(initialOpacitiesValues);
+
     const [centerOn,setCenterOn] = useState(null);
 
 
-    const s = useSelector(selectActivePath);
-    console.log(s)
-    // const buildingMapData = props.route.params.buildingMapData;
-    // const mapSvgData = props.route.params.mapSvgData;
-    // const initialFloorIndex = props.route.params.floorIndex;
-    // const building = props.route.params.building;
-
-    // const [loading,setLoading] = useState(true);
-    // const [floorIndex,setFloorIndex] = useState(initialFloorIndex);
-    // const [pathes,setPathes] = useState(null);
-    // const [selectedPath,setSelectedPath] = useState(null);
-
-    // useEffect(()=>{
-    //     const fetchPathes = async () => {
-    //         setLoading(true);
-    //         const data = [1];
-    //         setPathes(data)
-    //         setSelectedPath(data[0]);
-    //         setLoading(false);
-    //     }
-    //     fetchPathes();
-    // },[])
-
-    const calculateBestPathes = () => {
-
-    }
 
     const displayPathes = () => {
 
@@ -80,11 +91,7 @@ const BuildingPreNavigationScreen = (props) => {
 
     const handleOnGoNow = () => {
         props.navigation.navigate("navigation",{
-            buildingMapData,
-            mapSvgData,
-            floorIndex,
-            building,
-            selectedPath
+  
         });
     }
 
@@ -103,68 +110,68 @@ const BuildingPreNavigationScreen = (props) => {
     // if(loading){
     //     return <LoadingScreen messages={[]}/>
     // }
-    const onCancel = () => {
+    const onReject = () => {
+        // add message TODO
         props.navigation.goBack();
+        onLeave();
     }
+    // const fetchPath = async () => {
+
+    const onLeave = () => {
+        dispatch(setDestinationPOI(null));
+        dispatch(resetPaths());
+    }
+    // }
+
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true); // Set loading to true before fetching data
-            // Simulate loading delay
-            await new Promise(resolve => setTimeout(resolve, 100));
-            // Simulate data retrieval
-            const simulatedData ={
-                data:{
-                    routes:[
-                        {
-                            route:[
-                                [50, 50],  // Start
-                                [50, 150], // Stop 1
-                                [150, 150],// Stop 2
-                                [150, 250],// Destination
-                            ]
-                        },
-                        {
-
-                        },
-                        {
-
-                        }
-                    ]
-                }
-            };
-            const errorData= {error:'error'}
-            setData(simulatedData);
-            setLoading(false); // Set loading to false after data retrieval
-        };
-
-        // Call the fetchData function
-        fetchData();
-
-        // Clean-up function
-        return () => {
-            // If cleanup is needed, you can do it here
-        };
+        const buildingId = building.id;
+        dispatch(fetchNavigationPath({
+            buildingId,
+            destinationPOI,
+            currentLocation,
+            accessability}))
     }, []); 
-    useLayoutEffect(() => {
-        if (!loading && containerRef.current) {
-            console.log("BuildingMap component is fully rendered");
-            // Perform any actions after the BuildingMap component is fully rendered
+
+    useEffect(() => {
+        switch(navigationStatus){
+            case Status.IDLE : {
+                break;
+            }
+            case Status.FAILED: {
+                setLoading(false);
+                onReject()
+                console.log(navigationError)
+                break;
+            }
+            case Status.SUCCEEDED: {
+                setLoading(false);
+                break;
+                
+            }
+            case Status.PENDING: {
+                setLoading(true);
+                break;
+            }
         }
-    }, [loading]);
 
-    if(loading && !data){
-        return (
-            <LoadingModal visible={true}/>
-        )
-    }
+    },[navigationStatus])
 
-    if(data && data.error){
-        onCancel();
-        props.navigation.navigate('error-message',{error:data.error})
-        return;
+    
+    // useLayoutEffect(() => {
         
-        
-    }
+    //     if (!loading && containerRef.current) {
+    //         console.log("BuildingMap component is fully rendered");
+    //         // Perform any actions after the BuildingMap component is fully rendered
+    //     }
+    // }, [loading]);
+
+    // if(loading){
+    //     return (
+    //         <LoadingModal visible={true}/>
+    //     )
+    // }
+
+
 
     const onContinuePress = () => {
         props.navigation.navigate('building-navigation')
@@ -172,95 +179,111 @@ const BuildingPreNavigationScreen = (props) => {
 
     const onCancelPress = () => {
         props.navigation.goBack();
+        onLeave();
     }
+
+    const [openDropdown,setOpenDropdown] = useState(false)
+    const floors = Array.from({length:numFloors}).map((_,index) => {
+        return {
+            label: `floor ${index + minFloor}`,
+            value: index
+        }
+    })
+
+    if(loading){
+        return <LoadingModal visible={true}/>
+    }
+
     return (
         <View style={styles.container}>
             <View style={{
                 backgroundColor:'lightgray',
                 flexDirection:'row',
             }}>
-                <TouchableOpacity style={{
-                    flex:1,
-                    flexDirection:'row',
-                    justifyContent:'center',
-                    borderColor:'black',
-                    borderWidth:1,
-                    padding:20,
-                    backgroundColor:'pink'
-                }}>
-                    <Text style={styles.text}>
-                        Path1:
-                    </Text>  
-                </TouchableOpacity>
-                <TouchableOpacity style={{
-                    flex:1,
-                    flexDirection:'row',
-                    justifyContent:'center',
-                    borderColor:'black',
-                    borderWidth:1,
-                    padding:20,                    
-                }}>
-                    <Text style={styles.text}>
-                        Path2:
-                    </Text>  
-                </TouchableOpacity>
+                <DropDownPicker
+                    items={floors}
+                    open={openDropdown}
+                    setOpen={setOpenDropdown}
+                    setValue={setFloorIndex}
+                    value={floorIndex}
+                    listMode="MODAL"
+                />
               
             </View>
             <BuildingMap
-                centerOn={centerOn}
+                // centerOn={centerOn}
                 containerRef={containerRef}
-                opacitiesRef={opacitiesRef}
+                // opacitiesRef={opacitiesRef}
+                // rotationRef={rotationRef}
+                // rotateChildren={true}
+                centerOn={{
+                    x:0,
+                    y:0,
+                    scale:0.3,
+                    duration:300,
+                }}
+                currentFloorIndex={floorIndex}
+                onPOIPress={() => {}}
+                onPanMove={() => {}}
                 rotationRef={rotationRef}
+                opacitiesRef={opacitiesRef}
                 rotateChildren={true}
+                imageProps={{
+                    maxScale:0.3,
+                    // minScale:0.3,
+                }}
+                
+                
             >
-                <PathesRoutes/>
+                <NavigationPathsSVGs currentFloorIndex={floorIndex} pathsSVGs={pathsSVGs} />
             </BuildingMap>
             <View style={{
-                backgroundColor:"lightblue"
+                backgroundColor:"#0A4A6A",
+                borderTopEndRadius:20,
+                borderTopStartRadius:20,
+
             }}>
                 <View style={{
-                    flexDirection:'row',
                     justifyContent:'space-between',
                     padding:10,
                 }}>
                     <View style={{
-                        flex:1,
                         flexDirection:'row',
-                        justifyContent:'center',
+                        justifyContent:'space-around',
                     }}>
                         <Text style={{
                             fontSize:16,
-                            color:'black',
+                            color:'white',
                             fontWeight:'bold',
                         }}>
                             Time Length: 
                         </Text>
                         <Text style={{
                             fontSize:16,
-                            color:'black',
-                            fontWeight:'bold',
+                            color:'white',
+                            // fontWeight:'bold',
                         }}>
-                            30min
+                            {getSecondsTimeLengthString(pathTimeLength)}
                         </Text>
                     </View>
+
                     <View style={{
-                        flex:1,
                         flexDirection:'row',
-                        justifyContent:'center',
+                        justifyContent:'space-around',
                     }}>
                         <Text style={{
                             fontSize:16,
-                            color:'black',
+                            color:'white',
                             fontWeight:'bold',
                         }}>
                             Distance:
                         </Text>     
                         <Text style={{
                             fontSize:16,
-                            color:'black',
-                            fontWeight:'bold',
+                            color:'white',
+                            
                         }}>
-                            100m
+                            {pathDistance}m
                         </Text>                                   
                     </View>
 

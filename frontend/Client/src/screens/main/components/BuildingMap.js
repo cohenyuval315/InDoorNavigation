@@ -11,7 +11,7 @@ import BuildingMapFloorPOIsOverlay from "../building-map/components/POIs-overlay
 import BuildingMapGraphDataOverlay from "./building-map-graph";
 import BuildingMapFloorPOIsAreaOverlay from "../building-map/components/POIs-overlay/BuildingMapFloorPOIsAreaOverlay";
 
-const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children}) => {
+const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children,useOpacities=false}) => {
     const maps = useSelector(selectMap);
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
@@ -39,9 +39,9 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
                         <Animated.View 
                             key={`map_svg_${index}`} 
                             style={[{
-                                opacity: opacitiesRef.current[index],
-                                zIndex: currentFloorIndex === index ? 1 : 0,
-                                display:currentFloorIndex === index ? "flex" : "none",
+                                // opacity: useOpacities ? opacitiesRef.current[index] : 1,
+                                zIndex: useOpacities ? 1 : currentFloorIndex === index ? 1 : 0,
+                                display:useOpacities ? 1 : currentFloorIndex === index ? "flex" : "none",
                             },styles.floorMapContainer]} 
                             >
                                 <BuildingMapSVG

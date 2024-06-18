@@ -44,9 +44,19 @@ export const uploadProcessingRoute = createAsyncThunk(
 )
 export const uploadProcessingMap = createAsyncThunk(
   'admin/uploadProcessingMap', 
-  async (args,_) => {
+  async (args,{rejectWithValue}) => {
     const {buildingId,data} = args;
     const response = await client.postBuildingProcessingMap(buildingId,data)
+    if (response.ok){
+      const res = await client.getBuildingProcessingMap(buildingId,data['version'])
+      if(res.ok){
+        const results = await response.json();
+        return results;
+      }else{
+        rejectWithValue("failed to save this")
+      }
+    }
+    
     return response
   },
 )
@@ -127,7 +137,14 @@ const adminSlice = createSlice({
         .addCase(fetchProcessingRoute.fulfilled,(state,action) => {
           state.processingRoutes = action.payload;
           state.processingStatus = Status.SUCCEEDED
-        })           
+        })
+        
+        .addCase(uploadProcessingMap.rejected , (state,action) => {
+          state.processingError = action.payload;
+          state.processingStatus = Status.FAILED
+        })
+
+
     }
 
   })

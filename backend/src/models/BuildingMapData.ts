@@ -23,6 +23,10 @@ const buildingMapDataSchema = new Schema({
         type: Number,
         require: true
     },
+    unitInMeters:{
+        type:Number,
+        require:true,
+    },
     cardinalDirections:{
         type:buildingMapCardinalDirectionsSchema,
         require:true

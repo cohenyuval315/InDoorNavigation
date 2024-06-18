@@ -1,10 +1,10 @@
 import { StyleSheet, Switch, Text, View } from "react-native";
 
-const TestSwitch = ({value,onChange}) => {
+const TestSwitch = ({title,value,onChange}) => {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>
-                test? :
+                {title}
             </Text>
         <Switch 
             style={styles.switch}

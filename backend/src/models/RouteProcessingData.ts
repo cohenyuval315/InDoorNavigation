@@ -6,10 +6,6 @@ const routeProcessingDataSchema = new Schema({
         type: Schema.Types.String, 
         require:true
     },
-    isTest:{
-        type: Schema.Types.Boolean, 
-        default:false,
-    },
     routeName:{
         type: Schema.Types.String, 
         require:true,
@@ -17,12 +13,9 @@ const routeProcessingDataSchema = new Schema({
     route:{
         type: Schema.Types.Array, 
         require:true,
-        validate: {
-            validator: function(v:any) {
-                return v.length >= 1;
-            },
-            message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
-        }           
+    },
+    data:{
+        
     },
     checkpoints:{
         type: Schema.Types.Array, 
@@ -34,22 +27,6 @@ const routeProcessingDataSchema = new Schema({
             message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
         }               
     },
-    sensorsData:{
-        type: Schema.Types.Array, 
-        require:true,       
-        validate: {
-            validator: function(v:any) {
-                return v.length >= 1;
-            },
-            message: (props: { path: any; }) => `${props.path} must have at least 1 item!`
-        }       
-    },
-    wifiData:{
-
-    },
-    gpsData:{
-        
-    }
 }, { 
     timestamps: true,
     autoCreate: true,

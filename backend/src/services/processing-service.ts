@@ -30,6 +30,13 @@ export const uploadProcessingMap = async (data:any) => {
     return await BuildingProcessingMapData.insertMany([data]);
 }
 
+export const getAllProcessingMaps = async (buildingId:string) => {
+    return await BuildingProcessingMapData.find({
+        buildingId
+    });
+
+}
+
 
 export const getProcessingMap = async (buildingId:string,version:string) => {
  
@@ -40,5 +47,10 @@ export const getProcessingMap = async (buildingId:string,version:string) => {
     return processingMap;
 }
 
+
+export const getAllRoutesTitles = async (buildingId:string) => {
+    const routes = await  RouteProcessingDataSchema.find({buildingId})
+    return routes.map((route) => route.routeName)
+}
 
 

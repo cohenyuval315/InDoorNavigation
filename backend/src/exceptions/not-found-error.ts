@@ -1,9 +1,9 @@
-import HttpError from "./http-error";
 
-class NotFoundError extends HttpError{
+
+class NotFoundError extends Error{
     constructor(message: string){
-        const statusCode = 404;
-        super(message,statusCode);
+        super(message);
+        this.name = 'NotFoundError';
     }
 }
 export default NotFoundError;

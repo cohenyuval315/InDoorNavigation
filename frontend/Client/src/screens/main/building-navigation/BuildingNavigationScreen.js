@@ -1,11 +1,153 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TouchableOpacity, View,BackHandler, Text,AppState,Alert } from "react-native";
+import { TouchableOpacity, View,BackHandler, Text,AppState,Alert, Animated, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { selectActiveBuilding, selectActivePath } from "../../../app/active/active-slice";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import WebsocketClient from "../../../services/server/ws-client";
+import BuildingMap from "../components/BuildingMap";
+import BuildingMapUserPositionOverlay from "./components/user-position-overlay/BuildingMapUserPositionOverlay";
+import NavigationPathSVG from "./components/navigation-path-svg/NavigationPathSVG";
+import { selectMinFloor, selectNumberOfFloors } from "../../../app/map/map-slice";
+import LiveDirectionsView from "./components/live-directions-view";
+import { WifiService } from "../../../sensors/wifi-service";
+import { Geolocation, GeolocationService } from "../../../sensors/gps-service";
+import { SensorKey } from "../../../services/sensors/SensorKey";
+import SensorsService from "../../../sensors/sensors-service";
+import { resetPaths, selectNavigationError, selectNavigationPathsSVGs, selectNavigationStatus, setDestinationPOI } from "../../../app/navigation/navigation-slice";
+import Status from "../../../app/status";
+import StopButton from "./components/stop-button";
+import { UserIndoorPositionService } from "../../../position/user-indoor-position";
+import VolumeControlButton from "./components/volume-control-button";
+import Tts from 'react-native-tts';
+
+const BottomBar = ({timeLeft = 0,distanceLeft = 0}) => {
+    const [currentTime, setCurrentTime] = useState(new Date());
+    useEffect(() => {
+        const timer = setInterval(() => {
+          setCurrentTime(new Date());
+        }, 1000); // Update time every second
+    
+        return () => clearInterval(timer); // Clean up the timer on component unmount
+      }, []);
+
+      const formatTime = (date) => {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      };
+
+    return (
+        <View style={{
+            position:"absolute",
+            bottom:0,
+            width:"100%",
+            justifyContent:"center"
+        }}>
+            <View style={{
+                justifyContent:"center",
+                alignItems:"center",
+                flex:1,
+            }}>
+
+                <View style={{
+                    flex:1,
+                    width:'40%',
+                    justifyContent:"center",
+                    alignItems:"center",
+                    paddingHorizontal:10,
+                    borderRadius:10,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                }}>
+                    <View>
+                        <Text style={{
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                        }}>{formatTime(currentTime)}</Text>
+                    </View>
+
+                
+                    <View style={{
+                        flexDirection:"row",
+                        justifyContent:"space-between",
+                        width:"100%",
+                    }}>
+                        <Text>
+                            {timeLeft} min
+                        </Text>
+
+                        <Text>
+                            {distanceLeft} meters
+                        </Text>
+                    </View>
+                </View>
+
+            </View>
+        </View>
+    )
+}
+
+const ButtonLeft = () => {
+
+}
+
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    buttonContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10,
+    },
+    buttonText: {
+        color: 'red',
+    },
+    centerContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    timeText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+    infoContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 5,
+    },
+    infoText: {
+        marginHorizontal: 20,
+    },
+});
+
+
 
 const BuildingNavigationScreen = (props) => {
+    const [client, setClient] = useState(null);
+    const [floorIndex,setFloorIndex] = useState(0);
+    const initialNavigationPath = useSelector(selectNavigationPathsSVGs);
+    const navigationError = useSelector(selectNavigationError);
+    const navigationStatus = useSelector(selectNavigationStatus);
+    const [routeSVG, setRouteSVG] = useState(null)
+    const [isWSLoading, setIsWSLoading] = useState(true);
+    const [isWSConnected, setIsWSConnected] = useState(false);
+    const numFloors = useSelector(selectNumberOfFloors);
+    const minFloor = useSelector(selectMinFloor);
+
+    const containerRef = useRef(null);
+    const rotationRef = useRef(new Animated.Value(0)); 
+
+    const initialOpacitiesValues = Array.from({ length: numFloors }, (_, index) => index + minFloor == 0 ? new Animated.Value(1) : new Animated.Value(0))
+    const opacitiesRef = useRef(initialOpacitiesValues);
+
+    const [retryAttempts, setRetryAttempts] = useState(0);
+
     const [appState, setAppState] = useState(AppState.currentState);
     const [wasInBackground, setWasInBackground] = useState(false);
     const [keepRunning, setKeepRunning] = useState(false);
@@ -16,79 +158,183 @@ const BuildingNavigationScreen = (props) => {
     const selectedBuilding = useSelector(selectActiveBuilding);
     const selectedPath = useSelector(selectActivePath);
 
-    // const buildingMapData = props.route.params.buildingMapData;
-    // const mapSvgData = props.route.params.mapSvgData;
-    // const initialFloorIndex = props.route.params.floorIndex;
-    // const building = props.route.params.building;
-    // const selectedPath = props.route.params.selectedPath;
-
     const [loading,setLoading] = useState(true);
-    const [floorIndex,setFloorIndex] = useState(0);
 
-
-    const exitNavigation = () => {
-
+    const [loadingPath,setLoadingPath] = useState(true);
+    const [isTts,setIsTts] = useState(null);
+    const [loadingTts,setLoadingTts] = useState(true);
+    const [currentTtsDirection,setCurrentTtsDirection] = useState('');
+    const [volume, setVolume] = useState(0.5);
+    const onVolumeChange = (newVolume) => {
+        setVolume(newVolume);
     }
 
-    const stopNavigation = () => {
-
+    const speakDirection = (volume) => {
+        Tts.speak(currentTtsDirection,{
+            androidParams: {
+                KEY_PARAM_PAN: -1,
+                KEY_PARAM_VOLUME: volume,
+                KEY_PARAM_STREAM: 'STREAM_MUSIC',
+              },
+        })
     }
 
-    const resumeNavigation = () => {
-        
-    }
-
-    const startNavigation = () => {
-
-    }
-
-    const startVoiceDirections = () => {
-
-    }
-
-    useEffect(()=>{ 
-        async function centerOnUser(){
-            
+    useEffect(() => {
+        Tts.getInitStatus().then(() => {
+            setIsTts(true);
+            Tts.setDefaultLanguage('en-IE');
+            Tts.setDefaultRate(0.6);
+            Tts.setDefaultPitch(1.5);            
+            setLoadingTts(false);
+  
+        }, (err) => {
+          if (err.code === 'no_engine') {
+            setIsTts(false)
+            setLoadingTts(false);
+            Tts.requestInstallEngine();
+          }
+        });
+        return () => {
+            if(isTts){
+                Tts.stop();
+            }            
         }
-        centerOnUser();
-        startNavigation();
-        startVoiceDirections()
     },[])
 
-    const displayNextDirectionStep = () => {
+    useEffect(() => {
+        switch(navigationStatus){
+            case Status.IDLE : {
+                break;
+            }
+            case Status.FAILED: {
+                setLoadingPath(false);
+                console.log(navigationError)
+                break;
+            }
+            case Status.SUCCEEDED: {
+                setLoadingPath(false);
+                setRouteSVG(initialNavigationPath)
+                break;
+                
+            }
+            case Status.PENDING: {
+                setLoadingPath(true);
+                break;
+            }
+        }
+
+    },[navigationStatus])
+
+    
+    useEffect(() => {
+        WifiService.getInstance().startStream();
+        const subscription = WifiService.getInstance().subscribeWifi({
+            next: () => {
+
+            },
+            error: (err) => {
+
+            },
+            complete: () => {
+
+            }
+        })
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [])
+
+
+    useEffect(() => {
+        GeolocationService.getInstance().startStream({
+            distanceFilter:0,
+            enableHighAccuracy:true,
+            timeout:3000,
+            maximumAge:0
+        });
+
+        const subscription = GeolocationService.getInstance().subscribeGeoLocation({
+            next: () => {
+
+            },
+
+            error: (err) => {
+
+            },
+            complete:() => {
+
+            }
+           
+        })
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [])
+
+    const onSensorNext = (data,sensorKey) => {
 
     }
-
-    const reCenter = () => {
-
+    const onSensorError = (err,sensorKey) => {
+        
     }
-
-    const overView = () => {
-
-    }
-
-    const addAStop = () => {
-
-    }
-
-    const displayPOISByCategory = () => {
-
-    }
-
-    const Report = () => {
+    const onSensorComplete = (sensorKey) => {
         
     }
 
+    useEffect(() => {
+        const setupService = async (sensorKey,interval) => {
+            const service = await SensorsService.getInstance().sensor(sensorKey)
+            service.configSensorInterval(interval);
+            service.startSensor();
+            const subscription = service.subscribe({
+                next:(data) => onSensorNext(data,sensorKey),
+                error:(err) => onSensorError(err,sensorKey),
+                complete:() => onSensorComplete(sensorKey)
+            })
+            return subscription;
+        }
+    
+        const acc = setupService(SensorKey.ACCELEROMETER,100);
+        const grav = setupService(SensorKey.GRAVITY,5000);
+        const gyr = setupService(SensorKey.GYROSCOPE,100);
+        const gyroUn = setupService(SensorKey.GYROSCOPEUNCALIBRATED,5000);
+        const lin = setupService(SensorKey.LINEARACCELERATION,5000);
+        const mag = setupService(SensorKey.MAGNETOMETER,100);
+        const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,5000);
+        const rot = setupService(SensorKey.ROTATIONVECTOR,100);
+        const sd = setupService(SensorKey.STEPDETECTOR,100);
+        
+        return () => {
+            acc.then((s)=>{
+                s.unsubscribe()
+            })
+            grav.then((s)=>{
+                s.unsubscribe()
+            })
+            gyr.then((s)=>{
+                s.unsubscribe()
+            })
+            gyroUn.then((s)=>{
+                s.unsubscribe()
+            })
+            lin.then((s)=>{
+                s.unsubscribe()
+            })
+            mag.then((s)=>{
+                s.unsubscribe()
+            })
+            magUn.then((s)=>{
+                s.unsubscribe()
+            })
+            rot.then((s)=>{
+                s.unsubscribe()
+            })
+            sd.then((s)=>{
+                s.unsubscribe()
+            })
+        }
+    },[])
 
-    const onBackHandlerNavigationStop = () => {
-        console.log('Keep Running Pressed')
-        exitNavigation()
-        navigation.goBack()        
-    }
-
-    const onBackHandlerNavigationStay = () => {
-
-    }
 
     const onBackgroundNavigationExit = () => {
         setWasInBackground(false);
@@ -134,7 +380,6 @@ const BuildingNavigationScreen = (props) => {
         );      
     }
 
-
     const confirmationStop = async () => {
         Alert.alert(
             'Confirmation',
@@ -142,21 +387,18 @@ const BuildingNavigationScreen = (props) => {
             [
                 {
                     text: 'Continue',
-                    onPress: () =>  onBackHandlerNavigationStay(),
+                    onPress: () =>  {},
                     style: 'cancel'
                 },
-                { text: 'Stop', onPress: () => onBackHandlerNavigationStop() }
+                { text: 'Stop', onPress: onStopPress }
             ],
             { cancelable: false }
         );        
     }
 
+
     useEffect(() => {
         const backAction = () => {
-            
-          // Return true to prevent default behavior (closing the app)
-          // Return false to allow default behavior (close the app)
-          // Replace the below logic with your custom behavior
           confirmationStop();
           return true;
         };
@@ -170,84 +412,148 @@ const BuildingNavigationScreen = (props) => {
     
       }, []); 
 
+    //   useEffect(() => {
+    //     const handleAppStateChange = (nextAppState) => {
+    //         if (
+    //             appState.match(/inactive|background/) &&
+    //             nextAppState === 'active'
+    //         ) {
+    //             if (wasInBackground && keepRunning) {
+    //                 onForegroundNavigationContinue()
+    //             }
+    //         } else if (nextAppState === 'background') {
+    //             confirmationExit();
+    //         }
+    //         setAppState(nextAppState);
+    //     };
+
+    //     AppState.addEventListener('change', handleAppStateChange);
+    //   },[appState])
+
+
+    //   useFocusEffect(
+    //     useCallback(() => {
+    //       const onBeforeRemove = (e) => {
+    //         e.preventDefault();
+    
+    //         Alert.alert(
+    //           'Exit Confirmation',
+    //           'Are you sure you want to exit the app?',
+    //           [
+    //             { text: 'Cancel', style: 'cancel', onPress: () => {} },
+    //             {
+    //               text: 'OK',
+    //               onPress: () => navigation.dispatch(e.data.action),
+    //             },
+    //           ]
+    //         );
+    //       };
+    
+    //       navigation.addListener('beforeRemove', onBeforeRemove);
+    
+    //       return () => {
+    //         navigation.removeListener('beforeRemove', onBeforeRemove);
+    //       };
+    //     }, [navigation])
+    //   );
+
+      const onWebSocketNext = (value) => {
+
+      }
+
+      const onWebSocketError = (value) => {
+
+      }
+
+      const onWebSocketComplete = () => {
+
+      }
       useEffect(() => {
-        const handleAppStateChange = (nextAppState) => {
-            if (
-                appState.match(/inactive|background/) &&
-                nextAppState === 'active'
-            ) {
-                if (wasInBackground && keepRunning) {
-                    onForegroundNavigationContinue()
-                }
-            } else if (nextAppState === 'background') {
-                confirmationExit();
-            }
-            setAppState(nextAppState);
-        };
-
-        AppState.addEventListener('change', handleAppStateChange);
-      },[appState])
-
-
-      useFocusEffect(
-        useCallback(() => {
-          const onBeforeRemove = (e) => {
-            e.preventDefault();
-    
-            Alert.alert(
-              'Exit Confirmation',
-              'Are you sure you want to exit the app?',
-              [
-                { text: 'Cancel', style: 'cancel', onPress: () => {} },
-                {
-                  text: 'OK',
-                  onPress: () => navigation.dispatch(e.data.action),
-                },
-              ]
-            );
-          };
-    
-          navigation.addListener('beforeRemove', onBeforeRemove);
-    
-          return () => {
-            navigation.removeListener('beforeRemove', onBeforeRemove);
-          };
-        }, [navigation])
-      );
-
-      useEffect(() => {
-        
-        const handleMessage = (message) => {
-            setMessages((prevMessages) => [...prevMessages, message]);
-        };
         const websocketClient = new WebsocketClient();
-        // websocketClient.on('message', handleMessage);
+            setClient(websocketClient);
+          
+            websocketClient.connect(() => {
+                console.log('WebSocket connection opened');
+                setIsWSLoading(false);
+                setIsWSConnected(true);
+            }, () => {
+                console.log('WebSocket connection closed');
+                setIsWSLoading(false);
+                setIsWSConnected(false);  
+            })
 
-        // Open WebSocket when the component mounts
-        websocketClient.connect().catch((error) => {
-            console.error('Failed to connect WebSocket:', error);
-        });
+            const subscription = websocketClient.subscribe({
+                 complete:onWebSocketComplete,
+                 error:onWebSocketError,
+                 next:onWebSocketNext,
+                 
+            })
 
-        // Clean up WebSocket when the component unmounts
-        return () => {
-            // websocketClient.off('message', handleMessage);
-            websocketClient.disconnect();
-        };
+            return () => {
+                subscription.unsubscribe();
+                websocketClient.disconnect();
+            };
         }, []);
 
+        const connectWebSocket = () => {
+ 
+        };
 
+        const disconnectWebSocket = () => {
+            if (client) {
+                client.disconnect();
+            }
+        };
+
+
+
+        
+
+    const onPanMove = () => {
+
+    }
+
+
+    const onStopPress = () => {
+        props.navigation.navigate("building-map");
+        onLeave();
+    }
+
+    const onCancelPress = () => {
+        onLeave();
+    }
+
+    const onLeave = () => {
+        dispatch(setDestinationPOI(null));
+        dispatch(resetPaths());
+        disconnectWebSocket();
+    }
+
+    const userBuildingMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
     return (
         <View style={{
             flex:1,
         }}>
-            <TouchableOpacity >
-                <Text style={{
-                    fontSize:30,
-                    color:"black"
-                }}>
-                    Building Navigation
-                </Text>
-            </TouchableOpacity>
+            <LiveDirectionsView />
+            <StopButton onPress={confirmationStop}/>
+            <BuildingMap 
+                centerOn={null}
+                containerRef={containerRef}
+                currentFloorIndex={floorIndex}
+                opacitiesRef={opacitiesRef}
+                onPanMove={onPanMove}
+                onPOIPress={null}
+                rotationRef={rotationRef}
+
+                imageProps={{
+
+                }}
+            >
+                <BuildingMapUserPositionOverlay userBuildingMapCoordinates={userBuildingMapCoordinates}/>
+                {!loadingPath && (<NavigationPathSVG pathSVG={routeSVG[floorIndex]}/>)}
+            </BuildingMap>
+            <BottomBar/> 
+            <VolumeControlButton volume={volume} onVolumeChange={onVolumeChange}/>
         </View>
     )
 }
