@@ -16,7 +16,6 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
 
-    console.log("thistype:",Object.keys(maps[currentFloorIndex]))
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}

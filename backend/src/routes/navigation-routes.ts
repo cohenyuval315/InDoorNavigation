@@ -19,8 +19,6 @@
 // export default router;
 
 import * as navigationController from '../controllers/navigation-controller';
-import * as buildingController from '../controllers/building-controller'
-import * as ProcessingController from '../controllers/processing-controller';
 import {Router, Request, Response, NextFunction } from 'express';
 
 const navigationRouter = Router();
@@ -39,5 +37,23 @@ const navigationRouter = Router();
  *         description: Internal Server Error
  */
 navigationRouter.post('/buildings/:buildingId',async (req:Request, res:Response, next:NextFunction) => await  navigationController.getNavigationRoute(req,res,next));
+
+/**
+ * @swagger
+ * /admin/buildings/:id/graph
+ *   post:
+ *     summary: get building graph data
+ *     description: 
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+navigationRouter.post('/buildings/:buildingId/wifi',async (req:Request, res:Response, next:NextFunction) => await  navigationController.getWifiLocation(req,res,next));
+
+
+
+navigationRouter.post('/buildings/:buildingId/initialwifi',async (req:Request, res:Response, next:NextFunction) => await  navigationController.getInitialWifiLocation(req,res,next));
 
 export default navigationRouter;

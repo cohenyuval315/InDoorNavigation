@@ -45,26 +45,46 @@ export const getRelatvieGeoLocationBoundaryBox = (globalCoordinates) => {
 
 }
 
+export const isPointInBoundaryBox = (geoLocationBoundaryBox, targetCoordinates) => {
+    const { minLatitude, maxLatitude, minLongitude, maxLongitude } = geoLocationBoundaryBox;
+    const { latitude, longitude } = targetCoordinates;
+
+    const isWithinLatitude = latitude >= minLatitude && latitude <= maxLatitude;
+    const isWithinLongitude = longitude >= minLongitude && longitude <= maxLongitude;
+
+    if (isWithinLatitude && isWithinLongitude) {
+        return targetCoordinates;
+    } else {
+        return null;
+    }
+}
+
 export const getRelativeGeoCoordinates = (geoLocationBoundaryBox,targetCoordinates) => {
+    const targetCoords = isPointInBoundaryBox(geoLocationBoundaryBox,targetCoordinates)
+    if(!targetCoords){
+        return null;
+    }
+    
     const {minLatitude,
         maxLatitude,
         minLongitude,
         maxLongitude} = getRelatvieGeoLocationBoundaryBox(geoLocationBoundaryBox);
 
     const x = 100 * (targetCoordinates.longitude - minLongitude) / (maxLongitude - minLongitude);
-    const y = 100 * (maxLatitude - targetCoordinates.latitude) / (maxLatitude - minLatitude);
+    const y = 100 * (1 - (targetCoordinates.latitude - minLatitude) / (maxLatitude - minLatitude));
 
     return { x, y };    
 }
 
 export const getRelativeGlobalCoordinates = (geoLocationBoundaryBox,targetCoordinates) => {
+    // invert lantitude since it y goes down as we go down unlike our cordinates
     const {minLatitude,
         maxLatitude,
         minLongitude,
         maxLongitude} = geoLocationBoundaryBox;
     
     const x = 100 * (targetCoordinates.longitude - minLongitude) / (maxLongitude - minLongitude);
-    const y = 100 * (maxLatitude - targetCoordinates.latitude) / (maxLatitude - minLatitude);
+    const y = 100 * (1 - (targetCoordinates.latitude - minLatitude) / (maxLatitude - minLatitude)); 
 
     return { x, y };    
 }

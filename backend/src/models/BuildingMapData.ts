@@ -27,6 +27,9 @@ const buildingMapDataSchema = new Schema({
         type:Number,
         require:true,
     },
+    floorAltitudes:{
+        
+    },
     cardinalDirections:{
         type:buildingMapCardinalDirectionsSchema,
         require:true

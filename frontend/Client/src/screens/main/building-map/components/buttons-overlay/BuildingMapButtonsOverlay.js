@@ -5,7 +5,14 @@ import FoundationIcons from 'react-native-vector-icons/Foundation';
 import MapOverlay from "../../../../../layouts/map-overlay";
 import { useNavigation } from "@react-navigation/native";
 
-const BuildingMapButtonsOverlay = ({isInitUserPosition,centerOnRef,userPositionRef}) => {
+const BuildingMapButtonsOverlay = ({
+    centerOnRef,
+    userCoordinatesRef,
+    userPositionRef,
+    mapContainerRef,
+    mapRotationRef,
+}) => {
+
     const navigation = useNavigation();
     const onPathBuilderPress = () => {
         navigation.navigate('building-map-path-builder-modal');

@@ -3,7 +3,7 @@ import { BuildingStatus, BuildingType, CardinalDirection, Direction, POIType, Se
 import { BuildingSeed } from "./BuildingSeed";
 
 // 24 Digit Hex Code
-const afekaBuildingId = "E384F534F12C984588D8868E";
+const afekaBuildingId = "e384f534f12c984588d8868e".toLowerCase();
 
 const nodes =[ 
     {
@@ -7341,6 +7341,10 @@ const afekaBuildingMapData = {
         [-1]: 1,
         0: 1, 
     },
+    floorAltitudes:{
+        [-1]: 43.175806,
+        0: 39.038158, 
+    },
     // POIsMaps:
 }
 
@@ -7392,6 +7396,7 @@ const afekaBuildingSeed:BuildingSeed = {
             width: 1326,
             height: 1207,
             floorHeight:1,
+
         },
         {
             floor:0,

@@ -52,6 +52,66 @@ export const getUserLocation  = async (req:Request,res:Response,next:NextFunctio
 
 
 
+export const getInitialWifiLocation = async (req:Request,res:Response,next:NextFunction) => {
+  try{
+    const buildingId = req.params.buildingId
+    const body = req.body;
+    const wifiMap = BuildingWifiMap.find({
+      buildingId:buildingId
+    })
+    if (!wifiMap){
+      console.error("getUserLocation error = could not find wifi map ");
+    }
+    const {wifiScanData} = body;
+    const response = await localizationService.getInitialUserLocationByWifi(wifiMap,wifiScanData);
+    if (response){
+      res.status(200).json({
+        data:response
+      })
+
+      return;
+    }else{
+      res.status(500).json({
+        message:"failed"
+      })
+      return;
+    }
+  }catch(error){
+    next(error);
+  }
+}
+
+
+export const getWifiLocation = async (req:Request,res:Response,next:NextFunction) => {
+  try{
+    const buildingId = req.params.buildingId
+    const body = req.body;
+    const wifiMap = BuildingWifiMap.find({
+      buildingId:buildingId
+    })
+    if (!wifiMap){
+      console.error("getUserLocation error = could not find wifi map ");
+    }
+    const {userState, wifiScanData} = body;
+    const response = await localizationService.getUserLocationByWifi(wifiMap,userState,wifiScanData);
+    if (response){
+      res.status(200).json({
+        data:response
+      })
+
+      return;
+    }else{
+      res.status(500).json({
+        message:"failed"
+      })
+      return;
+    }
+  }catch(error){
+    next(error);
+  }
+}
+
+
   // if (!validator.isString(name) || validator.isEmpty(name)) {
   //   return res.status(400).json({ error: 'Name must be a non-empty string' });
   // }

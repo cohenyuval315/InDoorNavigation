@@ -17,11 +17,16 @@ export const LoadingMessagesProvider = ({ children }) => {
         );
     }
 
+    const resetLoadingMessage = () => {
+      setLoadingMessages([]);
+    }
+
     return (
       <LoadingMessagesContext.Provider
       value={{  
         loadingMessages,
-        addLoadingMessage
+        addLoadingMessage,
+        resetLoadingMessage
       }}>
         {children}
         

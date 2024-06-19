@@ -47,7 +47,7 @@ const prepareBuildingData = (building) => {
     // console.log(building.globalCoordinates)
     const center = findGeographicalCenter(building.geoArea)
     const mapCoords = offsetFunction(center);
-    console.log(mapCoords);
+    console.log("buildingmap:",mapCoords);
     return {
         ...building,
         mapCoordinates:mapCoords,

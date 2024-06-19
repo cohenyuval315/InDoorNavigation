@@ -77,10 +77,17 @@ export const createBuildingData = async (buildingId:string,buildingData:any,over
             console.log(`Building with name ${existingBuilding.details.title} already exists.`);
             if (override){
                 console.log(`Overide - Deleteing Building with name ${existingBuilding.details.title}.`);
-                await BuildingData.findByIdAndDelete(id);
+                const res = await BuildingData.findByIdAndDelete(id);
+                if (res) {
+                    console.log("success deleting building data");
+                } else {
+                    console.log(`failure deleting building data.`);
+                }                
             }else{
                 return;
             }
+        }else{
+            console.log(`Building with name ${buildingData.details.title} does not exist.`);
         }
 
         await buildingDataSchema.save()
@@ -111,10 +118,17 @@ export const createBuildingMapData = async (buildingId:string,buildingMapData:an
                 const res = await BuildingMapData.findOneAndDelete({
                     buildingId:id
                 })
-                console.log("response after deleting building map data:",res);
+                if (res) {
+                    console.log("success deleting building map data");
+                } else {
+                    console.log(`failure deleting building map data.`);
+                }
+                
             }else{
                 return null;
             }
+        }else{
+            console.log(`Building Map Doesnt Not Exists.`);
         }
         const pois = buildingMapDataSchema.get("POIs");
         const mapFloors = buildingMapDataSchema.get("mapFloors");
@@ -154,10 +168,16 @@ export const createBuildingGraphMapData = async (buildingId:string,buildingGraph
                 const res = await BuildingGraphMap.findOneAndDelete({
                     buildingId:id
                 })
-                console.log("response after deleting building graph map data:",res);
+                if (res) {
+                    console.log("success deleting building graph map data");
+                } else {
+                    console.log(`failure deleting building graph map data.`);
+                }
             }else{
                 return null;
             }
+        }else{
+            console.log(`Building Graph Map Doesnt Not Exists.`);
         }
 
         await buildingGraphMapSchema.save()
@@ -188,10 +208,16 @@ export const createBuildingWifiMapData = async (buildingId:string,buildingWifiMa
                 const res = await BuildingWifiMap.findOneAndDelete({
                     buildingId:id
                 })
-                console.log("response after deleting building wifi map data:",res);
+                if (res) {
+                    console.log("success deleting building wifi map data");
+                } else {
+                    console.log(`failure deleting building wifi map data.`);
+                }
             }else{
                 return null;
             }
+        }else{
+            console.log(`Building wifi Map Doesnt Not Exists.`);
         }
 
         await buildingWifiMapSchema.save()
@@ -222,10 +248,16 @@ export const createBuildingMagneticMapData = async (buildingId:string,buildingMa
                 const res=  await BuildingMagneticMap.findOneAndDelete({
                     buildingId:id
                 })
-                console.log("response after deleting building magnetic map data:",res);
+                if (res) {
+                    console.log("success deleting building magnetic map data");
+                } else {
+                    console.log(`failure deleting building magnetic map data.`);
+                }
             }else{
                 return null;
             }
+        }else{
+            console.log(`Building magnetic Map Doesnt Not Exists.`);
         }
 
         await buildingMagneticMapSchema.save()

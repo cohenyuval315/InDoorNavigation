@@ -137,7 +137,7 @@ app.use('/admin',adminRouter);
 app.use('/navigation',navigationRouter);
 app.use(errorHandler)
 
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws) => {
   console.log('A client connected via WebSocket');
   let index = 1;
   // Handle events from the client

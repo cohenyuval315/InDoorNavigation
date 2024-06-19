@@ -20,12 +20,16 @@ import { calculateEdgesWeights } from '../utils/graph-utils';
 import { generateColorMap, generateGraphMaps } from '../utils/maps-generation';
 import { getEdgesWithIds } from '../utils/edges';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+let __dirname = path.dirname(new URL(import.meta.url).pathname);
 console.log('__dirname:', __dirname);
 
 const isWindows = process.platform === 'win32';
-const baseBuildingAssetsPath = path.join(__dirname, '..','..','src','seeding')
+if (isWindows && __dirname.startsWith('/')) {
+  __dirname = __dirname.slice(1);
+}
 
+const baseBuildingAssetsPath = path.join(__dirname, '..','..','src','seeding')
+console.log('__path:',baseBuildingAssetsPath)
 export async function seedBuilding(buildingSeed:BuildingSeed){
     console.log(`seeding building with id {${buildingSeed.buildingId}}...`);
     const {buildingTitle,buildingId,data,graph,magnetic,map,wifi,mapFloors} = buildingSeed;

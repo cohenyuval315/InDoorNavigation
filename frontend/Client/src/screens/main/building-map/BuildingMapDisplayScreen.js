@@ -9,6 +9,7 @@ import LoadingModal from "../../../components/modals/loading";
 import BuildingMapDisplayMap from "./BuildingMapDisplayMap";
 import { useConfirmationModal } from "../../../contexts/ConfirmationModalContext";
 import { selectActiveBuilding } from "../../../app/active/active-slice";
+import useLoadingMessages from "../../../hooks/useLoadingMessages";
 
 
 const BuildingMapDisplayScreen = (props) => {
@@ -19,22 +20,27 @@ const BuildingMapDisplayScreen = (props) => {
     const [mapComponent, setMapComponent] = useState(null);
     const {openConfirm} = useConfirmationModal();
     const selectedBuilding = useSelector(selectActiveBuilding);
+    const {resetLoadingMessage} = useLoadingMessages();
+  
 
+    useLayoutEffect(() => {
+        resetLoadingMessage();
+        dispatch(fetchBuildingByMapId(selectedBuilding.id));
+    },[])
+
+    const backAction = () => {
+        openConfirm(
+            "Return to Building Selection",
+            "Are you sure you want to return to the building selection screen?",
+            () => {
+                props.navigation.navigate("buildings-global-map")
+            },
+        );
+        return true;
+    };
+    
 
     useEffect(() => {
-        
-        const backAction = () => {
-            openConfirm(
-                "Return to Building Selection",
-                "Are you sure you want to return to the building selection screen?",
-                () => {
-                    props.navigation.navigate("buildings-global-map")
-                },
-            );
-            return true;
-        };
-        
-        
         const backHandler = BackHandler.addEventListener(
             'hardwareBackPress',
             backAction
@@ -43,10 +49,6 @@ const BuildingMapDisplayScreen = (props) => {
         return () => backHandler.remove();
     }, [])
 
-    // USE LAYOUT EFFECT BEFORE PAIN THE SCREEN , GOOD IDEA.
-    useLayoutEffect(() => {
-        dispatch(fetchBuildingByMapId(selectedBuilding.id));
-    },[])
 
 
     useEffect(() => {
@@ -54,14 +56,20 @@ const BuildingMapDisplayScreen = (props) => {
             case Status.SUCCEEDED:{
                 setLoading(false);
                 break;
-            }   
+            }
+            case Status.FAILED:{
+                setLoading(false);
+                break;
+            }
         }
     }, [mapStatus])
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setMapComponent(
-                <BuildingMapDisplayMap /> 
+                <BuildingMapDisplayMap
+                    backAction={backAction}
+                 /> 
             );
         });
     

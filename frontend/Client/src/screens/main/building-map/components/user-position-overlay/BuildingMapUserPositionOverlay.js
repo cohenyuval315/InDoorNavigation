@@ -1,14 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { selectMap, selectMinFloor } from "../../../../../app/map/map-slice";
+
 import MapOverlay from "../../../../../layouts/map-overlay";
 import { SvgXml } from "react-native-svg";
-import { calculateBottomLeftOffset, calculateDisplayDimensions } from "../../../../../utils/map-data";
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../../../utils/scaling";
 
-import Status from "../../../../../app/status";
-import { UserIndoorPositionService } from "../../../../../position/user-indoor-position";
 const userSVG = `
     <?xml version="1.0" encoding="utf-8"?>
     <!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
@@ -24,77 +19,22 @@ const userSVG = `
 `;
 
 
-const BuildingMapUserPositionOverlay = ({userPositionRef,onFloorChange,onInitUserPosition}) => {
+const BuildingMapUserPositionOverlay = ({
+    userCoordinatesRef,
+    userRotationRef
+}) => {
     
-    const [mapFloor,setMapFloor] = useState(0); 
-    const maps = useSelector(selectMap);
-    const map = maps[mapFloor];    
-    const mapWidth = map.width;
-    const mapHeight = map.height;
-    // const positionRef = useRef(null);
-    const userBuildingMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-    const [isInitialPositionSet, setIsInitialPositionSet] = useState(false);
-
-    useEffect(() => {
-        UserIndoorPositionService.getInstance().startStream()
-        const subscription = UserIndoorPositionService.getInstance().subscribe({
-
-            next:(pos) => {
-                if(pos){
-                    let x = pos.x * mapWidth / 100;
-                    let y = pos.y * mapHeight / 100;
-                    if(x < 0){
-                        x = x * -1;
-                    }
-                    if (y < 0 ){
-                        y = y * -1
-                    }
-                    x = 50;
-                    y = 50;
-                    if(!isInitialPositionSet){
-                        userBuildingMapCoordinates.setValue({
-                            x:x,
-                            y:y
-                        })
-                        onInitUserPosition()
-                        setIsInitialPositionSet(true);
-                    }else{
-                        setPosition(
-                            x,
-                            y
-                        )
-                    }
-                    
-                }else{
-                    console.log("pos is null")
-                }
-            }
-        })
-        return () => {
-            subscription.unsubscribe();
-        }
-    }, [])
-
-    const setPosition = (x,y) => {
-        if(userBuildingMapCoordinates){
-            Animated.timing(userBuildingMapCoordinates, {
-                toValue: {
-                    x:x,
-                    y:y
-                },
-                duration: 100,
-                easing: Easing.out(Easing.quad),
-                useNativeDriver: false,
-            }).start();
-        }
-
-    }
- 
-
-    if (!isInitialPositionSet){
+    if (
+        !userCoordinatesRef || 
+        !userRotationRef || 
+        !userCoordinatesRef.current || 
+        !userRotationRef.current
+    ) {
         return null;
     }
-    
+
+    const iconSize = 30;
+
     return (
         <MapOverlay>
             <Animated.View style={{
@@ -103,20 +43,29 @@ const BuildingMapUserPositionOverlay = ({userPositionRef,onFloorChange,onInitUse
             }}>
                 <Animated.View style={{
                     position:'absolute',
-                    top: userBuildingMapCoordinates.y.interpolate({
+                    top: userCoordinatesRef.current.y.interpolate({
                         inputRange: [0, 100],
                         outputRange: ['0%', '100%']
                     }),
-                    left: userBuildingMapCoordinates.x.interpolate({
+                    left: userCoordinatesRef.current.x.interpolate({
                         inputRange: [0, 100],
                         outputRange: ['0%', '100%']
                     }),  
+                    transform: [
+                        { translateX: -iconSize/2 },
+                        { translateY: -iconSize/2 },
+                        { rotate: userRotationRef.current.interpolate({
+                            inputRange: [0, 360],
+                            outputRange: ['0deg', '360deg'],
+                            extrapolate: 'clamp',
+                        }) },
+                    ],
                 }}>
                     <TouchableOpacity>
                         <SvgXml
                             xml={userSVG}
-                            width={30}
-                            height={30}
+                            width={iconSize}
+                            height={iconSize}
                         />
                     </TouchableOpacity>
                 </Animated.View>

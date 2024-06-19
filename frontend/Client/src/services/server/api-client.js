@@ -187,6 +187,38 @@ class ApiClient{
         });
         return response
     }
+
+    async getUserWifiLocation(buildingId,userState,wifiScanData){
+        const path =  `/navigation/buildings/${buildingId}/wifi`;
+        console.log("fetching wifi pos: ",path)
+        const response = await fetch(this.base_url + path,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userState,
+                wifiScanData
+            })
+        });
+        console.log("fetching wifi res")
+        return response
+    }
+    
+    async getUserWifiLocation(buildingId,wifiScanData){
+        const path =  `/navigation/buildings/${buildingId}/initialwifi`;
+        console.log("fetching wifi pos: ",path)
+        const response = await fetch(this.base_url + path,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                wifiScanData
+            })
+        });
+        return response
+    }
 }
 
 const client = new ApiClient(SERVER_URL);

@@ -18,7 +18,6 @@ export const getAllBuildingsData = async (req:Request,res:Response,next:NextFunc
             const data = buildings.map((building) => {
                 const b = building.toJSON();
                 b['id'] = building._id.toString();
-                console.log("b:",b)
                 return b
             });
             return res.status(200).json({ data: data });

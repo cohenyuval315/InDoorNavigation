@@ -1,87 +1,16 @@
-import React,{ useEffect, useRef, useState } from "react";
+import React,{ useCallback, useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
 import PulsingCircle from "./PulsingCircle";
 import UserMapAvatar from "./UserMapAvatar";
 import useGPS from "../../../../../hooks/useGPS";
 import {getRelativeCoordsByIsrael  } from "../../../../../static-maps/israel";
 import useLoadingMessages from "../../../../../hooks/useLoadingMessages";
-
-
-// const UserMapAvatar = () => {
-//     return (
-//         <Animated.View style={{
-//             width:10,
-//             height:10,
-//             backgroundColor:"blue",
-//             borderRadius:30,
-//             justifyContent:"center",
-//             alignItems:'center',
-//             borderColor:"lightgray",
-//             borderWidth:1,
-//         }}>
-
-//         </Animated.View>
-//     )
-// }
-
-// const PulsingCircle = ({  }) => {
-//     const scale = useRef(new Animated.Value(1)).current;
-//     const opacity = useRef(new Animated.Value(1)).current;
-//     const maxScale = 2;
-//     const duration = 3000;
-//     const minOpacity = 0;
-//     const maxOpacity = 0.8;
-//     const minScale = 0;
-//     const radius = 50;
-//     const borderRadius = 50;
-//     const color = "#0080ff";
-    
-  
-//     useEffect(() => {
-//       function animateRing() {
-//         const pulse = Animated.parallel([
-//           Animated.timing(scale, {
-//             toValue: maxScale,
-//             duration: duration,
-//             easing: Easing.out(Easing.quad),
-//             useNativeDriver: true,
-//           }),
-//           Animated.timing(opacity, {
-//             toValue: minOpacity,
-//             duration: duration,
-//             useNativeDriver: true,
-//           }),
-//         ]).start(() => {
-//             opacity.setValue(maxOpacity);
-//             scale.setValue(minScale);
-//             animateRing(); 
-//         });
-//       }
-//       animateRing(); // Start the first pulse
-//     }, []);
-  
-//     return (
-//       <Animated.View
-//         style={{
-//             position:"absolute",
-//             width: radius,
-//             height: radius,
-//             backgroundColor: color,
-//             borderRadius: borderRadius,
-//             opacity:opacity,
-//             transform: [{ scale:scale }],
-//         }}
-//       />
-//     );
-//   };
-  
-
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
+import MapOverlay from "../../../../../layouts/map-overlay";
+import { GeolocationService } from "../../../../../sensors/gps-service";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 const GlobalMapUserOverlay = () => {
-    const {subscribeGPS,unsubscribeGPS} = useGPS();
     const {addLoadingMessage} = useLoadingMessages();
     const userMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
     const [isInitialPositionSet, setIsInitialPositionSet] = useState(false);
@@ -95,6 +24,7 @@ const GlobalMapUserOverlay = () => {
         }
         const { latitude, longitude } = position.coords;
         const newCoordinates = getRelativeCoordsByIsrael({ latitude, longitude });        
+        console.log("UserCoords",newCoordinates)
         if (retryMessageCallbackRef.current){
             retryMessageCallbackRef.current()
         }
@@ -125,12 +55,27 @@ const GlobalMapUserOverlay = () => {
         }
         
     }
-    
-    useEffect(() => {
-        startMessageCallbackRef.current = addLoadingMessage("loading user geo positon");
-        subscribeGPS(onPosition,onPositionError);
-        return () => unsubscribeGPS();
-    },[]) 
+    useFocusEffect(
+        useCallback(() => {
+            GeolocationService.getInstance().startStream({
+                distanceFilter:100,
+                enableHighAccuracy:true,
+                maximumAge:0,
+                timeout:100,
+                useSignificantChanges:false,
+            })
+            const sub = GeolocationService.getInstance().subscribeGeoLocation({
+                next:onPosition,
+                error:onPositionError
+            })
+            startMessageCallbackRef.current = addLoadingMessage("loading user geo positon");
+
+            return () => {
+                sub.unsubscribe();
+            }
+        },[])
+    );
+
 
     if (!isInitialPositionSet) {
         return null;
@@ -138,23 +83,27 @@ const GlobalMapUserOverlay = () => {
 
 
     return (
-        <Animated.View style={{
-            position: "absolute",
-            zIndex: 22,
-            top: userMapCoordinates.y.interpolate({
-                inputRange: [0, 100],
-                outputRange: ['0%', '100%']
-            }),
-            left: userMapCoordinates.x.interpolate({
-                inputRange: [0, 100],
-                outputRange: ['0%', '100%']
-            }),            
-            justifyContent: "center",
-            alignItems: "center",
+        <MapOverlay styles={{
+            
         }}>
-            <PulsingCircle/>
-            <UserMapAvatar />
-        </Animated.View>
+            <Animated.View style={{
+                position: "absolute",
+                zIndex: 22,
+                top: userMapCoordinates.y.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0%', '100%']
+                }),
+                left: userMapCoordinates.x.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0%', '100%']
+                }),            
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <PulsingCircle/>
+                <UserMapAvatar />
+            </Animated.View>
+        </MapOverlay>
     )
 }
 

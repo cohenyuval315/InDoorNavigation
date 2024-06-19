@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../../../utils/scaling";
 import { useDispatch } from "react-redux";
 import { setActiveBuilding } from "../../../../../app/active/active-slice";
+import MapOverlay from "../../../../../layouts/map-overlay";
 
 const GlobalMapBuilding = ({building,color,zIndex,onBuildingPress}) => {
     const dispatch = useDispatch();
@@ -11,13 +12,16 @@ const GlobalMapBuilding = ({building,color,zIndex,onBuildingPress}) => {
     const handleOnBuildingPress = () => {
         dispatch(setActiveBuilding(building));
     }
-
+      const iconSize = 40;
     return (
+        <MapOverlay>
         <View style={{
             position:"absolute",
             top:`${building.mapCoordinates.y}%`, 
             left:`${building.mapCoordinates.x}%`, 
             zIndex: 30, 
+            marginLeft: -iconSize / 2,
+            marginTop: -iconSize / 2,
         }}>
             <TouchableOpacity
             onPress={handleOnBuildingPress}
@@ -26,16 +30,15 @@ const GlobalMapBuilding = ({building,color,zIndex,onBuildingPress}) => {
                     color:"black",
                     zIndex:zIndex
                 }}>
-                    <Ionicons style={{
-
-                    }} 
+                    <Ionicons
                         name={"location"} 
-                        size={40} 
+                        size={iconSize} 
                         color={color} 
                     />
                 </Text>
             </TouchableOpacity>
-      </View>
+        </View>
+        </MapOverlay>
     );
   };
 

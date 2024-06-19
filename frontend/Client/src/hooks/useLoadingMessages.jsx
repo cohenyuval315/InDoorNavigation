@@ -3,8 +3,8 @@ import { Animated, Easing } from 'react-native';
 import { useLoadingMessagesContext } from '../contexts/LoadingMessagesContext';
 
 function useLoadingMessages() {
-    const {loadingMessages,addLoadingMessage} = useLoadingMessagesContext()
+    const {loadingMessages,addLoadingMessage,resetLoadingMessage} = useLoadingMessagesContext()
     
-    return { loadingMessages, addLoadingMessage};
+    return { loadingMessages, addLoadingMessage,resetLoadingMessage};
 }
 export default useLoadingMessages;

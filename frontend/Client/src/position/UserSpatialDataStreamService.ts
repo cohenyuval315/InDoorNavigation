@@ -51,6 +51,12 @@ export interface UserSpatialData {
     wifi?:object,
 }
 
+export interface StreamObject {
+    stream:string,
+    timestamp:Date,
+    data:any,
+}
+
 export class UserSpatialDataStreamService {
     private static instance: UserSpatialDataStreamService;
     private subject:Subject<UserSpatialData  | null | void>;
@@ -217,6 +223,14 @@ export class UserSpatialDataStreamService {
         return unsubscribe;
     }
 
+    getObservable(){
+        return this.subject.asObservable();
+    }
+
+    async createStream(){
+        this.stream = await this._createMergeStream();
+        return this.stream
+    }
 
     async startStream() {
         if(this.isStreaming){
@@ -232,10 +246,9 @@ export class UserSpatialDataStreamService {
         this.streamWIFI();
         this.streamGPS();
         
-  
-        this.stream = await this._createMergeStream();
+        const stream = await this.createStream();
         
-        this.subscription = this.stream.subscribe(({
+        this.subscription = stream.subscribe(({
             next:(value) => {
                 this.subject.next(value);
             },
