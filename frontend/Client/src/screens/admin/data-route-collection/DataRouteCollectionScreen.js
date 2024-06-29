@@ -9,17 +9,17 @@ import ActiveRouteOverlay from "./components/active-route-overlay";
 import {  selectMinFloor } from "../../../app/map/map-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { TextInput } from "react-native-gesture-handler";
-import { SensorKey } from "../../../services/sensors/SensorKey";
-import SensorsService from "../../../sensors/sensors-service";
-import { WifiService } from "../../../sensors/wifi-service";
+import { SensorKey } from "../../../sensors/SensorKey";
+import SensorsService from "../../../services/SensorsService";
+import { WifiService } from "../../../services/WifiService";
 import { useConfirmationModal } from "../../../contexts/ConfirmationModalContext";
 import { fetchProcessingRoute, selectProcessingError, selectProcessingRoutes, selectProcessingStatus, uploadProcessingRoute } from "../../../app/admin/admin-slice";
 import parseErrorStack from "react-native/Libraries/Core/Devtools/parseErrorStack";
 import Status from "../../../app/status";
 import useGPS from "../../../hooks/useGPS";
-import { Geolocation } from "../../../sensors/gps-service";
-import client from "../../../services/server/api-client";
-import { UserSpatialDataStreamService } from "../../../position/UserSpatialDataStreamService";
+import { Geolocation } from "../../../services/GpsService";
+import client from "../../../server/api-client";
+import { UserSpatialDataStreamService } from "../../../services/UserSpatialDataStreamService";
 import FloorSelection from "../components/floor-selection";
 
 

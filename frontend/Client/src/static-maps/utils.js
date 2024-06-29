@@ -46,11 +46,16 @@ export const getRelatvieGeoLocationBoundaryBox = (globalCoordinates) => {
 }
 
 export const isPointInBoundaryBox = (geoLocationBoundaryBox, targetCoordinates) => {
-    const { minLatitude, maxLatitude, minLongitude, maxLongitude } = geoLocationBoundaryBox;
+    const {minLatitude,
+        maxLatitude,
+        minLongitude,
+        maxLongitude} = getRelatvieGeoLocationBoundaryBox(geoLocationBoundaryBox);
     const { latitude, longitude } = targetCoordinates;
 
     const isWithinLatitude = latitude >= minLatitude && latitude <= maxLatitude;
     const isWithinLongitude = longitude >= minLongitude && longitude <= maxLongitude;
+    console.log("isWIthinLogo",isWithinLongitude)
+    console.log("isWIthinLant",isWithinLatitude)
 
     if (isWithinLatitude && isWithinLongitude) {
         return targetCoordinates;

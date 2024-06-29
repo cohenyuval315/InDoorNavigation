@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NativeModules, StyleSheet, Text, View } from "react-native";
-import sensors from "../../../services/sensors/sensors";
+import sensors from "../../../sensors/sensors";
 
 const SensorValue = ({ name, value }) => (
   <View style={styles.valueContainer}>

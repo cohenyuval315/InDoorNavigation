@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, Text, TouchableOpacity, View } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BuildingPOIIcon = ({POI,rotationRef,onPOIPress}) => {
     let iconName = "close-circle-outline" 
 
     // iconName = POI.details.icon;
     
-    const iconSize = 20; 
+    const iconSize = 35; 
     const centerX = POI.center.x;
     const centerY = POI.center.y;
     const iconPositionX = centerX - iconSize / 2; 
@@ -62,7 +63,7 @@ const BuildingPOIIcon = ({POI,rotationRef,onPOIPress}) => {
                     backgroundColor:"white",
                     borderRadius:30,
                 }}>
-                    <MaterialCommunityIcons name={iconName}  size={iconSize} color={"black"} />
+                    <Icon name={POI.icon}  size={iconSize} color={'rgba(0, 0, 0, 0.5)'} />
                 </Text>
             </TouchableOpacity> 
       </Animated.View>                 

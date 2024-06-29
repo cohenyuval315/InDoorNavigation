@@ -7,8 +7,8 @@ import {
     isSensorAvailable,
     getSensorInformation,
     setUpdateInterval
- } from '../services/sensors';
-import { SensorKey, sensorKeys } from '../services/sensors/SensorKey';
+ } from '../sensors';
+import { SensorKey, sensorKeys } from '../sensors/SensorKey';
 
 
 

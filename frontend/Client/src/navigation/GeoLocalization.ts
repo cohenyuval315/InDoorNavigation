@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectActiveBuilding, setActiveBuilding } from "../app/active/active-slice";
 import { selectAllBuildings } from "../app/building/buildings-slice";
 import { GeolocationResponse } from "@react-native-community/geolocation";
-import { PositionError } from "../sensors/gps-service";
+import { PositionError } from "../services/GpsService";
 import { useNavigation } from "@react-navigation/native";
 import { useConfirmationModal } from "../contexts/ConfirmationModalContext";
 

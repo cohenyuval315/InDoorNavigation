@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import client from '../../services/server/api-client';
+import client from '../../server/api-client';
 import Status from '../status';
 
 
@@ -16,9 +16,8 @@ export const fetchNavigationPath = createAsyncThunk(
         currentLocation,
         accessability)
     if (response.ok){
-      const results = await response.json();
-      return results.data;
-
+        const results = await response.json();
+        return results.data;
     }else{
       return rejectWithValue("error")
     }
@@ -32,13 +31,23 @@ const navigationInitialState = {
   distance:null,
   timeLength:null,
   status:Status.IDLE,
-  destinationPOI:null
+  destinationPOI:null,
+  userPosition:null,
+  accessibility:{
+    stairs:true
+  },
 }
 
 const navigationSlice = createSlice({
     name: 'navigation',
     initialState:  navigationInitialState,
     reducers: { 
+      setAccessibility: (state, action) => {
+        state.accessibility = action.payload;
+      },
+      setUserPosition: (state, action) => {
+          state.userPosition = action.payload;
+        },
         setDestinationPOI: (state, action) => {
             state.destinationPOI = action.payload;
         },
@@ -76,8 +85,10 @@ export const selectNavigationPathTimeLength = state => state.navigation.timeLeng
 export const selectNavigationError = state => state.navigation.error;
 export const selectNavigationStatus = state => state.navigation.status;
 export const selectNavigationDestinationPOI = state => state.navigation.destinationPOI
+export const selectUserPosition = state => state.navigation.userPosition
+export const selectUserAccessibility = state => state.navigation.accessibility;
 
   // export const selectPOIById = POIId => state => state.map.POIs.find(POI => POI.id === POIId);
-  export const {setDestinationPOI,resetPaths} = navigationSlice.actions;
+  export const {setDestinationPOI,resetPaths,setUserPosition} = navigationSlice.actions;
   export default navigationSlice.reducer;
   

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {  } from '../services/sensors/rnsensors';
+import {  } from '../sensors/rnsensors';
 
 
 const useRotation = () => {

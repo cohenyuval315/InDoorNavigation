@@ -1,16 +1,17 @@
 import { Animated } from "react-native"
 
-const UserMapAvatar = () => {
+const UserMapAvatar = ({size}) => {
     return (
         <Animated.View style={{
-            width:10,
-            height:10,
+            width:size,
+            height:size,
             backgroundColor:"blue",
             borderRadius:30,
             justifyContent:"center",
             alignItems:'center',
             borderColor:"lightgray",
             borderWidth:1,
+            pointerEvents:"none",
         }}>
 
         </Animated.View>

@@ -1,6 +1,6 @@
 // GPSContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { GeolocationService, GeolocationStreamOptions } from '../sensors/gps-service';
+import { GeolocationService, GeolocationStreamOptions } from '../services/GpsService';
 import { GeolocationResponse } from '@react-native-community/geolocation';
 import { Observer, Subscription } from 'rxjs';
 

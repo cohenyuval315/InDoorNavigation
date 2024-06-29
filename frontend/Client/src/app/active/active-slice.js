@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createSlice } from '@reduxjs/toolkit'
 import Status from '../status';
-import { UserIndoorPositionService } from "../../position/user-indoor-position";
+import { UserIndoorPositionService } from "../../services/UserIndoorPositionService";
 
 const initialState = {
     error:null,
@@ -49,9 +49,6 @@ const activeSlice = createSlice({
         setActiveBuilding: (state, action) => {
             state.activeBuilding = action.payload;
             state.status = Status.SUCCEEDED
-            if (action.payload){
-                UserIndoorPositionService.getInstance().setBuildingBoundary(action.payload.geoArea)
-            }
             
         },
         setActivePOI: (state, action) => {

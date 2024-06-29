@@ -592,6 +592,22 @@ export default class ImageViewer extends React.Component<ImageZoomProps, ImageZo
     }
   }
 
+  public getCurrentState() {
+    return {
+        scale:this.scale,
+        positionX: this.positionX,
+        positionY: this.positionY,
+        zoomLastDistance:this.zoomLastDistance,
+        zoomCurrentDistance: this.zoomCurrentDistance,
+        lastPositionX :this.lastPositionX,
+        lastPositionY:this.lastPositionY,
+        state : this.state,
+        context: this.context,
+        centerDiffX: this.centerDiffX,
+        centerDiffY: this.centerDiffY
+    }
+  }
+
   public didCenterOnChange(
     params: { x: number; y: number; scale: number; duration: number },
     paramsNext: { x: number; y: number; scale: number; duration: number }

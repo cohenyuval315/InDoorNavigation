@@ -1,5 +1,5 @@
 import DropDownPicker from "react-native-dropdown-picker";
-import { DeviceOrientationType } from "../../../../constants/constants";
+import { DeviceOrientationType } from "../../../../constants/enums";
 import { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 

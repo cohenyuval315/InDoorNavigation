@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { SensorKey } from "../../services/sensors/SensorKey";
+import { SensorKey } from "../../sensors/SensorKey";
 import useSensor from "../useSensor";
 
 const useMagnetometerSensor = (interval = 1,windowSize=-1,onLoadCallback=null,onEventCallback=null,onEventWindowDataUpdate=null) => {

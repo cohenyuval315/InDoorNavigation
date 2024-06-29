@@ -1,4 +1,5 @@
-import { MapFloor } from "../core/MapFloor";
+import { MapFloor } from "../common/interfaces/MapFloor";
+
 
 export interface BuildingSeed { 
     buildingId: string;
@@ -23,5 +24,4 @@ export interface BuildingSeed {
         override:boolean,
         data:any
     },
-    mapFloors:MapFloor[]
 }

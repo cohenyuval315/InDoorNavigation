@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import useGPS from "../hooks/useGPS";
-import { GeolocationStreamOptions, PositionError } from "../sensors/gps-service";
+import { GeolocationStreamOptions, PositionError } from "../services/GpsService";
 
 
 const GPSStream = ({ children = null }) => {

@@ -1,3 +1,4 @@
+import { POIType } from "../constants/enums";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "./scaling";
 import { isOpen, stringifySchedule } from "./schedule-formatter";
 
@@ -35,17 +36,65 @@ export const calculateDisplayDimensions = (mapWidth,mapHeight,windowWidth, windo
 }
 const getIconName = (icon) => {
     switch(icon){
-        case 'toilet': {
+        case POIType.RESTAURANT: {
+            return 'food';
+        }
+        case POIType.CLASS_ROOM: {
+            return 'google-classroom';
+        }
+        case POIType.PATIENT_ROOM: {
+            return 'bed-outline';
+        }
+        case POIType.DOCTOR_ROOM: {
+            return 'desk';
+        }
+        case POIType.YARD: {
+            return 'yard';
+        }
+        case POIType.BATHROOM: {
             return 'toilet';
         }
-        case 'stairs-down':{
-            return 'stairs-down';
+        case POIType.LAB: {
+            return 'glass-fragile';
         }
-        case 'stairs-up':{
-            return 'stairs-up';
+        case POIType.ROOM: {
+            return 'headset';
         }
-        case 'food':{
-            return 'food';
+        case POIType.ELEVATOR: {
+            return 'elevator';
+        }
+        case POIType.STAIRS: {
+            return 'stairs';
+        }
+        case POIType.ESCALATORS: {
+            return 'escalator';
+        }
+        case POIType.ROOM_ENTRANCE: {
+            return 'door';
+        }
+        case POIType.BUILDING_ENTRANCE: {
+            return 'door-sliding-open';
+        }
+        case POIType.EXIT: {
+            return 'exit-run';
+        }
+        case POIType.EMERGENCY_EXIT: {
+            return 'exit-run';
+        }
+        case POIType.INFORMATION_DESK: {
+            return 'information';
+        }
+        case POIType.UNKNOWN: {
+            return 'penguin';
+        }
+        case POIType.VENDING_MACHINE: {
+            return 'slot-machine';
+        }
+        case POIType.SMOKING_AREA: {
+            return 'smoking';
+        }
+        case POIType.CAFETERIA: {
+            return 'food-outline';
         }
         default:{
             return "close-circle-outline";
@@ -85,7 +134,7 @@ export function normalizePOIsPoints(POIs,mapWidth,mapHeight,floor,windowWidth,wi
             }),
             center:normalizePoint(POI.center,mapWidth,displayedMapWidth,mapHeight,displayedMapHeight,_offsetX,_offsetY),
             openStatus:POI.details.openingHours ? isOpen(POI.details.openingHours) : null,
-            icon:getIconName(POI.details.icon),
+            icon:getIconName(POI.details.POIType),
             scheduleString:POI.details.openingHours ? stringifySchedule(POI.details.openingHours) : null, 
             
         }

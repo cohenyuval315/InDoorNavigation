@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import GPSStream from "./GPSStream";
-import { sensors } from "../services/sensors";
-import { setUpdateInterval, start,startTrigger } from "../services/sensors/rnsensors";
-import { SensorKey } from "../services/sensors/SensorKey";
+import { sensors } from "../sensors";
+import { setUpdateInterval, start,startTrigger } from "../sensors/rnsensors";
+import { SensorKey } from "../sensors/SensorKey";
 import { Observable, buffer, bufferCount, interval, map, mergeAll, share, take, window } from "rxjs";
-import SensorsService from "../sensors/sensors-service";
+import SensorsService from "../services/SensorsService";
 async function check(){
     // const service = await SensorsService.getInstance().sensor(SensorKey.ACCELEROMETER);
     // service.stopSensor()

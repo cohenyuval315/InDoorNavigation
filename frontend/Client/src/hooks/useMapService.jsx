@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { isMapServiceAvailable } from '../services/3rd-party/map-service-provider';
+import { isMapServiceAvailable } from '../externals/map-service-provider';
 
 function useMapService() {
     const [loadingMapServiceStatus,setLoadingMapServiceStatus] = useState(false);

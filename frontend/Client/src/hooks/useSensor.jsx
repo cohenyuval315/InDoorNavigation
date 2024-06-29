@@ -8,8 +8,8 @@ import {
     getSensorInformation,
     setUpdateInterval
 
- } from '../services/sensors';
-import { SensorKey, sensorKeys } from '../services/sensors/SensorKey';
+ } from '../sensors';
+import { SensorKey, sensorKeys } from '../sensors/SensorKey';
  
 // gyroscope,
 // accelerometer,

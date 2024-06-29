@@ -7,10 +7,11 @@ import BuildingMap from "../components/BuildingMap";
 import LoadingModal from "../../../components/modals/loading";
 import RouteSVG from "../components/PathSVG";
 import MapOverlay from "../../../layouts/map-overlay";
-import { fetchNavigationPath, resetPaths, selectNavigationDestinationPOI, selectNavigationError, selectNavigationPathDistance, selectNavigationPathTimeLength, selectNavigationPaths, selectNavigationPathsSVGs, selectNavigationStatus, setDestinationPOI } from "../../../app/navigation/navigation-slice";
+import { fetchNavigationPath, resetPaths, selectNavigationDestinationPOI, selectNavigationError, selectNavigationPathDistance, selectNavigationPathTimeLength, selectNavigationPaths, selectNavigationPathsSVGs, selectNavigationStatus, selectUserAccessibility, selectUserPosition, setDestinationPOI } from "../../../app/navigation/navigation-slice";
 import Status from "../../../app/status";
 import DropDownPicker from "react-native-dropdown-picker";
 import NavigationPathsSVGs from "./components/navigation-paths-svgs/NavigationPathsSVGs";
+import client from "../../../server/api-client";
 
 
 const getSecondsTimeLengthString = (seconds) => {
@@ -58,16 +59,15 @@ const BuildingPreNavigationScreen = (props) => {
     const minFloor = useSelector(selectMinFloor);
     const numFloors = useSelector(selectNumberOfFloors);
     const [floorIndex,setFloorIndex] = useState(0);
+    const userPosition = useSelector(selectUserPosition);
+    const accessibility = useSelector(selectUserAccessibility)
 
-    const currentLocation = {
-        x:0,
-        y:0,
-        floor:0
-    }
-    const accessability = {
-        stairs:true,
-    }
-
+    useEffect(() => {
+        if(userPosition){
+            console.log("pp",userPosition)
+            setFloorIndex(userPosition.floor)
+        }
+    },[userPosition])
 
 
     const numberOfFloors = useSelector(selectNumberOfFloors);
@@ -123,13 +123,18 @@ const BuildingPreNavigationScreen = (props) => {
     }
     // }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const buildingId = building.id;
+        if (!userPosition){
+            // await client.getUserInitialWifiLocation();
+        }
         dispatch(fetchNavigationPath({
             buildingId,
             destinationPOI,
-            currentLocation,
-            accessability}))
+            userPosition,
+            accessibility
+        }))
+
     }, []); 
 
     useEffect(() => {
@@ -213,6 +218,8 @@ const BuildingPreNavigationScreen = (props) => {
             <BuildingMap
                 // centerOn={centerOn}
                 containerRef={containerRef}
+                containerRotationRef={rotationRef}
+             
                 // opacitiesRef={opacitiesRef}
                 // rotationRef={rotationRef}
                 // rotateChildren={true}

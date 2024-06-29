@@ -1,42 +1,50 @@
-# services:
+services:
+  backend:
+    container_name: indoor-express
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile.dev
+    environment:
+     - MONGODB_URI=mongodb://mongo:27017/test
+    ports:
+      - "8080:8080"    
+      - "3000:3000"    
+      - "8000:8000"    
+    depends_on:
+      - mongo
+      - localstack
 
+  mongo:
+    container_name: indoor-db
+    image: mongo
+    ports:
+      - "27017:27017"
+  
+    volumes:
+      - mongodbdata:/data/db
+    environment:
+      - MONGO_LOG=0  
+      # - MONGO_INITDB_ROOT_USERNAME=root
+      # - MONGO_INITDB_ROOT_PASSWORD=test
+    command: mongod --quiet --logpath /dev/null 
 
-  # backend:
-#   #   build: .
-#   #   ports:
-#   #    - "8080:8080"
-#   #   environment:
-#   #    - MONGODB_URI=mongodb://mongo:27017/test
-#   #   links:
-#   #    - mongo
-#   #   depends_on:
-#   #    - mongo
+      
+  localstack:
+    container_name: indoor-storage
+    image: localstack/localstack
 
-#   mongo:
-#     container_name: mongodb
-#     image: mongo
-#     ports:
-#       - "27017:27017"
-#     volumes:
-#       - mongodbdata:/data/db
+    environment:
+      - DEBUG=1
+      - LS_LOG=error #info  # override DEBUG
+      - SERVICES=s3,sqs
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+      - "4510-4559:4510-4559"  
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
-#   localstack:
-#     container_name: storage
-#     image: localstack/localstack
-#     ports:
-#       - "127.0.0.1:4566:4566"
-#       - "127.0.0.1:4510-4559:4510-4559"  
-#     environment:
-#       - DEBUG=1
-#       - GATEWAY_LISTEN=0.0.0.0:4566
-#       - LOCALSTACK_HOST=localhost.localstack.cloud:4566
-#       - LS_LOG=info  # override DEBUG
-#       - SERVICES=s3,ec2,apigateway
-#       - DOCKER_SOCK=/var/run/docker.sock
-#       - LOCALSTACK_VOLUME_DIR=./.localstack
-#     # volumes:
-#       # - "./.localstack:/var/lib/localstack"
-#       # - "/var/run/docker.sock:/var/run/docker.sock"
+volumes:
+  mongodbdata:
 
-# volumes:
-#   mongodbdata:

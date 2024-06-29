@@ -20,20 +20,20 @@ const userSVG = `
 
 
 const BuildingMapUserPositionOverlay = ({
-    userCoordinatesRef,
-    userRotationRef
+    userX,
+    userY,
+    userHeading
 }) => {
     
     if (
-        !userCoordinatesRef || 
-        !userRotationRef || 
-        !userCoordinatesRef.current || 
-        !userRotationRef.current
+        !userX || 
+        !userY || 
+        !userHeading
     ) {
         return null;
     }
 
-    const iconSize = 30;
+    const iconSize = 50;
 
     return (
         <MapOverlay>
@@ -43,18 +43,18 @@ const BuildingMapUserPositionOverlay = ({
             }}>
                 <Animated.View style={{
                     position:'absolute',
-                    top: userCoordinatesRef.current.y.interpolate({
+                    bottom: userY.interpolate({
                         inputRange: [0, 100],
                         outputRange: ['0%', '100%']
                     }),
-                    left: userCoordinatesRef.current.x.interpolate({
+                    left: userX.interpolate({
                         inputRange: [0, 100],
                         outputRange: ['0%', '100%']
                     }),  
                     transform: [
                         { translateX: -iconSize/2 },
                         { translateY: -iconSize/2 },
-                        { rotate: userRotationRef.current.interpolate({
+                        { rotate: userHeading.interpolate({
                             inputRange: [0, 360],
                             outputRange: ['0deg', '360deg'],
                             extrapolate: 'clamp',

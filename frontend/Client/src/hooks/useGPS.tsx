@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGPSContext } from '../contexts/GPSContext';
 import { GeolocationResponse } from '@react-native-community/geolocation';
-import { PositionError } from '../sensors/gps-service';
+import { PositionError } from '../services/GpsService';
 // import { getGlobalGeoCoordinatesByGPS,GPS } from '../sensors/gps-service';
 // import { setNumTriggers } from '../services/sensors';
 

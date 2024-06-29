@@ -11,7 +11,7 @@ import FloorSelection from "../components/floor-selection";
 import AdminBuildingMap from "../components/building-map/AdminBuildingMap";
 import AdminBuildingFloorMap from "../components/building-map/AdminBuildingFloorMap";
 import { generateUUID } from "../../../utils/uuid";
-import { CardinalDirection, Direction } from "../../../constants/constants";
+import { CardinalDirection, Direction } from "../../../constants/enums";
 import CategorySelection from "../components/category-selection";
 import PositionSelection from "../components/position-selection";
 import PositionOverlay from "../components/position-overlay";
@@ -30,7 +30,7 @@ import useRotation from "../../../hooks/useRotationVector";
 import useLinearAcceleration from "../../../hooks/_old/useLinearAcceleration";
 import useOrientation from "../../../hooks/_old/useOrientation";
 import useSensor from "../../../hooks/useSensor";
-import { SensorKey } from "../../../services/sensors/SensorKey";
+import { SensorKey } from "../../../sensors/SensorKey";
 import useGravitySensor from "../../../hooks/_old/useGravitySensor";
 import { SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import TestSwitch from "../components/test-switch";
@@ -42,12 +42,12 @@ import DeviceOrientationSelection from "../components/device-orientation-selecti
 import useMagnetometerSensor from "../../../hooks/_old/useMagnetometerSensor";
 import MapModal from "../../../components/map/modals/MapModal";
 import PointOverlay from "../components/point-overlay/PointOverlay";
-import SensorsService from "../../../sensors/sensors-service";
+import SensorsService from "../../../services/SensorsService";
 import { fetchProcessingMap, selectProcessingError, selectProcessingMap, selectProcessingStatus, uploadProcessingMap } from "../../../app/admin/admin-slice";
 import Status from "../../../app/status";
 import GeoLocalization from "../../../navigation/GeoLocalization";
-import { Geolocation, GeolocationService } from "../../../sensors/gps-service";
-import client from "../../../services/server/api-client";
+import { Geolocation, GeolocationService } from "../../../services/GpsService";
+import client from "../../../server/api-client";
 
 // magnetometerData
 // magnetometerUncalibData

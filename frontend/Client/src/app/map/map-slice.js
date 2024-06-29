@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import client from '../../services/server/api-client';
+import client from '../../server/api-client';
 import Status from '../status';
 import { normalizePOIsPoints } from "../../utils/map-data";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
@@ -9,11 +9,15 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../utils/scaling";
 export const fetchBuildingByMapId = createAsyncThunk(
   'map/fetchBuildingMapById', 
   async (buildingId,{rejectWithValue}) => {
-    const response = await client.getBuildingMap(buildingId)
-    if (response){
-      return response.data;
+    const response = await client.getBuildingMapData(buildingId)
+    if(response.ok){
+      const result = await response.json();
+      const data = result.data;
+      return data;
+    }else{
+      return rejectWithValue("not found")
     }
-    return rejectWithValue("not found")
+    
   },
 )
 
@@ -28,6 +32,7 @@ const mapInitialState = {
   dims:null,
   globalCoordinatesBoundary:null,
   floorAltitudes:null,
+  unitInMeters:null,
 }
 
 const mapSlice = createSlice({
@@ -66,6 +71,7 @@ const mapSlice = createSlice({
           state.status = Status.SUCCEEDED;       
           state.error = null;   
           state.floorAltitudes = buildingMapData.floorAltitudes;
+          state.unitInMeters = buildingMapData.unitInMeters;
         })
         .addCase(fetchBuildingByMapId.rejected, (state, action) => {
           state.data = null;
@@ -73,7 +79,8 @@ const mapSlice = createSlice({
           state.POIsMaps = null;
           state.floorAltitudes = null;
           state.status = Status.FAILED;
-          state.error = action.payload.error;
+          state.unitInMeters = null;
+          state.error = action.payload;
           
         })   
                        
@@ -94,6 +101,7 @@ const mapSlice = createSlice({
   export const selectPOIsMaps = state => state.map.POIsMaps;
   export const selectMapGlobalCoordinates = state => state.map.globalCoordinatesBoundary;
   export const selectFloorAltitudes = state => state.map.floorAltitudes;
+  export const selectUnitInMeters = state => state.map.unitInMeters;
   // export const selectPOIById = POIId => state => state.map.POIs.find(POI => POI.id === POIId);
   export const {} = mapSlice.actions;
   export default mapSlice.reducer;

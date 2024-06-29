@@ -1,6 +1,6 @@
 import { useNavigation,useNavigationState } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { start } from "../services/sensors/rnsensors";
+import { start } from "../sensors/rnsensors";
 
 
 const ScreenStreams = ({children}) => {

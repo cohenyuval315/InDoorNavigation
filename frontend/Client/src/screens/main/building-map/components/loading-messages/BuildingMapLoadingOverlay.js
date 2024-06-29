@@ -62,7 +62,7 @@ const BuildingMapLoadingOverlay = () => {
     return (
         <View style={{
             position: "absolute",
-            left: "3%",
+            left: "40%",
             bottom: "16%",
             flexDirection:"column-reverse"
         }}>

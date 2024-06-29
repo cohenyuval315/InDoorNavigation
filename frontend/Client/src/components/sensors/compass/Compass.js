@@ -9,7 +9,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import {sensors,setUpdateInterval} from '../../../services/sensors'
+import {sensors,setUpdateInterval} from '../../../sensors'
 setUpdateInterval("magnetometer", 1000);
 
 const Compass = () => {

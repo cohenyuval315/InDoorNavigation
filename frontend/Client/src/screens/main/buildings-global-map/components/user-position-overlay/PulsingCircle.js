@@ -41,6 +41,7 @@ const PulsingCircle = ({  }) => {
       <Animated.View
         style={{
             position:"absolute",
+            pointerEvents:"none",
             width: radius,
             height: radius,
             backgroundColor: color,

@@ -1,21 +1,21 @@
 import React,{ useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, Easing, StyleSheet, Text, View } from "react-native";
 import PulsingCircle from "./PulsingCircle";
 import UserMapAvatar from "./UserMapAvatar";
 import useGPS from "../../../../../hooks/useGPS";
 import {getRelativeCoordsByIsrael  } from "../../../../../static-maps/israel";
 import useLoadingMessages from "../../../../../hooks/useLoadingMessages";
 import MapOverlay from "../../../../../layouts/map-overlay";
-import { GeolocationService } from "../../../../../sensors/gps-service";
+import { GeolocationService } from "../../../../../services/GpsService";
 import { useFocusEffect } from "@react-navigation/native";
 
 
 const GlobalMapUserOverlay = () => {
     const {addLoadingMessage} = useLoadingMessages();
-    const userMapCoordinates = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-    const [isInitialPositionSet, setIsInitialPositionSet] = useState(false);
+    const [userMapCoordinates,setUserMapCoordinates] = useState(null);;
     const startMessageCallbackRef = useRef(null);
     const retryMessageCallbackRef = useRef(null);
+    const size = 10;
 
 
     const onPosition = (position) => {
@@ -24,24 +24,13 @@ const GlobalMapUserOverlay = () => {
         }
         const { latitude, longitude } = position.coords;
         const newCoordinates = getRelativeCoordsByIsrael({ latitude, longitude });        
-        console.log("UserCoords",newCoordinates)
         if (retryMessageCallbackRef.current){
             retryMessageCallbackRef.current()
         }
         if (startMessageCallbackRef.current){
             startMessageCallbackRef.current()
         }
-        if (!isInitialPositionSet) {
-            userMapCoordinates.setValue(newCoordinates);
-            setIsInitialPositionSet(true);
-          } else {
-            Animated.timing(userMapCoordinates, {
-              toValue: newCoordinates,
-              duration: 500, // Adjust duration as needed
-              easing: Easing.out(Easing.quad),
-              useNativeDriver: false, // Animated.ValueXY doesn't support native driver
-            }).start();
-          }
+        setUserMapCoordinates(newCoordinates)
 
     }
 
@@ -77,31 +66,31 @@ const GlobalMapUserOverlay = () => {
     );
 
 
-    if (!isInitialPositionSet) {
+    if (!userMapCoordinates) {
         return null;
     }
 
 
     return (
         <MapOverlay styles={{
-            
+            width:"100%",
         }}>
             <Animated.View style={{
                 position: "absolute",
+                
+
                 zIndex: 22,
-                top: userMapCoordinates.y.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: ['0%', '100%']
-                }),
-                left: userMapCoordinates.x.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: ['0%', '100%']
-                }),            
+                top: `${userMapCoordinates.y}%`,
+                left: `${userMapCoordinates.x}%`,
+                marginLeft: -size / 2,
+                marginTop: -size / 2,
+                
                 justifyContent: "center",
                 alignItems: "center",
             }}>
+                
                 <PulsingCircle/>
-                <UserMapAvatar />
+                <UserMapAvatar size={size} />
             </Animated.View>
         </MapOverlay>
     )

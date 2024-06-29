@@ -6,46 +6,61 @@ import MapOverlay from "../../../../../layouts/map-overlay";
 import { useNavigation } from "@react-navigation/native";
 
 const BuildingMapButtonsOverlay = ({
-    centerOnRef,
-    userCoordinatesRef,
-    userPositionRef,
-    mapContainerRef,
-    mapRotationRef,
+    isRotated,
+    toggleRotation,
+    onRotatePress,
+    isCentered,
+    isLocked,
+    onUserCenterPress,
+    onUserCenterLockPress
 }) => {
 
     const navigation = useNavigation();
+
     const onPathBuilderPress = () => {
         navigation.navigate('building-map-path-builder-modal');
     }
-    const onCenterOnUserPress = () => {
-        if(isInitUserPosition){
-            centerOnRef.current = {
-                x: 100,
-                y: 100,
-                scale: 1,
-                duration: 300,
+
+
+    const onCenterActionUserPress = () =>{
+        if(!isLocked){
+            if(isCentered){
+                onUserCenterLockPress();
+            }else{
+                onUserCenterPress();
+                
             }
         }
 
     }
 
-    const onLockOnUserPress = () => {
-
+    const onRotationActionUserPress = () => {
+        // toggleRotation() , later
+        onRotatePress()
     }
 
-    const onActionOnUserPress = () =>{
-        if(centerOnRef.current == null){
-            console.log("reached")
-            onCenterOnUserPress()
-        }else{
-            console.log("reached")
-            onLockOnUserPress();
-        }
-    }
 
     return (
         <MapOverlay>
+
             <TouchableOpacity 
+            onPress={onRotationActionUserPress}
+            style={{
+                position:"absolute",
+                top:"16%",
+                right:"1%",
+                padding:10,
+                borderRadius:30,
+                backgroundColor:'rgba(0, 0, 0, 0.9)',
+            }}>
+                <Text style={{
+                    color:"black"
+                }}>
+                    <MaterialCommunityIcons name="rotate-right" color={"lightgray"} size={30} />
+                </Text>
+            </TouchableOpacity>        
+
+            {/* <TouchableOpacity 
             onPress={onPathBuilderPress}
             style={{
                 position:"absolute",
@@ -53,31 +68,33 @@ const BuildingMapButtonsOverlay = ({
                 right:0,
                 padding:10,
                 borderRadius:30,
-                backgroundColor:"lightgray"
+                backgroundColor:'rgba(0, 0, 0, 0.5)',
             }}>
                 <Text style={{
                     color:"black"
                 }}>
                     <MaterialCommunityIcons name="map-marker-path" color={"black"} size={30} />
                 </Text>
-            </TouchableOpacity>        
+            </TouchableOpacity>     */}
+
+
             <TouchableOpacity 
-            onPress={onActionOnUserPress}
+            onPress={onCenterActionUserPress}
             style={{
                 position:"absolute",
                 left:"3%",
                 bottom:"15%",
                 padding:10,
                 borderRadius:50,
-                backgroundColor:"lightblue"                
+                backgroundColor:'rgba(0, 0, 0, 0.9)',            
             }}>
                 <Text style={{
                     color:"black"
                 }}>
-                    {centerOnRef.current == null ? (
-                        <MaterialCommunityIcons name="target" color={"black"} size={30} />
+                    {isCentered ? (
+                        <FoundationIcons name="target-two" color={isLocked ? "red": "lightgray"} size={30} />
                     ): (
-                        <FoundationIcons name="target-two" color={"black"} size={30} />
+                        <MaterialCommunityIcons name="target" color={"lightgray"} size={30} />
                     )}
                     
                     

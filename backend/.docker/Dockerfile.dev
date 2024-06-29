@@ -1,0 +1,36 @@
+FROM node:20.9.0 AS build
+
+USER node
+
+WORKDIR /home/node/app
+
+# Copy package.json and either yarn.lock or package-lock.json
+COPY --chown=node:node package.json ./
+
+COPY --chown=node:node yarn.lock package-lock.json* ./
+
+
+
+# Install dependencies based on the lock file that exists
+RUN if [ -f yarn.lock ]; then \
+      yarn install --frozen-lockfile; \
+    elif [ -f package-lock.json ]; then \
+      npm install --frozen-lockfile; \
+    else \
+      npm install; \
+    fi
+
+COPY --chown=node:node . .
+
+RUN yarn build
+
+RUN mkdir ./dist/seed
+
+COPY --chown=node:node ./src/seeding ./dist/seed
+
+CMD ["npm", "run", "dev"]
+
+
+
+
+

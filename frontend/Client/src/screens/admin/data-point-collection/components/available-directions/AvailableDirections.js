@@ -1,5 +1,5 @@
 import DropDownPicker from "react-native-dropdown-picker";
-import { Direction } from "../../../../../constants/constants";
+import { Direction } from "../../../../../constants/enums";
 import { useState } from "react";
 
 const AvailableDirections = ({val,onChange}) => {

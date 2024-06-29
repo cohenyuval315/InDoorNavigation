@@ -1,5 +1,5 @@
 import { createAsyncThunk,createSlice } from "@reduxjs/toolkit"
-import client from '../../services/server/api-client';
+import client from '../../server/api-client';
 import Status from './../status';
 import { useSelector } from "react-redux";
 

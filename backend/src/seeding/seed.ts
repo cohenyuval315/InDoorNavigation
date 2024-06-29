@@ -1,71 +1,75 @@
-import BuildingData from '../models/BuildingData'
-import { BuildingSeed } from './BuildingSeed'
-import afekaBuildingSeed from './afeka'
-import {
-    createBuildingData,
-    createBuildingMapData,
-    createBuildingGraphMapData,
-    createBuildingMagneticMapData,
-    createBuildingWifiMapData,
-    getBuildingData,
-    getBuildingMapData,
-    getBuildingGraphMapData,
-    getBuildingMagneticMapData,
-    getBuildingWifiMapData
-} from './../services/buildings-service';
-import { ObjectId } from "mongodb";
+import { BuildingSeed } from './BuildingSeed.js'
+import afekaBuildingSeed from './afeka/afeka.js'
 import fs from 'fs/promises';
 import path from 'path';
-import { calculateEdgesWeights } from '../utils/graph-utils';
-import { generateColorMap, generateGraphMaps } from '../utils/maps-generation';
-import { getEdgesWithIds } from '../utils/edges';
+import { createBuildingData } from '../domains/buildings/data/domain/buildingService.js';
+import { createBuildingMapData } from '../domains/buildings/map/domain/buildingMapService.js';
+import { createBuildingGraphMapData } from '../domains/buildings/graph/domain/buildingGraphService.js';
+import { createBuildingMagneticMapData } from '../domains/buildings/magnetic/domain/buildingMagneticService.js';
+import { createBuildingWifiMapData } from '../domains/buildings/wifi/domain/buildingWifiService.js';
+import { logger } from '@/lib/logger/logger.js';
+import { generateColorMap, generatePOIsMaps } from '@/common/utils/POI/map.js';
+import { calculatePOIsCenterPoint } from '@/common/utils/POI/normalize.js';
+import { MapFloor } from '@/common/interfaces/MapFloor.js';
+import { getMaxFloor, getMinFloor } from '@/common/utils/floor.js';
+import { calculateEdgesWeights, getEdgesWithIds } from '@/common/utils/utils.js';
+import { generateGraphMaps } from '@/common/utils/graph/graph-svg.js';
 
 let __dirname = path.dirname(new URL(import.meta.url).pathname);
-console.log('__dirname:', __dirname);
+logger.log('__dirname:', __dirname);
 
 const isWindows = process.platform === 'win32';
 if (isWindows && __dirname.startsWith('/')) {
   __dirname = __dirname.slice(1);
 }
 
-const baseBuildingAssetsPath = path.join(__dirname, '..','..','src','seeding')
-console.log('__path:',baseBuildingAssetsPath)
+const baseBuildingAssetsPath = path.join(__dirname, '..','seed')
+logger.info('__path:',baseBuildingAssetsPath)
+
+
 export async function seedBuilding(buildingSeed:BuildingSeed){
-    console.log(`seeding building with id {${buildingSeed.buildingId}}...`);
-    const {buildingTitle,buildingId,data,graph,magnetic,map,wifi,mapFloors} = buildingSeed;
+    logger.info(`seeding building with id {${buildingSeed.buildingId}}...`);
+    const {buildingTitle,buildingId,data,graph,magnetic,map,wifi} = buildingSeed;
     try {
-        
-        const floorMapsPromises = mapFloors.map(async (mapFloor) => {
-            const {floor,height,width,floorHeight} = mapFloor;
+        const mapFloors = map.data.mapFloors;
+
+        // normalize pois
+        const normalPois = calculatePOIsCenterPoint(map.data.POIs);
+        map.data.POIs = normalPois;
+
+        // svg colors 
+        const poisColorMap = generateColorMap(map.data.POIs,getMinFloor(mapFloors),getMaxFloor(mapFloors));
+        map.data.POIsColorMap = poisColorMap
+
+        // normalize edges and ids 
+        const {edges,nodes} = graph.data;
+        const filteredEdges = calculateEdgesWeights(nodes,edges,mapFloors);
+        const normaizedEdges = getEdgesWithIds(filteredEdges);
+        graph.data.edges = normaizedEdges;
+
+        // svg graph maps
+        graph.data.graphMaps = generateGraphMaps(poisColorMap, nodes,edges,mapFloors)
+
+        // svg poi maps
+        const poisMaps = generatePOIsMaps(poisColorMap,map.data.POIs,mapFloors);
+        map.data.POIsMaps = poisMaps;
+
+                
+        // svg map floor
+        const floorMapsPromises = map.data.mapFloors.map(async (mapFloor:MapFloor) => {
+            const floor = mapFloor.floor;
             const mapSvgPath = path.join(baseBuildingAssetsPath,buildingTitle, 'maps', `_${floor}.svg`);//.slice(3);
             const mapSvg = await fs.readFile(mapSvgPath,'utf-8')
             return {
-                map:mapSvg,
-                height,
-                width,
-                floor,
-                floorHeight
+                ...mapFloor,
+                map:mapSvg
             };
 
         })
         const mapFloorsData = await Promise.all(floorMapsPromises);
-        const poisColorMap = generateColorMap(map.data.POIs,map.data.minFloor,map.data.maxFloor);
         map.data.mapFloors = mapFloorsData;
-        map.data.POIsColorMap = poisColorMap
-        
-        const nodes = graph.data.nodes
-        const edges = graph.data.edges
-        const floorHeights = {}
 
-        mapFloors.forEach((f) => {
-            floorHeights[f.floor] = f.floorHeight;
-        })
-        
-        const filteredEdges = calculateEdgesWeights(nodes,edges,floorHeights);
-        const normaizedEdges = getEdgesWithIds(filteredEdges);
-        graph.data.edges = normaizedEdges;
-        graph.data.mapFloors = mapFloors;
-        graph.data.graphMaps = generateGraphMaps(poisColorMap, nodes,edges,mapFloors)
+
 
         await createBuildingData(buildingId,data.data,data.override);
         await createBuildingMapData(buildingId,map.data,map.override);
@@ -79,7 +83,7 @@ export async function seedBuilding(buildingSeed:BuildingSeed){
         // const wifiMap = await getBuildingWifiMapData(buildingId)
         
     }catch(error){
-        console.log(`error seeding building with id {${buildingSeed.buildingId}}... ${error.message}`);
+        logger.info(`error seeding building with id {${buildingSeed.buildingId}}... ${error.message}`);
     }
 
     
@@ -87,11 +91,11 @@ export async function seedBuilding(buildingSeed:BuildingSeed){
 
 export async function seedAllBuilding(){
     try{
-        console.log("seeding all buildings...")
+        logger.info("seeding all buildings...")
         await seedBuilding(afekaBuildingSeed)
     }catch(error) {
-        console.error("error in seeding buildings")
-        console.error(error)
+        logger.error("error in seeding buildings")
+        logger.error(error)
     }
 
 }

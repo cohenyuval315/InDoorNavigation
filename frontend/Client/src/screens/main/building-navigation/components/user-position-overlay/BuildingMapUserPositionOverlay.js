@@ -8,7 +8,7 @@ import { calculateBottomLeftOffset, calculateDisplayDimensions } from "../../../
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "../../../../../utils/scaling";
 
 import Status from "../../../../../app/status";
-import { UserIndoorPositionService } from "../../../../../position/user-indoor-position";
+import { UserIndoorPositionService } from "../../../../../services/UserIndoorPositionService";
 const userSVG = `
     <?xml version="1.0" encoding="utf-8"?>
     <!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->

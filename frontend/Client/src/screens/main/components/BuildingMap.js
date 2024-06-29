@@ -11,19 +11,18 @@ import BuildingMapFloorPOIsOverlay from "../building-map/components/POIs-overlay
 import BuildingMapGraphDataOverlay from "./building-map-graph";
 import BuildingMapFloorPOIsAreaOverlay from "../building-map/components/POIs-overlay/BuildingMapFloorPOIsAreaOverlay";
 
-const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children,useOpacities=false}) => {
+const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,containerRotationRef,opacitiesRef,onPanMove,onPOIPress,rotateChildren=false,imageProps={},children,useOpacities=false,minScale=1,cropWidthScale= 0.5,cropHeightScale=0.5}) => {
     const maps = useSelector(selectMap);
     const numberOfFloors = useSelector(selectNumberOfFloors);
     const minFloor = useSelector(selectMinFloor);
-
     return (
         <ImageZoom style={styles.container}
             ref={containerRef}
-            cropWidth={WINDOW_WIDTH * 0.5}
-            cropHeight={WINDOW_HEIGHT * 0.5}
+            cropWidth={WINDOW_WIDTH * cropWidthScale}
+            cropHeight={WINDOW_HEIGHT * cropHeightScale}
             imageWidth={maps[currentFloorIndex].width}
             imageHeight={maps[currentFloorIndex].height}
-            minScale={0.3}
+            minScale={minScale}
             centerOn={centerOn}
             useHardwareTextureAndroid
             useNativeDriver
@@ -32,7 +31,7 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
             onMove={onPanMove} 
             {...imageProps}                  
         >   
-            <RotatingLayout rotationRef={rotationRef}>
+            <RotatingLayout rotationRef={containerRotationRef}>
                 {Array.from({ length: numberOfFloors }, (_, index) => {
                     return (
                         <Animated.View 
@@ -43,15 +42,17 @@ const BuildingMap = ({currentFloorIndex,centerOn,containerRef,rotationRef,opacit
                                 display:useOpacities ? 1 : currentFloorIndex === index ? "flex" : "none",
                             },styles.floorMapContainer]} 
                             >
-                                <BuildingMapSVG
-                                    data={maps[index]}
-                                />
-                                <BuildingMapFloorPOIsOverlay 
-                                    floorIndex={maps[index].floor - minFloor}
-                                    rotationRef={rotationRef}
-                                    onPOIPress={onPOIPress}
-                                />
-                                <BuildingMapFloorPOIsAreaOverlay floorIndex={maps[index].floor - minFloor} />
+                                <RotatingLayout rotationRef={rotationRef}>
+                                    <BuildingMapSVG
+                                        data={maps[index]}
+                                    />
+                                    <BuildingMapFloorPOIsOverlay 
+                                        floorIndex={maps[index].floor - minFloor}
+                                        rotationRef={rotationRef}
+                                        onPOIPress={onPOIPress}
+                                    />
+                                    <BuildingMapFloorPOIsAreaOverlay floorIndex={maps[index].floor - minFloor} />
+                                </RotatingLayout>
                         </Animated.View>
                     )
                 }

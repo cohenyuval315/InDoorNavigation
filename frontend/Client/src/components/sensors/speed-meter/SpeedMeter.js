@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View,Animated as NativeAnimated } from 'react-native';
-import { sensors, setUpdateInterval } from '../../../services/sensors';
+import { sensors, setUpdateInterval } from '../../../sensors';
 import { Svg, Circle, Path } from 'react-native-svg';
 import { useAnimatedStyle,interpolate } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';

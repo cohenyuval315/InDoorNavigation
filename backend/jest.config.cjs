@@ -4,7 +4,7 @@ module.exports = {
     transform: {
       '^.+\\.js$': 'babel-jest',
     },
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node',"svg","png"],
     setupFiles: ["dotenv/config"],
   };
   

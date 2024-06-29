@@ -4,7 +4,7 @@ import BuildingCard from "../../components/_trash/building/BuildingCard";
 import { hideGlobalModal, showGlobalModal } from "../../layouts/global-modal/GlobalModal";
 import { generateUUID } from "../../utils/uuid";
 import BuildingRedirectPicker from "../../components/_trash/building/BuildingRedirectPicker";
-import { openMap } from "../../services/3rd-party/map-service-provider";
+import { openMap } from "../../externals/map-service-provider";
 
 const onMapDirectionPress = async (building) => {
     await openMap(building.details.address,building.details.city,building.details.zipCode);

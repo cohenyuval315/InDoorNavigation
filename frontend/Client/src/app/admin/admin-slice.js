@@ -1,28 +1,47 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import client from '../../services/server/api-client';
+import client from '../../server/api-client';
 import Status from '../status';
 
 export const fetchBuildingGraphById = createAsyncThunk(
   'admin/fetchBuildingGraphById', 
-  async (buildingId,_) => {
-    const response = await client.getBuildingGraphMap(buildingId)
-    return response.data
+  async (buildingId,{rejectWithValue}) => {
+    const response = await client.getBuildingGraphData(buildingId)
+    if(response.ok){
+      const result = await response.json()
+      const data = result.data;
+      return data;
+    }else{
+      return rejectWithValue("graph fail");
+    }
+    
   },
 )
 export const fetchAllProcessingRoutes = createAsyncThunk(
   'admin/fetchAllProcessingRoutes', 
-  async (buildingId,_) => {
+  async (buildingId,{rejectWithValue}) => {
     const response = await client.getAllBuildingProcessingRoutes(buildingId)
-    return response
+    if(response.ok){
+      const result = await response.json();
+      const data = result.data;
+      return data;
+    }else{
+      return rejectWithValue("rejected")
+    }
   },
 )
 
 export const fetchProcessingMap = createAsyncThunk(
   'admin/fetchProcessingMap', 
-  async (args,_) => {
+  async (args,{rejectWithValue}) => {
     const {buildingId,version} = args;
-    const response = await client.getBuildingProcessingMap(buildingId,version)
-    return response
+    const response = await client.getBuildingProcessingPoints(buildingId,version)
+    if(response.ok){
+      const result = await response.json();
+      const data= result.data;
+      return data
+    }else{
+      return rejectWithValue("not found")
+    }
   },
 )
 export const fetchProcessingRoute = createAsyncThunk(
@@ -38,7 +57,7 @@ export const uploadProcessingRoute = createAsyncThunk(
   'admin/uploadProcessingRoute', 
   async (args,_) => {
     const {buildingId,data} = args;
-    const response = await client.postBuildingProcessingRoute(buildingId,data)
+    const response = await client.createBuildingProcessingRoute(buildingId,data)
     return response
   },
 )
@@ -46,18 +65,19 @@ export const uploadProcessingMap = createAsyncThunk(
   'admin/uploadProcessingMap', 
   async (args,{rejectWithValue}) => {
     const {buildingId,data} = args;
-    const response = await client.postBuildingProcessingMap(buildingId,data)
+    const response = await client.createBuildingProcessingPoints(buildingId,data)
     if (response.ok){
-      const res = await client.getBuildingProcessingMap(buildingId,data['version'])
+      const res = await client.getBuildingProcessingPoints(buildingId,data['version'])
       if(res.ok){
-        const results = await response.json();
-        return results;
+        const result = await response.json();
+        const data= result.data;
+        return data
       }else{
-        rejectWithValue("failed to save this")
+        return rejectWithValue("not found")
       }
+    }else{
+      return rejectWithValue("failed to create")
     }
-    
-    return response
   },
 )
 
@@ -102,19 +122,19 @@ const adminSlice = createSlice({
           state.nodes = null;
           state.edges = null;
           state.status = Status.FAILED;
-          state.error = action.payload.error;
+          state.error = action.payload;
         })
         .addCase(fetchProcessingMap.rejected,(state,action) => {
           state.processingStatus = Status.FAILED
-          state.processingError = action.payload.error;
+          state.processingError = action.payload;
         })
         .addCase(fetchAllProcessingRoutes.rejected,(state,action) => {
           state.processingStatus = Status.FAILED
-          state.processingError = action.payload.error;
+          state.processingError = action.payload;
         }) 
         .addCase(fetchProcessingRoute.rejected,(state,action) => {
           state.processingStatus = Status.FAILED
-          state.processingError = action.payload.error;
+          state.processingError = action.payload;
         })  
 
         .addCase(fetchProcessingMap.pending,(state,action) => {

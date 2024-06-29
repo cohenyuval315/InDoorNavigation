@@ -3,20 +3,20 @@ import { TouchableOpacity, View,BackHandler, Text,AppState,Alert, Animated, Styl
 import { useDispatch, useSelector } from "react-redux";
 import { selectActiveBuilding, selectActivePath } from "../../../app/active/active-slice";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import WebsocketClient from "../../../services/server/ws-client";
+import WebsocketClient from "../../../server/ws-client";
 import BuildingMap from "../components/BuildingMap";
 import BuildingMapUserPositionOverlay from "./components/user-position-overlay/BuildingMapUserPositionOverlay";
 import NavigationPathSVG from "./components/navigation-path-svg/NavigationPathSVG";
 import { selectMinFloor, selectNumberOfFloors } from "../../../app/map/map-slice";
 import LiveDirectionsView from "./components/live-directions-view";
-import { WifiService } from "../../../sensors/wifi-service";
-import { Geolocation, GeolocationService } from "../../../sensors/gps-service";
-import { SensorKey } from "../../../services/sensors/SensorKey";
-import SensorsService from "../../../sensors/sensors-service";
+import { WifiService } from "../../../services/WifiService";
+import { Geolocation, GeolocationService } from "../../../services/GpsService";
+import { SensorKey } from "../../../sensors/SensorKey";
+import SensorsService from "../../../services/SensorsService";
 import { resetPaths, selectNavigationError, selectNavigationPathsSVGs, selectNavigationStatus, setDestinationPOI } from "../../../app/navigation/navigation-slice";
 import Status from "../../../app/status";
 import StopButton from "./components/stop-button";
-import { UserIndoorPositionService } from "../../../position/user-indoor-position";
+import { UserIndoorPositionService } from "../../../services/UserIndoorPositionService";
 import VolumeControlButton from "./components/volume-control-button";
 import Tts from 'react-native-tts';
 
@@ -226,50 +226,8 @@ const BuildingNavigationScreen = (props) => {
     },[navigationStatus])
 
     
-    useEffect(() => {
-        WifiService.getInstance().startStream();
-        const subscription = WifiService.getInstance().subscribeWifi({
-            next: () => {
 
-            },
-            error: (err) => {
-
-            },
-            complete: () => {
-
-            }
-        })
-        return () => {
-            subscription.unsubscribe()
-        }
-    }, [])
-
-
-    useEffect(() => {
-        GeolocationService.getInstance().startStream({
-            distanceFilter:0,
-            enableHighAccuracy:true,
-            timeout:3000,
-            maximumAge:0
-        });
-
-        const subscription = GeolocationService.getInstance().subscribeGeoLocation({
-            next: () => {
-
-            },
-
-            error: (err) => {
-
-            },
-            complete:() => {
-
-            }
-           
-        })
-        return () => {
-            subscription.unsubscribe()
-        }
-    }, [])
+ 
 
     const onSensorNext = (data,sensorKey) => {
 
@@ -281,59 +239,6 @@ const BuildingNavigationScreen = (props) => {
         
     }
 
-    useEffect(() => {
-        const setupService = async (sensorKey,interval) => {
-            const service = await SensorsService.getInstance().sensor(sensorKey)
-            service.configSensorInterval(interval);
-            service.startSensor();
-            const subscription = service.subscribe({
-                next:(data) => onSensorNext(data,sensorKey),
-                error:(err) => onSensorError(err,sensorKey),
-                complete:() => onSensorComplete(sensorKey)
-            })
-            return subscription;
-        }
-    
-        const acc = setupService(SensorKey.ACCELEROMETER,100);
-        const grav = setupService(SensorKey.GRAVITY,5000);
-        const gyr = setupService(SensorKey.GYROSCOPE,100);
-        const gyroUn = setupService(SensorKey.GYROSCOPEUNCALIBRATED,5000);
-        const lin = setupService(SensorKey.LINEARACCELERATION,5000);
-        const mag = setupService(SensorKey.MAGNETOMETER,100);
-        const magUn = setupService(SensorKey.MAGNETOMETERUNCALIBRATED,5000);
-        const rot = setupService(SensorKey.ROTATIONVECTOR,100);
-        const sd = setupService(SensorKey.STEPDETECTOR,100);
-        
-        return () => {
-            acc.then((s)=>{
-                s.unsubscribe()
-            })
-            grav.then((s)=>{
-                s.unsubscribe()
-            })
-            gyr.then((s)=>{
-                s.unsubscribe()
-            })
-            gyroUn.then((s)=>{
-                s.unsubscribe()
-            })
-            lin.then((s)=>{
-                s.unsubscribe()
-            })
-            mag.then((s)=>{
-                s.unsubscribe()
-            })
-            magUn.then((s)=>{
-                s.unsubscribe()
-            })
-            rot.then((s)=>{
-                s.unsubscribe()
-            })
-            sd.then((s)=>{
-                s.unsubscribe()
-            })
-        }
-    },[])
 
 
     const onBackgroundNavigationExit = () => {
@@ -474,8 +379,10 @@ const BuildingNavigationScreen = (props) => {
           
             websocketClient.connect(() => {
                 console.log('WebSocket connection opened');
+                onWebsocketConnection();
                 setIsWSLoading(false);
                 setIsWSConnected(true);
+                
             }, () => {
                 console.log('WebSocket connection closed');
                 setIsWSLoading(false);
@@ -495,7 +402,7 @@ const BuildingNavigationScreen = (props) => {
             };
         }, []);
 
-        const connectWebSocket = () => {
+        const onWebsocketConnection = () => {
  
         };
 

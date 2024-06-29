@@ -1,4 +1,4 @@
-import { BuildingType } from "../constants/constants";
+import { BuildingType } from "../constants/enums";
 import { getIsraelPointByGlobalCoordinates, getRelativeCoordsByIsrael } from "../static-maps/israel";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from "./scaling";
 import { isOpen, stringifySchedule } from "./schedule-formatter";
