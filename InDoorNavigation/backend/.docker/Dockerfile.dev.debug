@@ -1,0 +1,6 @@
+FROM indoor_dependencies:latest
+
+USER node
+
+WORKDIR /home/node/app
+

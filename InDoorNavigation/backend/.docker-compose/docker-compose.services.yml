@@ -1,0 +1,92 @@
+services: 
+  mongo:
+    container_name: indoor_database
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodbdata:/data/db
+    environment:
+      - MONGO_LOG=0
+    command: mongod --quiet --logpath /dev/null
+
+  localstack:
+    container_name: indoor_storage
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+      - "4510-4559:4510-4559"
+    volumes:
+      - "../.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  # redis:
+  #   container_name: redis
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+  #   environment:
+  #     - REDIS_PASSWORD=admin
+  #   volumes:
+  #     - redisdata:/data
+  #     - ../config/redis.conf:/usr/local/etc/redis/redis.conf
+  #   command: redis-server /usr/local/etc/redis/redis.conf
+
+  # prometheus:
+  #   container_name: prometheus
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ../config/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ../config/grafana.ini:/etc/grafana/grafana.ini
+  #   command: grafana-server -config /etc/grafana/grafana.ini
+
+  # elasticsearch:
+  #   container_name: elasticsearch
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
+  #   environment:
+  #     - node.name=es01
+  #     - cluster.name=elasticsearch-cluster
+  #     - discovery.type=single-node
+  #     - ES_JAVA_OPTS=-Xmx512m -Xms512m
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - elasticsearchdata:/usr/share/elasticsearch/data
+
+  # logstash:
+  #   container_name: logstash
+  #   image: docker.elastic.co/logstash/logstash:8.5.3
+  #   ports:
+  #     - "5044:5044"
+  #   volumes:
+  #     - ../config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #   depends_on:
+  #     - elasticsearch
+
+  # kibana:
+  #   container_name: kibana
+  #   image: docker.elastic.co/kibana/kibana:8.5.3
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
+
+volumes:
+  mongodbdata:
+  redisdata:
+  grafana-data:
+  elasticsearchdata:
+
+

@@ -1,0 +1,11 @@
+FROM indoor_client:latest
+
+
+USER docker
+
+
+WORKDIR /home/docker/app
+
+CMD ["sleep", "infinity"]
+
+

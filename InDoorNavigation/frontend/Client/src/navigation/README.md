@@ -1,0 +1,1 @@
+folder for screens navigation of the applciation

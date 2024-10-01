@@ -1,0 +1,37 @@
+FROM android_base_image:latest
+
+ARG NODE_VERSION=18
+
+# Install Node.js and Yarn
+RUN curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o n \
+    && bash n $NODE_VERSION \
+    && rm n \
+    && npm install -g n \
+    && npm install -g yarn
+
+
+RUN npm install -g react-native-cli
+
+
+RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+
+USER docker
+
+WORKDIR /home/docker
+
+RUN chown -R docker:docker /home/docker
+
+RUN chmod -R 755 /home/docker
+
+RUN mkdir /home/docker/app
+
+RUN chown -R docker:docker /home/docker/app
+
+RUN chmod -R 755 /home/docker/app
+
+# Expose the port for Metro Bundler
+EXPOSE 8081
+EXPOSE 5554 5555
+
+# Entry point
+ENTRYPOINT ["/bin/bash"]

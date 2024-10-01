@@ -1,0 +1,1 @@
+docker build -t android_base_image:latest -f ./.docker/Dockerfile.android .

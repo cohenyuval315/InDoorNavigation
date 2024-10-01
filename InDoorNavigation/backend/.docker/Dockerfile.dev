@@ -1,0 +1,24 @@
+FROM indoor_dependencies:latest
+
+USER node
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node . .
+
+RUN yarn build
+
+RUN mkdir ./dist/seed
+
+RUN mkdir ./dist/data
+
+COPY --chown=node:node ../src/seeding ./dist/seed
+
+COPY --chown=node:node ../src/data ./dist/data
+
+
+
+
+
+
+

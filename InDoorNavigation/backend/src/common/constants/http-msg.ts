@@ -1,0 +1,75 @@
+import HttpCode from "./http-codes.js";
+
+const CommonErrors: { [key: number]: string } = {
+    // Informational responses (100–199)
+    [HttpCode.Continue]: "Continue",
+    [HttpCode.SwitchingProtocols]: "Switching Protocols",
+    [HttpCode.Processing]: "Processing",
+    [HttpCode.EarlyHints]: "Early Hints",
+
+    // Successful responses (200–299)
+    [HttpCode.OK]: "OK",
+    [HttpCode.Created]: "Created",
+    [HttpCode.Accepted]: "Accepted",
+    [HttpCode.NonAuthoritativeInformation]: "Non-Authoritative Information",
+    [HttpCode.NoContent]: "No Content",
+    [HttpCode.ResetContent]: "Reset Content",
+    [HttpCode.PartialContent]: "Partial Content",
+    [HttpCode.MultiStatus]: "Multi-Status",
+    [HttpCode.AlreadyReported]: "Already Reported",
+    [HttpCode.IMUsed]: "IM Used",
+
+    // Redirection messages (300–399)
+    [HttpCode.MultipleChoices]: "Multiple Choices",
+    [HttpCode.MovedPermanently]: "Moved Permanently",
+    [HttpCode.Found]: "Found",
+    [HttpCode.SeeOther]: "See Other",
+    [HttpCode.NotModified]: "Not Modified",
+    [HttpCode.UseProxy]: "Use Proxy",
+    [HttpCode.SwitchProxy]: "Switch Proxy",
+    [HttpCode.TemporaryRedirect]: "Temporary Redirect",
+    [HttpCode.PermanentRedirect]: "Permanent Redirect",
+
+    // Client error responses (400–499)
+    [HttpCode.BadRequest]: "Bad Request",
+    [HttpCode.Unauthorized]: "Unauthorized",
+    [HttpCode.PaymentRequired]: "Payment Required",
+    [HttpCode.Forbidden]: "Forbidden",
+    [HttpCode.NotFound]: "Not Found",
+    [HttpCode.MethodNotAllowed]: "Method Not Allowed",
+    [HttpCode.NotAcceptable]: "Not Acceptable",
+    [HttpCode.ProxyAuthenticationRequired]: "Proxy Authentication Required",
+    [HttpCode.RequestTimeout]: "Request Timeout",
+    [HttpCode.Conflict]: "Conflict",
+    [HttpCode.Gone]: "Gone",
+    [HttpCode.LengthRequired]: "Length Required",
+    [HttpCode.PreconditionFailed]: "Precondition Failed",
+    [HttpCode.PayloadTooLarge]: "Payload Too Large",
+    [HttpCode.URITooLong]: "URI Too Long",
+    [HttpCode.UnsupportedMediaType]: "Unsupported Media Type",
+    [HttpCode.RangeNotSatisfiable]: "Range Not Satisfiable",
+    [HttpCode.ExpectationFailed]: "Expectation Failed",
+
+    [HttpCode.UnprocessableEntity]: "Unprocessable Entity",
+    [HttpCode.Locked]: "Locked",
+    [HttpCode.FailedDependency]: "Failed Dependency",
+    [HttpCode.TooEarly]: "Too Early",
+    [HttpCode.UpgradeRequired]: "Upgrade Required",
+    [HttpCode.PreconditionRequired]: "Precondition Required",
+    [HttpCode.TooManyRequests]: "Too Many Requests",
+    [HttpCode.RequestHeaderFieldsTooLarge]: "Request Header Fields Too Large",
+    [HttpCode.UnavailableForLegalReasons]: "Unavailable For Legal Reasons",
+
+    // Server error responses (500–599)
+    [HttpCode.InternalServerError]: "Internal Server Error",
+    [HttpCode.NotImplemented]: "Not Implemented",
+    [HttpCode.BadGateway]: "Bad Gateway",
+    [HttpCode.ServiceUnavailable]: "Service Unavailable",
+    [HttpCode.GatewayTimeout]: "Gateway Timeout",
+    [HttpCode.HTTPVersionNotSupported]: "HTTP Version Not Supported",
+    [HttpCode.VariantAlsoNegotiates]: "Variant Also Negotiates",
+    [HttpCode.InsufficientStorage]: "Insufficient Storage",
+    [HttpCode.LoopDetected]: "Loop Detected",
+    [HttpCode.NotExtended]: "Not Extended",
+    [HttpCode.NetworkAuthenticationRequired]: "Network Authentication Required",
+};

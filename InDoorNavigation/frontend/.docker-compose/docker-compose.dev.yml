@@ -1,0 +1,7 @@
+services:
+  emulator:
+    container_name: rnandroid
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile.emulator.test
+    command: sleep infinity

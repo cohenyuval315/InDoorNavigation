@@ -1,0 +1,3 @@
+import PathBuilderPathConfigurations from "./PathBuilderPathConfigurations";
+
+export default PathBuilderPathConfigurations

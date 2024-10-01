@@ -1,0 +1,1 @@
+docker build -t indoor_dependencies:latest -f ./.docker/Dockerfile.dependencies .

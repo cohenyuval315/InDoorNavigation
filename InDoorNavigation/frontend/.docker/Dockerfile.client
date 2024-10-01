@@ -1,0 +1,12 @@
+FROM rn_android_base:latest
+
+USER docker
+
+WORKDIR /home/docker/app
+
+COPY --chown=docker:docker ./Client .
+
+RUN yarn install
+
+
+

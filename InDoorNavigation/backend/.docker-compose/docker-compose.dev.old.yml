@@ -1,0 +1,54 @@
+services:
+  backend:
+    container_name: indoor_express
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile.dev
+    environment:
+     - MONGODB_URI=mongodb://mongo:27017/test
+    ports:
+      - "8080:8080"    
+      - "3000:3000"    
+      - "8000:8000"    
+    depends_on:
+      - mongo
+      - localstack
+    # volumes:
+    #    - ".:/home/node/app"
+    #    - "/home/node/app/node_modules"
+
+
+  mongo:
+    container_name: indoor_database
+    image: mongo
+    ports:
+      - "27017:27017"
+  
+    volumes:
+      - mongodbdata:/data/db
+    environment:
+      - MONGO_LOG=0  
+      # - MONGO_INITDB_ROOT_USERNAME=root
+      # - MONGO_INITDB_ROOT_PASSWORD=test
+    command: mongod --quiet --logpath /dev/null 
+
+      
+  localstack:
+    container_name: indoor_storage
+    image: localstack/localstack
+
+    environment:
+      - DEBUG=1
+      - LS_LOG=error #info  # override DEBUG
+      - SERVICES=s3,sqs
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+      - "4510-4559:4510-4559"  
+    volumes:
+      - "../.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+volumes:
+  mongodbdata:
+

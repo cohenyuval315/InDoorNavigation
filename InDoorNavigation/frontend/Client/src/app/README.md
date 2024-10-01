@@ -1,0 +1,1 @@
+folder 'app' is a convention for react redux toolkit folder 
